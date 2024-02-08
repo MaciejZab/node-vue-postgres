@@ -5,20 +5,20 @@ FROM node:18
 WORKDIR /usr/src/app
 
 # Copy files as a non-root user.
-RUN chown node:node ./
+RUN chown node:node /usr/src/app
 USER node
 
 # Production mode
 ENV NODE_ENV production
 
 # Copy package.json and package-lock.json to install dependencies
-COPY ./Node/package*.json ./
+COPY /Node/package*.json /usr/src/app
 
 # Install dependencies
 RUN npm ci && npm cache clean --force
 
 # Copy the rest of the application code
-COPY ./Node .
+COPY /Node /usr/src/app
 
 # Execute NodeJS (not NPM script) to handle SIGTERM and SIGINT signals.
 CMD ["node", "./src/index.js"]
