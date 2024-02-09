@@ -14,13 +14,13 @@ USER node
 ENV NODE_ENV production
 
 # Copy package.json and package-lock.json to install dependencies
-COPY /Vue/package*.json .
+COPY ./../Vue/package*.json .
 
 # Install dependencies
 RUN npm ci && npm cache clean --force
 
 # Copy the rest of the application code
-COPY /Vue .
+COPY ./../Vue .
 
 # Build the Vue.js application
 RUN npm run build
