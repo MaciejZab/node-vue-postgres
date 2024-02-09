@@ -15,9 +15,6 @@ COPY ../../Node/package*.json ./
 # Install dependencies
 RUN npm ci && npm cache clean --force
 
-# Copy the rest of the application code
-COPY ../../Node ./
-
 # Execute NodeJS (not NPM script) to handle SIGTERM and SIGINT signals.
 CMD ["node", "./src/index.js"]
 

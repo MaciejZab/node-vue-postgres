@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { defineEmits } from "vue";
-
-//
 const emits = defineEmits(["toggle-drawer"]);
 
 const toggleDrawer = () => emits("toggle-drawer");

@@ -2,9 +2,7 @@ version: "3.8"
 
 services:
   node:
-    build:
-      context: ./../Docker/Dockerfiles/Backend
-      dockerfile: Dockerfile
+    image: node:18
     ports:
       - 3000:3000
     restart: always
@@ -12,20 +10,18 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-      - ./../Node:/usr/src/app
+      - ./node/dist:/usr/src/app
     depends_on:
       - postgres
 
   vue:
-    build:
-      context: ./../Docker/Dockerfiles/Frontend
-      dockerfile: Dockerfile
+    image: nginx:1.25
     ports:
       - 80:80
       - 443:443
     restart: always
     volumes:
-      - ./../Vue:/usr/src/app
+      - ./vue/dist:/usr/share/nginx/html
     depends_on:
       - node
 
