@@ -31,49 +31,33 @@ Reconext Intranet leverages a unified technological ecosystem, seamlessly integr
 
     3. Install Dependencies:
 
-        Run the following commands in both the /vue and /node directories to install project dependencies:
+        Run the following command in both the /vue and /node directories to install project dependencies:
 
         - npm install
 
     4. Build Vue.js and Node.js Applications:
 
-        After installing dependencies, build the Vue.js frontend and Node.js backend by running:
+        After installing dependencies, build the Vue.js frontend and Node.js backend by running following command in both the /vue and /node directories:
 
         - npm run build
 
 #### Run Docker Containers
 
-    1. Build Docker Containers:
-
-        From the root directory of the project, build Docker containers using:
-
-        - docker-compose build
-
-    2. Start Docker Containers:
-
-        Once the containers are built, start the Docker containers in detached mode (background) by running:
+    1. Start the Docker containers in detached mode (background) by running:
 
         - docker-compose up -d
 
-    Following these steps will properly set up and deploy the Reconext Intranet application on your server environment. Adjust settings and configurations as needed for your specific use case.
-
 ### Development
 
-    To facilitate seamless development, the local host volumes /vue/dist and /node/dist are connected with the corresponding containers. However, to reflect changes made during development, developers need to rebuild the /node and /vue applications.
+    To facilitate seamless development, the local host volumes /vue/dist and /node/dist are connected with the corresponding containers. However, to finally reflect changes made during development, developers need to rebuild the /node and /vue applications.
 
-    1. Make Changes:
+    1. Modify the source code within the /node and /vue directories to implement desired changes.
 
-        Modify the source code within the /node and /vue directories to implement desired changes.
-
-        Build Node.js and Vue.js Applications:
+    2. Rebuild the Node.js backend and Vue.js frontend applications running the following command in both the /vue and /node directories:
 
         - npm run build
 
-    2. After making changes, rebuild the Node.js backend and Vue.js frontend applications using:
-
-        - npm run build
-
-        Optionally run the following command in /vue to see changes immediately without the need to rebuild the application on every change manually:
+        Optionally run the following command to see changes immediately without the need to rebuild the application on every change manually (development port will appear in terminal):
 
         - npm run dev
 
