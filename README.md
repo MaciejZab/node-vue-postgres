@@ -25,9 +25,9 @@ Reconext Intranet leverages a unified technological ecosystem, seamlessly integr
 
         - git clone https://github.com/MaciejZab/node-vue-postgres.git
 
-    2. Adjust Settings in .env File:
+    2. Adjust Settings with toAdjust.env file:
 
-        Navigate to the project directory and configure settings in the .env file according to your environment requirements.
+        Navigate to the project directory and rename 'toAdjust.env' file to '.env', then configure settings according to your requirements.
 
     3. Install Dependencies:
 
