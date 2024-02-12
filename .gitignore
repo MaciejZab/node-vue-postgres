@@ -1,5 +1,9 @@
 /.env
+
 /vue/dist
 /vue/node_modules
+/vue/package-lock.json
+
 /node/dist
 /node/node_modules
+/node/package-lock.json

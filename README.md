@@ -43,22 +43,32 @@ Reconext Intranet leverages a unified technological ecosystem, seamlessly integr
 
 #### Run Docker Containers
 
-    1. Start the Docker containers in detached mode (background) by running:
+    1. Build the Docker containers by running:
+
+        - docker-compose build
+
+    2. Start the Docker containers in detached mode (background) by running:
 
         - docker-compose up -d
 
+    Or simply:
+
+        - docker-compose up -d --build
+
 ### Development
 
-    To facilitate seamless development, the local host volumes /vue/dist and /node/dist are connected with the corresponding containers. However, to finally reflect changes made during development, developers need to rebuild the /node and /vue applications.
+    To facilitate seamless development, it's important to note that Vue and Node applications behave differently in terms of reloading changes during development.
 
-    1. Modify the source code within the /node and /vue directories to implement desired changes.
+    1. Modify the source code within the /node and/or /vue directories to implement desired changes.
 
-    2. Rebuild the Node.js backend and Vue.js frontend applications running the following command in both the /vue and /node directories:
+    2. Rebuilding the Node and/or Vue applications involves compiling the source code into JavaScript. To achieve this, run the following command in the /vue and/or /node directory:
 
         - npm run build
 
-        Optionally run the following command to see changes immediately without the need to rebuild the application on every change manually (development port will appear in terminal):
+    3. At this point, changes made to the Vue application are reflected in the browser.
 
-        - npm run dev
+    4. Unlike the Vue application, the Node application requires one additional step. To reflect modifications in the Node application, it's necessary to rebuild the container for this service. To achieve this, navigate to the root directory and run the following command:
 
-    Once the applications are rebuilt, the changes will automatically be reflected in the connected containers due to the volume mapping with /vue/dist and /node/dist.
+        - docker-compose up -d --build node
+
+    Once the Node service is rebuilt, the changes will be reflected.
