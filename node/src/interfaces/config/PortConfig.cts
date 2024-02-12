@@ -1,4 +1,3 @@
-// PortConfig.ts
 interface PortConfig {
   port: number;
 }
