@@ -13,6 +13,7 @@ const routes = [
     meta: {
       read: false,
       write: false,
+      control: false,
     },
   },
   {
@@ -27,6 +28,7 @@ const routes = [
         meta: {
           read: true,
           write: false,
+          control: false,
         },
       },
       {
@@ -36,6 +38,7 @@ const routes = [
         meta: {
           read: true,
           write: false,
+          control: false,
         },
       },
     ],

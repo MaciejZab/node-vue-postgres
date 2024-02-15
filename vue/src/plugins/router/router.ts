@@ -15,6 +15,7 @@ router.beforeEach((to, _from, next) => {
   const meta = {
     read: to.meta.read as boolean,
     write: to.meta.write as boolean,
+    control: to.meta.control as boolean,
   };
 
   // Compare user and route permissions
