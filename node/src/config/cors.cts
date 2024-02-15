@@ -1,22 +1,20 @@
 import { serverConfig } from "./server.cjs";
-import * as dotenv from "dotenv";
 
-dotenv.config({ path: "../../../.env" });
-
-const whitelist: Array<string> = [process.env.DOMAIN];
-
-const corsConfig: unknown = {
-  origin: (origin, callback) => {
-    if (whitelist.includes(origin)) callback(null, true);
-    else {
-      const queryParams: URLSearchParams = new URLSearchParams(origin);
-      const apiKey: string = queryParams.get("apiKey");
-
-      if (apiKey && apiKey === serverConfig.apiKey) callback(null, true);
-      else if (apiKey) callback(new Error("Not allowed by CORS, invalid apiKey"));
-      else if (!apiKey) callback(new Error("Not allowed by CORS, api key is required to access API from your origin"));
-    }
-  },
+const whitelist: Array<string> = [serverConfig.origin];
+const corsOptions = {
+  origin: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  // allowedHeaders: ["Content-Type"],
+  // exposedHeaders: ["X-Custom-Header"],
+  // credentials: true,
+  // maxAge: 600,
 };
 
-export { corsConfig };
+const corsOptionsDelegate = (req, callback) => {
+  const requestApiKey: string = req.query["api-key"];
+  if (requestApiKey && requestApiKey === serverConfig.apiKey) callback(null, corsOptions);
+  else if (whitelist.includes(req.headers.origin)) callback(null, corsOptions);
+  else callback(new Error("Not allowed by CORS, provide 'api-key' in request query."));
+};
+
+export { corsOptionsDelegate };

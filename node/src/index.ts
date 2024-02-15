@@ -1,18 +1,20 @@
 import express from "express";
+import cors from "cors";
 // import pg from "pg";
-// import cors from "cors";
 
-// import { corsConfig } from "./config/cors.cjs";
-// import { serverConfig } from "./config/server.cjs";
+import { corsOptionsDelegate } from "./config/cors.cjs";
+import { serverConfig } from "./config/server.cjs";
 // import { databaseConfig } from "./config/db.cjs";
 
 const app = express();
 
+app.use(cors(corsOptionsDelegate));
+
 app.get("/", (req, res) => {
-  res.send("Hello, world!!!"); // Simple text response
+  res.send(`Hello, world!!!`); // Simple text response
+});
+app.post("/", (req, res) => {
+  res.send(`Hello, world!!!`); // Simple text response
 });
 
-// app.use(cors(corsConfig));
-
-// app.listen(serverConfig.port);
-app.listen(3000, () => console.log("Server is up and running"));
+app.listen(serverConfig.port);

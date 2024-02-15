@@ -2,12 +2,14 @@ FROM node:18
 
 WORKDIR /usr/src/app
 
-COPY ./package*.json ./
+COPY ./node/package*.json ./
 
 RUN npm install
 
 RUN mkdir dist
 
-COPY ./dist ./dist
+COPY ./node/dist ./dist
+
+COPY ./.env ./
 
 CMD ["node", "./dist/index.js"]

@@ -3,8 +3,8 @@ version: "3.8"
 services:
   node:
     build:
-      context: ./node
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: /node/Dockerfile
     container_name: node
     ports:
       - ${NODE_PORT}:${NODE_PORT}

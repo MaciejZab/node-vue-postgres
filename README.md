@@ -5,70 +5,75 @@ Reconext Intranet leverages a unified technological ecosystem, seamlessly integr
 ## Table of Contents
 
 - [Installation](#installation)
+  - [Server Requirements](#server-requirements)
+  - [Pre-run Steps](#pre-run-steps)
+  - [Run Docker Containers](#run-docker-containers)
 - [Development](#development)
+- [API](#api)
 
-### Installation
+## Installation
 
-#### Server requirements
+### Server Requirements
 
-    1. Ensure that your server meets the following requirements:
+1. **Ensure that your server meets the following requirements:**
+   - Docker Engine with Docker Compose or Docker Desktop installed: Docker provides containerization for seamless deployment.
+   - Git installed: Git is necessary for cloning the project repository.
+   - Node.js installed: Node.js is required for running the project's backend and frontend.
 
-        - Docker Engine with Docker Compose or Docker Desktop installed: Docker provides containerization for seamless deployment.
+### Pre-run Steps
 
-        - Git installed: Git is necessary for cloning the project repository.
+1. Clone the project repository by running the following command in your desired server directory:
 
-        - Node.js installed: Node.js is required for running the project's backend and frontend.
+   ```bash
+   git clone https://github.com/MaciejZab/node-vue-postgres.git
+   ```
 
-#### Pre-run Steps
+2. Navigate to the project directory and rename 'toAdjust.env' file to '.env', then configure settings according to your requirements.
 
-    1. Clone the project repository by running the following command in your desired server directory:
+3. Install Dependencies: Run the following command in both the `/vue` and `/node` directories to install project dependencies:
 
-        - git clone https://github.com/MaciejZab/node-vue-postgres.git
+   ```bash
+   npm install
+   ```
 
-    2. Adjust Settings with toAdjust.env file:
+4. After installing dependencies, build the Vue.js frontend and Node.js backend by running the following command in both the `/vue` and `/node` directories:
 
-        Navigate to the project directory and rename 'toAdjust.env' file to '.env', then configure settings according to your requirements.
+   ```bash
+   npm run build
+   ```
 
-    3. Install Dependencies:
+### Run Docker Containers
 
-        Run the following command in both the /vue and /node directories to install project dependencies:
+1. Build the Docker containers by running in the project's root directory:
 
-        - npm install
+   ```bash
+   docker-compose up -d --build
+   ```
 
-    4. Build Vue.js and Node.js Applications:
+## Development
 
-        After installing dependencies, build the Vue.js frontend and Node.js backend by running following command in both the /vue and /node directories:
+To facilitate seamless development, it's important to note that Vue and Node applications behave differently in terms of reloading changes during development.
 
-        - npm run build
+1. First modify the source code within the `/node` and/or `/vue` directory.
+2. Rebuild Node and/or Vue application source code into JavaScript by running the following command in the `/vue` and/or `/node` directory:
 
-#### Run Docker Containers
+   ```bash
+   npm run build
+   ```
 
-    1. Build the Docker containers by running:
+3. At this point, changes made to the Vue application are reflected in the browser.
 
-        - docker-compose build
+4. Unlike the Vue application, the Node application requires one additional step. To reflect modifications in the Node application, it's necessary to rebuild the container for this service. To achieve this, navigate to the root directory and run the following command:
 
-    2. Start the Docker containers in detached mode (background) by running:
+   ```bash
+   docker-compose up -d --build node
+   ```
 
-        - docker-compose up -d
+5. Once the Node service is rebuilt, changes are reflected.
 
-    Or simply:
+## API
 
-        - docker-compose up -d --build
+To access exposed endpoints, you need to include an API key in the query parameters of your request. Here's how you can use the API key query parameter:
 
-### Development
-
-    To facilitate seamless development, it's important to note that Vue and Node applications behave differently in terms of reloading changes during development.
-
-    1. Modify the source code within the /node and/or /vue directories to implement desired changes.
-
-    2. Rebuilding the Node and/or Vue applications involves compiling the source code into JavaScript. To achieve this, run the following command in the /vue and/or /node directory:
-
-        - npm run build
-
-    3. At this point, changes made to the Vue application are reflected in the browser.
-
-    4. Unlike the Vue application, the Node application requires one additional step. To reflect modifications in the Node application, it's necessary to rebuild the container for this service. To achieve this, navigate to the root directory and run the following command:
-
-        - docker-compose up -d --build node
-
-    Once the Node service is rebuilt, the changes will be reflected.
+- **Parameter Name:** `api-key`
+- **Example:** `http://your-domain.com/api/endpoint?api-key=your-api-key`

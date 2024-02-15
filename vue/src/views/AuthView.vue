@@ -19,10 +19,11 @@ const passwordRules = computed(() => [(value: string) => !!value || "Password is
 
 const submitForm = () => {
   // Define the API endpoint
-  const apiUrl = "/Controllers/LogUserStatus.php";
-  // Make the POST request using Axios
+  const reqUrl: string = "http://localhost:3000";
+  const reqData: Form = data.value;
+
   axios
-    .post(apiUrl, data.value)
+    .post(reqUrl, reqData)
     .then(function (response) {
       console.log(response);
     })
