@@ -1,15 +1,11 @@
-const getRole = async (req, res) => {
+const getRole = async (req: Request, res: Response) => {
   try {
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
+  } catch (err) {}
 };
 
-const authRole = async (req, res) => {
+const authRole = async (req: Request, res: Response) => {
   try {
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
+  } catch (err) {}
 };
 
 export { getRole, authRole };

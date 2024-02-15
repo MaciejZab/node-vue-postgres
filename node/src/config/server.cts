@@ -4,7 +4,7 @@ import { ServerConfig } from "../interfaces/config/ServerConfig.cjs";
 dotenv.config({ path: "./.env" });
 
 const serverConfig: ServerConfig = {
-  origin: process.env.DOMAIN,
+  origin: process.env.HOST,
   port: parseInt(process.env.NODE_PORT),
   apiKey: process.env.NODE_API_KEY,
 };
