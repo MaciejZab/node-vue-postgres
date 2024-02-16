@@ -77,3 +77,37 @@ To access exposed endpoints, you need to include an API key in the query paramet
 
 - **Parameter Name:** `api-key`
 - **Example:** `http://your-domain.com/api/endpoint?api-key=your-api-key`
+
+The API key serves as an authentication mechanism for authorized access. Securely store and manage it to prevent unauthorized use.
+
+## Database
+
+Choice: PostgreSQL
+
+- Robust, open-source relational database known for performance, reliability, and feature richness.
+- Excellent support for ACID transactions and data integrity.
+- Ideal for complex data models and high-volume applications.
+
+### Object-Relational Mapping (ORM): TypeORM
+
+- Simplifies database interactions by bridging the gap between object-oriented models and relational databases.
+- Reduces boilerplate code for CRUD operations and data transformations.
+- Offers convenient connection management and query building capabilities.
+
+### Migrations
+
+Migrations are a way to manage database schema changes over time. Their purpose is to keep track of changes to the database structure in a consistent and reversible manner.
+
+To **create a migration** run the following command within the `/node` directory:
+
+```bash
+   npm run typeorm migration:create ./src/orm/migrations/migrationName
+```
+
+After creating the migration file, change its extension to .cts.
+
+To **create/update database schema** run the following command within the `/node` directory:
+
+```bash
+   npm run typeorm migration:run -- -d ./src/config/orm/dataSource.cts
+```

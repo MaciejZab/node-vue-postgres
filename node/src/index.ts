@@ -1,12 +1,9 @@
 import express from "express";
 import cors from "cors";
-// import pg from "pg";
-
+import "reflect-metadata";
 import { corsOptionsDelegate } from "./config/cors.cjs";
 import { serverConfig } from "./config/server.cjs";
 import { roleRoutes } from "./routes/roleRoutes.cjs";
-// import { databaseConfig } from "./config/db.cjs";
-
 import { myDataSource } from "./config/orm/dataSource.cjs";
 
 // establish database connection
