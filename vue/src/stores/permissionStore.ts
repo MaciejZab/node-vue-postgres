@@ -14,10 +14,12 @@ export const usePermissionStore = defineStore("auth", () => {
     control: false,
   });
 
-  const check = (routePermission: Permission): boolean => {
-    if (permission.value.read !== routePermission.read) return false;
-    if (permission.value.write !== routePermission.write) return false;
-    if (permission.value.control !== routePermission.control) return false;
+  const check = (permission: Permission): boolean => {
+    const requiredPermissions = Object.entries(permission).filter(([_, value]) => value === true);
+
+    for (const [key, _] of requiredPermissions) {
+      if (!(permission as any)[key]) return false;
+    }
 
     return true;
   };

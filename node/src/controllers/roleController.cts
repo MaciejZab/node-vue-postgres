@@ -32,9 +32,9 @@ const authRole = async (req: Request, res: Response) => {
       .getOne();
 
     if (role) {
-      res.json(role); // Send role data if authorized
+      res.status(200).json(role);
     } else {
-      res.json(false); // Send false if authorization fails
+      res.status(401).json({ message: "Invalid username or password." });
     }
   } catch (err) {
     console.error(err);

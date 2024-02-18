@@ -1,41 +1,107 @@
 <script setup lang="ts">
+import { VForm } from "vuetify/lib/components/VForm/index.mjs";
 import { ref, computed } from "vue";
 import axios from "axios";
+import { usePermissionStore } from "../stores/permissionStore";
+import { useRouter } from "vue-router";
 
-interface Form {
+// Router
+const router = useRouter();
+
+// Permissions
+const permissions = usePermissionStore();
+
+// Form reference
+const login = ref<typeof VForm | null>(null);
+
+// Form data
+interface LoginData {
   username: string;
   password: string;
 }
 
-const data = ref<Form>({
+const data = ref<LoginData>({
   username: "",
   password: "",
 });
 
-// Validation rules
-const nameRules = computed(() => [(value: string) => !!value || "User name is required."]);
+// Response error
+interface LoginError {
+  title: string;
+  text: string;
+}
 
+const loginError = ref<LoginError | null>(null);
+
+// Form Validation
+const validation = ref<boolean>(false);
+const nameRules = computed(() => [(value: string) => !!value || "User name is required."]);
 const passwordRules = computed(() => [(value: string) => !!value || "Password is required."]);
 
-const submitForm = () => {
-  // Define the API endpoint
-  const reqUrl: string = "http://172.21.240.1:3000/api/roles";
-  const reqData: Form = data.value;
+// Form Methods
+const loader = ref<boolean>(false);
 
-  axios
-    .post(reqUrl, reqData)
-    .then(function (response) {
-      console.log(response);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+const reset = (): Promise<boolean> => login.value?.reset();
+
+const loading = (bool: boolean): boolean => {
+  loader.value = bool;
+
+  return loader.value;
+};
+
+const submitLogin = (): void => {
+  if (validation.value) {
+    loginError.value = null;
+    loading(true);
+    const reqUrl: string = "http://172.21.240.1:3000/api/roles";
+    const reqData: LoginData = data.value;
+
+    axios
+      .post(reqUrl, reqData)
+      .then(function (response) {
+        permissions.change({
+          read: response.data.read,
+          write: response.data.write,
+          control: response.data.control,
+        });
+        router.push({ path: "/pages" });
+      })
+      .catch(function (error) {
+        loading(false);
+        reset();
+        switch (error.response.status) {
+          case 401:
+            loginError.value = {
+              title: error.response.statusText,
+              text: error.response.data.message,
+            };
+            break;
+          default:
+            break;
+        }
+      });
+  }
+};
+
+const proceed = (): void => {
+  loading(true);
+  permissions.change({
+    read: true,
+    write: false,
+    control: false,
+  });
+  router.push({ path: "/pages" });
 };
 </script>
 
 <template>
-  <v-sheet width="300" class="mx-auto pa-4" border>
-    <v-form class="d-flex flex-column" @submit.prevent="submitForm">
+  <v-sheet width="300" height="354" class="d-flex flex-column mx-auto" border>
+    <v-form
+      ref="login"
+      class="d-flex flex-column"
+      v-model="validation"
+      @submit.prevent="submitLogin"
+    >
       <v-text-field
         class="mb-2"
         v-model="data.username"
@@ -51,7 +117,24 @@ const submitForm = () => {
         type="password"
         required
       />
-      <v-btn type="submit" variant="text">Submit</v-btn>
+      <v-btn type="submit" variant="text">Login</v-btn>
     </v-form>
+    <v-alert
+      v-if="loginError"
+      type="error"
+      :text="`${loginError?.title}: ${loginError?.text}`"
+    ></v-alert>
+    <v-form ref="continue" class="d-flex flex-column" @submit.prevent="proceed">
+      <v-btn type="submit" variant="text">Continue without Login</v-btn>
+    </v-form>
+    <v-spacer v-if="!loginError"></v-spacer>
+    <v-progress-linear :active="loader" :indeterminate="loader" bottom></v-progress-linear>
   </v-sheet>
 </template>
+
+<style scoped lang="scss">
+@import "../assets/colors.scss";
+.v-progress-linear {
+  color: $green;
+}
+</style>
