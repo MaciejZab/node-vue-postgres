@@ -6,7 +6,7 @@ export class Role {
   id: number;
 
   @Column()
-  name: string;
+  username: string;
 
   @Column()
   password: string;

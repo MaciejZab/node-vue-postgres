@@ -19,7 +19,7 @@ const passwordRules = computed(() => [(value: string) => !!value || "Password is
 
 const submitForm = () => {
   // Define the API endpoint
-  const reqUrl: string = "http://localhost:3000";
+  const reqUrl: string = "http://172.21.240.1:3000/api/roles";
   const reqData: Form = data.value;
 
   axios
@@ -36,8 +36,21 @@ const submitForm = () => {
 <template>
   <v-sheet width="300" class="mx-auto pa-4" border>
     <v-form class="d-flex flex-column" @submit.prevent="submitForm">
-      <v-text-field class="mb-2" v-model="data.username" :rules="nameRules" label="Username" required />
-      <v-text-field class="mb-2" v-model="data.password" :rules="passwordRules" label="Password" type="password" required />
+      <v-text-field
+        class="mb-2"
+        v-model="data.username"
+        :rules="nameRules"
+        label="Username"
+        required
+      />
+      <v-text-field
+        class="mb-2"
+        v-model="data.password"
+        :rules="passwordRules"
+        label="Password"
+        type="password"
+        required
+      />
       <v-btn type="submit" variant="text">Submit</v-btn>
     </v-form>
   </v-sheet>

@@ -1,31 +1,31 @@
 import express from "express";
 import cors from "cors";
 import "reflect-metadata";
-import { corsOptionsDelegate } from "./config/cors.cjs";
-import { serverConfig } from "./config/server.cjs";
-import { roleRoutes } from "./routes/roleRoutes.cjs";
-import { myDataSource } from "./config/orm/dataSource.cjs";
-
-// establish database connection
-myDataSource
-  .initialize()
-  .then(() => {
-    console.log("Data Source has been initialized!");
-  })
-  .catch((err) => {
-    console.error("Error during Data Source initialization:", err);
-  });
 
 // create and setup express app
+import { corsOptionsDelegate } from "./config/cors.cjs";
+
 const app = express();
 app.use(express.json());
 app.use(cors(corsOptionsDelegate));
 
 // Routes
+import { roleRoutes } from "./routes/roleRoutes.cjs";
+
 app.use("/api/roles", roleRoutes);
 
-app.get("/", (req, res) => {
-  res.send(`Hello, world!!!`); // Simple text response
-});
+// DataSource instance initialize
+import { dataSource } from "./config/orm/dataSource.cjs";
+import { serverConfig } from "./config/server.cjs";
 
-app.listen(serverConfig.port);
+dataSource
+  .initialize()
+  .then(() => {
+    console.log("Data Source has been initialized!");
+    app.listen(serverConfig.port, () =>
+      console.log(`Node listens at ${serverConfig.origin}:${serverConfig.port}`)
+    );
+  })
+  .catch((err) => {
+    console.error("Error during Data Source initialization", err);
+  });
