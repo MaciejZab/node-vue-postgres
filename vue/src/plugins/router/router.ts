@@ -5,6 +5,7 @@ import { usePermissionStore } from "./../../stores/permissionStore.ts";
 // 3. Create the router instance and pass the `routes` option
 
 const router = createRouter({
+  // history: createWebHashHistory(),
   history: createWebHistory(),
   routes,
 });

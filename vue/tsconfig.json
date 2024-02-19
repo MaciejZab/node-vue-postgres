@@ -23,6 +23,6 @@
     "allowJs": true
   },
   // "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "src/*.vue"],
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "src/config/env.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -4,6 +4,8 @@ import { ref, computed } from "vue";
 import axios from "axios";
 import { usePermissionStore } from "../stores/permissionStore";
 import { useRouter } from "vue-router";
+import { nodeConfig } from "../config/env";
+import { endpoints } from "../config/endpoints";
 
 // Router
 const router = useRouter();
@@ -53,7 +55,7 @@ const submitLogin = (): void => {
   if (validation.value) {
     loginError.value = null;
     loading(true);
-    const reqUrl: string = "http://172.21.240.1:3000/api/roles";
+    const reqUrl: string = `${nodeConfig.origin}:${nodeConfig.port}${endpoints.roleAuthPath}`;
     const reqData: LoginData = data.value;
 
     axios
@@ -95,46 +97,76 @@ const proceed = (): void => {
 </script>
 
 <template>
-  <v-sheet width="300" height="354" class="d-flex flex-column mx-auto" border>
-    <v-form
-      ref="login"
-      class="d-flex flex-column"
-      v-model="validation"
-      @submit.prevent="submitLogin"
-    >
-      <v-text-field
-        class="mb-2"
-        v-model="data.username"
-        :rules="nameRules"
-        label="Username"
-        required
-      />
-      <v-text-field
-        class="mb-2"
-        v-model="data.password"
-        :rules="passwordRules"
-        label="Password"
-        type="password"
-        required
-      />
-      <v-btn type="submit" variant="text">Login</v-btn>
-    </v-form>
-    <v-alert
-      v-if="loginError"
-      type="error"
-      :text="`${loginError?.title}: ${loginError?.text}`"
-    ></v-alert>
-    <v-form ref="continue" class="d-flex flex-column" @submit.prevent="proceed">
-      <v-btn type="submit" variant="text">Continue without Login</v-btn>
-    </v-form>
-    <v-spacer v-if="!loginError"></v-spacer>
-    <v-progress-linear :active="loader" :indeterminate="loader" bottom></v-progress-linear>
-  </v-sheet>
+  <v-container class="fill-height">
+    <v-row>
+      <v-col>
+        <v-sheet :width="300" class="d-flex flex-column mx-auto">
+          <v-container>
+            <v-row>
+              <v-col>
+                <v-img :width="268" src="../intranet-logo.svg" class="d-flex flex-column"></v-img>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-form
+                  ref="login"
+                  class="d-flex flex-column"
+                  v-model="validation"
+                  @submit.prevent="submitLogin"
+                >
+                  <v-text-field
+                    class="mb-2"
+                    v-model="data.username"
+                    :rules="nameRules"
+                    label="Username"
+                    required
+                  />
+                  <v-text-field
+                    class="mb-2"
+                    v-model="data.password"
+                    :rules="passwordRules"
+                    label="Password"
+                    type="password"
+                    required
+                  />
+                  <v-btn type="submit" variant="text">Login</v-btn>
+                </v-form>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-alert
+                  v-if="loginError"
+                  type="error"
+                  :text="`${loginError?.title}: ${loginError?.text}`"
+                ></v-alert>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-form ref="continue" class="d-flex flex-column" @submit.prevent="proceed">
+                  <v-btn type="submit" variant="text">Continue without Login</v-btn>
+                </v-form>
+              </v-col>
+            </v-row>
+            <v-spacer v-if="!loginError"></v-spacer>
+          </v-container>
+
+          <v-progress-linear :active="loader" :indeterminate="loader" bottom></v-progress-linear>
+        </v-sheet>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <style scoped lang="scss">
 @import "../assets/colors.scss";
+
+.v-sheet {
+  border: 1px solid $reconext-cool-gray7;
+}
 .v-progress-linear {
-  color: $green;
+  color: $reconext-green;
 }
 </style>

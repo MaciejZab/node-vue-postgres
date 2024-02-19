@@ -28,15 +28,17 @@ Reconext Intranet leverages a unified technological ecosystem, seamlessly integr
    git clone https://github.com/MaciejZab/node-vue-postgres.git
    ```
 
-2. Navigate to the project directory and rename 'toAdjust.env' file to '.env', then configure settings according to your requirements.
+2. Navigate to the project `root` directory and rename 'toAdjust.env' file to '.env', then configure settings according to your requirements.
 
-3. Install Dependencies: Run the following command in both the `/vue` and `/node` directories to install project dependencies:
+3. Navigate to the project `/vue/src/config` directory and adjust 'env.ts' file according to your '.env' settings.
+
+4. Install Dependencies: Run the following command in both the `/vue` and `/node` directories to install project dependencies:
 
    ```bash
    npm install
    ```
 
-4. After installing dependencies, build the Vue.js frontend and Node.js backend by running the following command in both the `/vue` and `/node` directories:
+5. After installing dependencies, build the Vue.js frontend and Node.js backend by running the following command in both the `/vue` and `/node` directories:
 
    ```bash
    npm run build
