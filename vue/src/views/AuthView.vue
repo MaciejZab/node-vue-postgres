@@ -67,15 +67,16 @@ const submitLogin = (): void => {
     axios
       .post(reqUrl, reqData)
       .then(function (response) {
-        user.set({
-          id: response.data.id,
-          username: response.data.username,
-        });
-        permissions.set({
-          read: response.data.read,
-          write: response.data.write,
-          control: response.data.control,
-        });
+        console.log(response.data);
+        // user.set({
+        //   id: response.data.id,
+        //   username: response.data.username,
+        // });
+        // permissions.set({
+        //   read: response.data.read,
+        //   write: response.data.write,
+        //   control: response.data.control,
+        // });
         router.push({ path: "/pages" });
       })
       .catch(function (error) {
@@ -159,7 +160,9 @@ const proceed = (): void => {
                       />
                     </v-row>
                   </v-container>
-                  <v-btn type="submit" variant="text">Login</v-btn>
+                  <v-btn type="submit" class="bg-primaryVariant text-onPrimary" variant="tonal"
+                    >Login</v-btn
+                  >
                 </v-form>
               </v-col>
             </v-row>
@@ -175,7 +178,9 @@ const proceed = (): void => {
             <v-row>
               <v-col>
                 <v-form ref="continue" class="d-flex flex-column" @submit.prevent="proceed">
-                  <v-btn type="submit" variant="text">Continue without Login</v-btn>
+                  <v-btn type="submit" class="bg-primaryVariant text-onPrimary" variant="tonal"
+                    >Continue without Login</v-btn
+                  >
                 </v-form>
               </v-col>
             </v-row>
