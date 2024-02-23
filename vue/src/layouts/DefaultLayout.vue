@@ -14,9 +14,7 @@ const toggleDrawer = () => (drawerVisible.value = !drawerVisible.value);
   <NavDrawer :drawer-visible="drawerVisible" />
 
   <v-main>
-    <v-container fluid>
-      <router-view></router-view>
-    </v-container>
+    <router-view></router-view>
   </v-main>
 
   <v-footer app>

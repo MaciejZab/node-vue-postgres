@@ -26,7 +26,13 @@ export class WithRole1708041510673 implements MigrationInterface {
     const roles = [
       { username: "Admin", password: "admin_password", read: true, write: true, control: true },
       { username: "Editor", password: "editor_password", read: true, write: true, control: false },
-      { username: "Viewer", password: "viewer_password", read: true, write: false, control: false },
+      {
+        username: "Operator",
+        password: "operator_password",
+        read: true,
+        write: false,
+        control: false,
+      },
     ];
 
     for (const role of roles) {
