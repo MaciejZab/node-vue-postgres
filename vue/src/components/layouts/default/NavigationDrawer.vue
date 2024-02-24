@@ -15,8 +15,8 @@ const listItems = [
   {
     id: 1,
     link: "/",
-    content: "Change user",
-    icon: "account-convert",
+    content: "Logout",
+    icon: "account-arrow-left",
     onClick: "",
   },
   {

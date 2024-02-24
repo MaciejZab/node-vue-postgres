@@ -23,20 +23,22 @@ const userAuth = async (req: Request, res: Response) => {
     // Wait for LDAP authentication to complete
     await user.ldapAuthenticate();
 
-    // Check if user exist in database
-    const userExist: User = await dataSource
-      .getRepository(User)
-      .createQueryBuilder("user")
-      .where("user.username = :username", { username: user.username })
-      .getOne();
+    // // Check if user exist in database
+    // const userExist: User = await dataSource
+    //   .getRepository(User)
+    //   .createQueryBuilder("user")
+    //   .where("user.username = :username", { username: user.username })
+    //   .getOne();
 
-    // Create new User if these credentials doesn't exist in database
-    if (!userExist) {
-      await dataSource.getRepository(User).save(user);
-      res.status(404).json({ message: "Authentication successful. User has been created." });
-    } else {
-      res.status(200).json({ userExist, message: "Authentication successful." });
-    }
+    // // Create new User if these credentials doesn't exist in database
+    // if (!userExist) {
+    //   await dataSource.getRepository(User).save(user);
+    //   res.status(404).json({ message: "Authentication successful. User has been created." });
+    // } else {
+    //   res.status(200).json({ userExist, message: "Authentication successful." });
+    // }
+
+    res.status(200).json({ message: "Authentication successful." });
   } catch (err) {
     res.status(404).json({ message: "Invalid username or password." });
   }
