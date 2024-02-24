@@ -1,12 +1,6 @@
 import { DataSource, DataSourceOptions } from "typeorm";
 import * as dotenv from "dotenv";
 
-// Entities
-import { Role } from "../../orm/entity/role.entity.cjs";
-
-// Migrations
-import { WithRole1708041510673 } from "../../orm/migrations/1708041510673-withRole.cjs";
-
 dotenv.config({ path: "./../.env" });
 
 const options: DataSourceOptions = {
@@ -16,8 +10,8 @@ const options: DataSourceOptions = {
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
-  entities: [Role],
-  migrations: [WithRole1708041510673],
+  entities: ["src/orm/entity/**/*.entity.cts"],
+  migrations: ["src/orm/migrations/**/*.migration.cts"],
 };
 
 const dataSource = new DataSource(options);

@@ -113,3 +113,12 @@ To **create/update database schema** run the following command within the `/node
 ```bash
    npm run typeorm migration:run -- -d ./src/config/orm/dataSource.cts
 ```
+
+To **revert database schema** run the following command within the `/node` directory:
+
+```bash
+   npm run typeorm migration:revert -- -d ./src/config/orm/dataSource.cts
+```
+
+entities: ["src/orm/entity/**/*.entity.cts"],
+migrations: ["src/orm/migrations/**/*.migration.cts"],

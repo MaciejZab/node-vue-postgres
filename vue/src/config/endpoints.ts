@@ -2,7 +2,7 @@ interface Endpoints {
   roleAuthPath: string;
 }
 const endpoints: Endpoints = {
-  roleAuthPath: "/api/roles",
+  roleAuthPath: "/api/user",
 };
 
 export { endpoints };

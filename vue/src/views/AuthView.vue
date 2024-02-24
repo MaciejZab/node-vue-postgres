@@ -18,14 +18,19 @@ const user = useUserStore();
 // Form reference
 const login = ref<typeof VForm | null>(null);
 
+// Form loading animation
+const loader = ref<boolean>(false);
+
 // Form data
 interface LoginData {
   username: string;
+  domain: string;
   password: string;
 }
 
 const data = ref<LoginData>({
   username: "",
+  domain: "",
   password: "",
 });
 
@@ -35,6 +40,8 @@ interface LoginError {
   text: string;
 }
 
+const loginError = ref<LoginError | null>(null);
+
 // Password
 const passwordVisibility = ref<boolean>(false);
 const passwordIcon = computed((): string => (passwordVisibility.value ? "mdi-eye" : "mdi-eye-off"));
@@ -42,13 +49,17 @@ const passwordType = computed((): string => (passwordVisibility.value ? "text" :
 
 // Form Validation
 const validation = ref<boolean>(false);
-const nameRules = computed(() => [(value: string) => !!value || "User name is required."]);
+const nameRules = computed(() => [
+  (value: string) => !!value || "User name is required.",
+  (value: string) => {
+    if (/^[a-zA-Z]+\.[a-zA-Z]+$/.test(value)) return true;
+    return "Please enter the user name in the format: 'name.surname'";
+  },
+]);
+const domainRules = computed(() => [(value: string) => !!value || "Domain is required."]);
 const passwordRules = computed(() => [(value: string) => !!value || "Password is required."]);
 
-const loginError = ref<LoginError | null>(null);
-
 // Form Methods
-const loader = ref<boolean>(false);
 
 const reset = (): Promise<boolean> => login.value?.reset();
 
@@ -62,13 +73,14 @@ const submitLogin = (): void => {
     loginError.value = null;
     loading(true);
     const reqUrl: string = `${nodeConfig.origin}:${nodeConfig.port}${endpoints.roleAuthPath}`;
+    data.value.username.toLocaleLowerCase();
     const reqData: LoginData = data.value;
 
     axios
       .post(reqUrl, reqData)
       .then(function (response) {
         console.log(response.data);
-        // user.set({
+        // user.set(
         //   id: response.data.id,
         //   username: response.data.username,
         // });
@@ -145,7 +157,13 @@ const proceed = (): void => {
                       ></v-text-field
                     ></v-row>
                     <v-row>
-                      <v-select label="Domain" :items="['@reconext.com', '@tgn.com']"></v-select>
+                      <v-select
+                        label="Domain"
+                        v-model="data.domain"
+                        :items="['reconext.com', 'tgn.teleplan.com']"
+                        :rules="domainRules"
+                        required
+                      ></v-select>
                     </v-row>
                     <v-row>
                       <v-text-field

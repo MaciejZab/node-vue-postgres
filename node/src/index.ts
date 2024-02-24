@@ -10,9 +10,9 @@ app.use(express.json());
 app.use(cors(corsOptionsDelegate));
 
 // Routes
-import { roleRoutes } from "./routes/roleRoutes.cjs";
+import { userRoutes } from "./routes/userRoutes.cjs";
 
-app.use("/api/roles", roleRoutes);
+app.use("/api/user", userRoutes);
 
 // DataSource instance initialize
 import { dataSource } from "./config/orm/dataSource.cjs";
