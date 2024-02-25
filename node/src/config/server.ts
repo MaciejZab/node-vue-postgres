@@ -1,9 +1,9 @@
 import * as dotenv from "dotenv";
-import { ServerConfig } from "../interfaces/config/ServerConfig.cjs";
+import { IServerConfig } from "../interfaces/config/IServerConfig";
 
 dotenv.config({ path: "./.env" });
 
-const serverConfig: ServerConfig = {
+const serverConfig: IServerConfig = {
   host: process.env.HOST,
   origin: process.env.ORIGIN,
   port: parseInt(process.env.NODE_PORT),

@@ -1,14 +1,15 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { User } from "../intefaces/User";
+import { IUser } from "../interfaces/user/IUser";
 
 export const useUserStore = defineStore("user", () => {
-  const user = ref<User>({
+  const user = ref<IUser>({
     id: null,
     username: null,
+    domain: null,
   });
 
-  const set = (data: User): boolean => {
+  const set = (data: IUser): boolean => {
     try {
       user.value.id = data.id;
       user.value.username = data.username;
@@ -21,12 +22,12 @@ export const useUserStore = defineStore("user", () => {
     return true;
   };
 
-  const info = (): User | false => {
+  const info = (): IUser | false => {
     try {
       const json: string | null = localStorage.getItem("user");
       if (!json) throw new Error("No user data found in localStorage");
 
-      const user: User = JSON.parse(json);
+      const user: IUser = JSON.parse(json);
       return user;
     } catch (error) {
       console.error("Error retrieving user info:", error);

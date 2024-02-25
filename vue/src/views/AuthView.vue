@@ -7,13 +7,15 @@ import { useUserStore } from "../stores/userStore";
 import { useRouter } from "vue-router";
 import { nodeConfig } from "../config/env";
 import { endpoints } from "../config/endpoints";
+import { User } from "../models/user/User";
+import { Permission } from "../models/user/Permission";
 
 // Router
 const router = useRouter();
 
 // Stores
-const permissions = usePermissionStore();
-const user = useUserStore();
+const permissionStore = usePermissionStore();
+const userStore = useUserStore();
 
 // Form reference
 const login = ref<typeof VForm | null>(null);
@@ -79,19 +81,12 @@ const submitLogin = (): void => {
     axios
       .post(reqUrl, reqData)
       .then(function (response) {
-        console.log(response.data);
-        // user.set(
-        //   id: response.data.id,
-        //   username: response.data.username,
-        // });
-        // permissions.set({
-        //   read: response.data.read,
-        //   write: response.data.write,
-        //   control: response.data.control,
-        // });
+        userStore.set(new User(response.data.userExist));
+        permissionStore.set(new Permission(response.data.userExist.permissions));
         router.push({ path: "/pages" });
       })
       .catch(function (error) {
+        console.log(error);
         loading(false);
         reset();
         switch (error.response.status) {
@@ -114,15 +109,18 @@ const submitLogin = (): void => {
 
 const proceed = (): void => {
   loading(true);
-  user.set({
-    id: 3,
-    username: "Operator",
-  });
-  permissions.set({
+  const user = {
+    id: null,
+    username: null,
+    domain: null,
+  };
+  const permissions = {
     read: true,
     write: false,
     control: false,
-  });
+  };
+  userStore.set(new User(user));
+  permissionStore.set(new Permission(permissions));
   router.push({ path: "/pages" });
 };
 </script>
@@ -216,7 +214,3 @@ const proceed = (): void => {
     </v-row>
   </v-container>
 </template>
-
-<style scoped lang="scss">
-@import "../assets/colors.scss";
-</style>

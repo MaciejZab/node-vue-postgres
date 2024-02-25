@@ -84,7 +84,7 @@ The API key serves as an authentication mechanism for authorized access. Securel
 
 ## Database
 
-Choice: PostgreSQL
+**Choice:** PostgreSQL
 
 - Robust, open-source relational database known for performance, reliability, and feature richness.
 - Excellent support for ACID transactions and data integrity.
@@ -92,33 +92,46 @@ Choice: PostgreSQL
 
 ### Object-Relational Mapping (ORM): TypeORM
 
+**Docs:** [TypeORM](https://typeorm.io/)
+
 - Simplifies database interactions by bridging the gap between object-oriented models and relational databases.
 - Reduces boilerplate code for CRUD operations and data transformations.
 - Offers convenient connection management and query building capabilities.
 
-### Migrations
+#### Migrations
 
 Migrations are a way to manage database schema changes over time. Their purpose is to keep track of changes to the database structure in a consistent and reversible manner.
 
 To **create a migration** run the following command within the `/node` directory:
 
 ```bash
-   npm run typeorm migration:create ./src/orm/migrations/migrationName
+npm run typeorm migration:create ./src/orm/migrations/migrationName
 ```
 
 After creating the migration file, change its extension to .cts.
 
+There are two methods you must fill with your migration code: `up` and `down`. up has to contain the code you need to perform the migration. down has to revert whatever up changed. down method is used to revert the last migration.
+
 To **create/update database schema** run the following command within the `/node` directory:
 
 ```bash
-   npm run typeorm migration:run -- -d ./src/config/orm/dataSource.cts
+   npm run typeorm migration:run -- -d ./src/config/orm/dataSource.ts
 ```
 
 To **revert database schema** run the following command within the `/node` directory:
 
 ```bash
-   npm run typeorm migration:revert -- -d ./src/config/orm/dataSource.cts
+   npm run typeorm migration:revert -- -d ./src/config/orm/dataSource.ts
 ```
 
-entities: ["src/orm/entity/**/*.entity.cts"],
-migrations: ["src/orm/migrations/**/*.migration.cts"],
+Migrations are stored in the directory specified by the `migrations` option in `node/src/config/orm/dataSource.cts`. The configuration looks like this:
+
+migrations: ["src/orm/migrations/**/*.migration.cts"]
+
+#### Entities
+
+Due to compilation incapability to resolve some TypeScript keywords, it's crucial not to add decorators like `@Entity()` or `@Column()` directly to classes in the `node/src/models` directory. Instead, create copies in the `node/src/orm/entities` directory with decorators.
+
+Entities, which represent models used for database queries, are stored in a directory specified by the `entities` option in `node/src/config/orm/dataSource.cts`. The configuration for entities looks like this:
+
+entities: ["src/orm/entity/**/*.entity.cts"]

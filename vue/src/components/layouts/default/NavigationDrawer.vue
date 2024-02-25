@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useUserStore } from "../../../stores/userStore";
-import { User } from "../../../intefaces/User";
+import { IUser } from "../../../interfaces/user/IUser";
 
 const props = defineProps(["drawerVisible"]);
 
@@ -9,7 +9,7 @@ const smallScreen = ref<boolean>(window.innerWidth < 960);
 
 const drawerLocation = computed((): "bottom" | "left" => (smallScreen.value ? "bottom" : "left"));
 
-const user = ref<User | false>(useUserStore().info());
+const user = ref<IUser | false>(useUserStore().info());
 
 const listItems = [
   {
@@ -69,4 +69,3 @@ const listItems = [
     </v-list>
   </v-navigation-drawer>
 </template>
-../../../intefaces/User

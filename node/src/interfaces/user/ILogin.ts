@@ -1,7 +1,7 @@
-interface Login {
+interface ILogin {
   username: string;
   domain: string;
   password: string;
 }
 
-export { Login };
+export { ILogin };

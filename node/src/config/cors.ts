@@ -1,4 +1,4 @@
-import { serverConfig } from "./server.cjs";
+import { serverConfig } from "./server";
 
 const whitelist: Array<string> = [serverConfig.origin];
 const corsOptions = {

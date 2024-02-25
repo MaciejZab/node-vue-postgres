@@ -1,7 +1,7 @@
-interface Permission {
+interface IPermission {
   read: boolean;
   write: boolean;
   control: boolean;
 }
 
-export type { Permission };
+export { IPermission };

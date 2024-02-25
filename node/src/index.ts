@@ -3,20 +3,20 @@ import cors from "cors";
 import "reflect-metadata";
 
 // create and setup express app
-import { corsOptionsDelegate } from "./config/cors.cjs";
+import { corsOptionsDelegate } from "./config/cors";
 
 const app = express();
 app.use(express.json());
 app.use(cors(corsOptionsDelegate));
 
 // Routes
-import { userRoutes } from "./routes/userRoutes.cjs";
+import { userRoutes } from "./routes/userRoutes";
 
 app.use("/api/user", userRoutes);
 
 // DataSource instance initialize
-import { dataSource } from "./config/orm/dataSource.cjs";
-import { serverConfig } from "./config/server.cjs";
+import { dataSource } from "./config/orm/dataSource";
+import { serverConfig } from "./config/server";
 
 dataSource
   .initialize()

@@ -4,7 +4,7 @@ interface ServerConfig {
 }
 
 const nodeConfig: ServerConfig = {
-  origin: "http://10.212.34.238",
+  origin: "http://10.212.34.235",
   port: 3000,
 };
 

@@ -1,21 +1,21 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { Permission } from "../intefaces/Permission";
+import { IPermission } from "../interfaces/user/IPermission";
 
 export const usePermissionStore = defineStore("auth", () => {
-  const permission = ref<Permission>({
+  const permission = ref<IPermission>({
     read: false,
     write: false,
     control: false,
   });
 
-  const check = (routePermission: Permission): boolean => {
+  const check = (routePermission: IPermission): boolean => {
     const requiredPermissions = Object.entries(routePermission).filter(
       ([_, value]) => value === true
     );
 
     const json: string | null = localStorage.getItem("permission");
-    const permission: Permission = json ? JSON.parse(json) : null;
+    const permission: IPermission = json ? JSON.parse(json) : null;
 
     for (const [key, _] of requiredPermissions) {
       if (!(permission as any)[key]) return false;
@@ -24,7 +24,7 @@ export const usePermissionStore = defineStore("auth", () => {
     return true;
   };
 
-  const set = (userPermission: Permission): boolean => {
+  const set = (userPermission: IPermission): boolean => {
     try {
       permission.value.read = userPermission.read;
       permission.value.write = userPermission.write;

@@ -10,8 +10,8 @@ const options: DataSourceOptions = {
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
-  entities: ["src/orm/entity/**/*.entity.cts"],
-  migrations: ["src/orm/migrations/**/*.migration.cts"],
+  entities: [`${__dirname}/../../orm/entity/**/*Entity.js`],
+  migrations: [`${__dirname}/../../orm/migrations/*Migration.ts`],
 };
 
 const dataSource = new DataSource(options);

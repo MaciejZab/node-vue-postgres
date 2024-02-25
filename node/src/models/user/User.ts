@@ -1,13 +1,12 @@
 import { authenticate } from "ldap-authentication";
-import { Login } from "../../interfaces/user/Login.cjs";
+import { ILogin } from "../../interfaces/user/ILogin";
 
 class User {
-  readonly id: number;
-  readonly username: string;
-  readonly domain: string;
-  readonly password: string;
+  public readonly username: string;
+  public readonly domain: string;
+  public readonly password: string;
 
-  constructor(login: Login) {
+  constructor(login: ILogin) {
     this.username = login.username;
     this.domain = login.domain;
     this.password = login.password;
