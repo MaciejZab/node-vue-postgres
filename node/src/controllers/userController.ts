@@ -8,7 +8,7 @@ const findUser = async (username: string): Promise<UserEntity> => {
   return dataSource
     .getRepository(UserEntity)
     .createQueryBuilder("user_entity")
-    .leftJoinAndSelect("user_entity.permissions", "user_entity_permission")
+    .leftJoinAndSelect("user_entity.permission", "user_entity_permission")
     .where("user_entity.username = :username", { username: username })
     .getOne();
 };
@@ -39,13 +39,13 @@ const userAuth = async (req: Request, res: Response) => {
 
     // Create new UserEntity if user doesn't exist in database
     if (!userExist) {
-      const permissions = await dataSource
+      const permission = await dataSource
         .getRepository(UserPermissionEntity)
         .save(new UserPermissionEntity(true, false, false));
 
       await dataSource
         .getRepository(UserEntity)
-        .save(new UserEntity(user.username, user.domain, permissions));
+        .save(new UserEntity(user.username, user.domain, permission));
 
       userExist = await findUser(user.username);
 
@@ -56,6 +56,7 @@ const userAuth = async (req: Request, res: Response) => {
       res.status(200).json({ userExist, message: "Authentication successful." });
     }
   } catch (err) {
+    console.log(err);
     res.status(404).json({ err, message: "Unknown error occurred. Failed to authenticate user." });
   }
 };

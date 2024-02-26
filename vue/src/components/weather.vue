@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import axios from "axios";
-import { computed } from "vue";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 const getWeather = (weatherType: string, icon: boolean = false): string => {
   switch (weatherType) {
@@ -10,7 +9,7 @@ const getWeather = (weatherType: string, icon: boolean = false): string => {
       return icon ? "weather-sunny" : "Clear sky";
     case "pcloudyday":
     case "pcloudynight":
-      return icon ? "weather-partlycloudy" : "Partly cloudy";
+      return icon ? "weather-partly-cloudy" : "Partly cloudy";
     case "mcloudyday":
     case "mcloudynight":
       return icon ? "weather-cloudy" : "Mostly cloudy";

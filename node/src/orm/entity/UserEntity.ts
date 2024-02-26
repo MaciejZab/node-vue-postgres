@@ -12,11 +12,11 @@ export class UserEntity {
 
   @OneToOne(() => UserPermissionEntity)
   @JoinColumn()
-  permissions: UserPermissionEntity;
+  permission: UserPermissionEntity;
 
-  constructor(username: string, domain: string, permissions: UserPermissionEntity) {
+  constructor(username: string, domain: string, permission: UserPermissionEntity) {
     this.username = username;
     this.domain = domain;
-    this.permissions = permissions;
+    this.permission = permission;
   }
 }

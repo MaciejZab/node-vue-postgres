@@ -1,26 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useTheme } from "vuetify";
+// import ApplicationWindow from "../components/views/settings/ApplicationWindow.vue";
 
 const tab = ref(1);
 const theme = ref("light");
 const themeInstance = useTheme();
 
-const changeTheme = () => {
-  try {
-    console.log(1);
-    themeInstance.global.name.value = theme.value; // Check if this is the correct method for your Vuetify version
-  } catch (error) {
-    console.error("Error changing theme:", error);
-  }
-};
-
-watch(theme, (newTheme: string, oldTheme: string) => {
-  // Perform an action when theme changes
-  console.log("Theme changed from", oldTheme, "to", newTheme);
-  // You can call your custom function or update other parts of your app here
-  changeTheme();
-});
+watch(theme, () => (themeInstance.global.name.value = theme.value));
 </script>
 
 <template>
@@ -34,10 +21,30 @@ watch(theme, (newTheme: string, oldTheme: string) => {
           </v-tabs>
           <v-window v-model="tab">
             <v-window-item v-for="n in 2" :key="n" :value="n">
-              <v-container fluid>
+              <v-container fluid v-if="tab === 1">
                 <v-row>
                   <v-col md="4">
+                    <!-- <application-window /> -->
                     <v-select v-model="theme" label="Theme" :items="['light', 'dark']"></v-select>
+                  </v-col>
+                </v-row>
+              </v-container>
+              <v-container fluid v-if="tab === 2">
+                <v-row>
+                  <v-col md="4">
+                    <!-- <v-card
+                      title="Card title"
+                      text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin mattis lacinia justo. Cras pede libero, dapibus nec, pretium sit amet, tempor quis. In laoreet, magna id viverra tincidunt, sem odio bibendum justo, vel imperdiet sapien wisi sed libero."
+                    >
+                      <v-card-actions>
+                        <v-btn>Click me</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                    <v-select
+                      v-model="theme"
+                      label="Theme"
+                      :items="['different', 'dark']"
+                    ></v-select> -->
                   </v-col>
                 </v-row>
               </v-container>

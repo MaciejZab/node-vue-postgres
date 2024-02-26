@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, ComputedRef } from "vue";
 import { useUserStore } from "../../../stores/userStore";
 import { IUser } from "../../../interfaces/user/IUser";
 
@@ -9,7 +9,11 @@ const smallScreen = ref<boolean>(window.innerWidth < 960);
 
 const drawerLocation = computed((): "bottom" | "left" => (smallScreen.value ? "bottom" : "left"));
 
-const user = ref<IUser | false>(useUserStore().info());
+const userObj = ref<IUser | false>(useUserStore().info());
+const username: ComputedRef<string> = computed(() => {
+  const lowercased = userObj.value ? userObj.value.username?.split(".").at(0) : null;
+  return lowercased ? lowercased.charAt(0).toUpperCase() + lowercased.slice(1) : "";
+});
 
 const listItems = [
   {
@@ -46,9 +50,7 @@ const listItems = [
     <v-list>
       <v-list-item>
         <v-list-item-content>
-          <v-list-item-title class="text-h6">
-            Hello {{ user ? user.username : "" }}
-          </v-list-item-title>
+          <v-list-item-title class="text-h6"> Hello {{ username }} </v-list-item-title>
           <!-- <v-list-item-subtitle> </v-list-item-subtitle> -->
         </v-list-item-content>
       </v-list-item>

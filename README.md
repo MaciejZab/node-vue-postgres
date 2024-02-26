@@ -82,6 +82,8 @@ To access exposed endpoints, you need to include an API key in the query paramet
 
 The API key serves as an authentication mechanism for authorized access. Securely store and manage it to prevent unauthorized use.
 
+### Endpoints
+
 ## Database
 
 **Choice:** PostgreSQL
@@ -108,8 +110,6 @@ To **create a migration** run the following command within the `/node` directory
 npm run typeorm migration:create ./src/orm/migrations/migrationName
 ```
 
-After creating the migration file, change its extension to .cts.
-
 There are two methods you must fill with your migration code: `up` and `down`. up has to contain the code you need to perform the migration. down has to revert whatever up changed. down method is used to revert the last migration.
 
 To **create/update database schema** run the following command within the `/node` directory:
@@ -124,14 +124,14 @@ To **revert database schema** run the following command within the `/node` direc
    npm run typeorm migration:revert -- -d ./src/config/orm/dataSource.ts
 ```
 
-Migrations are stored in the directory specified by the `migrations` option in `node/src/config/orm/dataSource.cts`. The configuration looks like this:
+Migrations are stored in the directory specified by the `migrations` option in `node/src/config/orm/dataSource.ts`. The configuration looks like this:
 
-migrations: ["src/orm/migrations/**/*.migration.cts"]
+migrations: [`${__dirname}/../../orm/migrations/*Migration.ts`]
 
 #### Entities
 
 Due to compilation incapability to resolve some TypeScript keywords, it's crucial not to add decorators like `@Entity()` or `@Column()` directly to classes in the `node/src/models` directory. Instead, create copies in the `node/src/orm/entities` directory with decorators.
 
-Entities, which represent models used for database queries, are stored in a directory specified by the `entities` option in `node/src/config/orm/dataSource.cts`. The configuration for entities looks like this:
+Entities, which represent models used for database queries, are stored in a directory specified by the `entities` option in `node/src/config/orm/dataSource.ts`. The configuration for entities looks like this:
 
-entities: ["src/orm/entity/**/*.entity.cts"]
+entities: [`${__dirname}/../../orm/entity/**/*Entity.js`]

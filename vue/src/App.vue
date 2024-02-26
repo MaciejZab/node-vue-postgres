@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <v-app class="bg-background">
+  <v-app class="bg-background font-size-handler">
     <!-- vue-router -->
     <router-view></router-view>
   </v-app>

@@ -10,14 +10,14 @@ export const usePermissionStore = defineStore("auth", () => {
   });
 
   const check = (routePermission: IPermission): boolean => {
-    const requiredPermissions = Object.entries(routePermission).filter(
+    const requiredPermission = Object.entries(routePermission).filter(
       ([_, value]) => value === true
     );
 
     const json: string | null = localStorage.getItem("permission");
     const permission: IPermission = json ? JSON.parse(json) : null;
 
-    for (const [key, _] of requiredPermissions) {
+    for (const [key, _] of requiredPermission) {
       if (!(permission as any)[key]) return false;
     }
 

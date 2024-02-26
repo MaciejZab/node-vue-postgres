@@ -32,7 +32,7 @@ interface LoginData {
 
 const data = ref<LoginData>({
   username: "",
-  domain: "",
+  domain: "reconext.com",
   password: "",
 });
 
@@ -82,7 +82,7 @@ const submitLogin = (): void => {
       .post(reqUrl, reqData)
       .then(function (response) {
         userStore.set(new User(response.data.userExist));
-        permissionStore.set(new Permission(response.data.userExist.permissions));
+        permissionStore.set(new Permission(response.data.userExist.permission));
         router.push({ path: "/pages" });
       })
       .catch(function (error) {
@@ -114,13 +114,13 @@ const proceed = (): void => {
     username: null,
     domain: null,
   };
-  const permissions = {
+  const permission = {
     read: true,
     write: false,
     control: false,
   };
   userStore.set(new User(user));
-  permissionStore.set(new Permission(permissions));
+  permissionStore.set(new Permission(permission));
   router.push({ path: "/pages" });
 };
 </script>

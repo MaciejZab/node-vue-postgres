@@ -15,7 +15,7 @@ export class User1708720253714 implements MigrationInterface {
           },
           { name: "username", type: "varchar" },
           { name: "domain", type: "varchar" },
-          { name: "permissionsId", type: "int" },
+          { name: "permissionId", type: "int" },
         ],
       })
     );
@@ -41,7 +41,7 @@ export class User1708720253714 implements MigrationInterface {
     await queryRunner.createForeignKey(
       "user_entity",
       new TableForeignKey({
-        columnNames: ["permissionsId"],
+        columnNames: ["permissionId"],
         referencedColumnNames: ["id"],
         referencedTableName: "user_permission_entity",
         onDelete: "CASCADE",
