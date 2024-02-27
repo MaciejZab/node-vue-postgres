@@ -1,6 +1,6 @@
 import { serverConfig } from "./server";
 
-const whitelist: Array<string> = [serverConfig.origin];
+const whitelist: Array<string> = [serverConfig.origin, "http://10.41.20.95"];
 const corsOptions = {
   origin: true,
   methods: ["GET", "POST", "PUT", "DELETE"],

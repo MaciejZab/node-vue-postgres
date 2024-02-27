@@ -90,7 +90,7 @@ const submitLogin = (): void => {
         loading(false);
         reset();
         switch (error.response.status) {
-          case 401:
+          case 404:
             loginError.value = {
               title: error.response.statusText,
               text: error.response.data.message,

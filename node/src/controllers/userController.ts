@@ -19,6 +19,7 @@ const getUser = async (req: Request, res: Response) => {
 
     res.status(200).json({ user, message: "User found." });
   } catch (err) {
+    console.log(err);
     res.status(404).json({ err, message: "Unknown error occurred. Failed to retrieve user." });
   }
 };
