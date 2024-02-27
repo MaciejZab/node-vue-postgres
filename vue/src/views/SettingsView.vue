@@ -1,13 +1,20 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useTheme } from "vuetify";
+import { useSettingsStore } from "../stores/settingsStore";
 // import ApplicationWindow from "../components/views/settings/ApplicationWindow.vue";
 
+const settingsStore = useSettingsStore();
+const settingsInfo = settingsStore.info();
+const themeFromSettings = settingsInfo ? settingsInfo.theme : "light";
+
 const tab = ref(1);
-const theme = ref("light");
+const theme = ref(themeFromSettings);
 const themeInstance = useTheme();
 
-watch(theme, () => (themeInstance.global.name.value = theme.value));
+watch(theme, () => {
+  themeInstance.global.name.value = theme.value;
+});
 </script>
 
 <template>

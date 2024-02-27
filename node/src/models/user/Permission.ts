@@ -5,10 +5,10 @@ class Permission implements IPermission {
   write: boolean;
   control: boolean;
 
-  constructor(read: boolean, write: boolean, control: boolean) {
-    this.read = read;
-    this.write = write;
-    this.control = control;
+  constructor(permission: IPermission | null = null) {
+    this.read = permission?.read ?? true;
+    this.write = permission?.write ?? false;
+    this.control = permission?.control ?? false;
   }
 }
 

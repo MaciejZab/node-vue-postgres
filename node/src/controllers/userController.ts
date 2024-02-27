@@ -1,14 +1,16 @@
 import { Request, Response } from "express";
 import { dataSource } from "../config/orm/dataSource";
-import { UserEntity } from "../orm/entity/UserEntity";
+import { UserEntity } from "../orm/entity/user/UserEntity";
 import { User } from "../models/user/User";
-import { UserPermissionEntity } from "../orm/entity/UserPermissionEntity";
+import { UserPermissionEntity } from "../orm/entity/user/UserPermissionEntity";
+import { UserSettingsEntity } from "../orm/entity/user/UserSettingsEntity";
 
 const findUser = async (username: string): Promise<UserEntity> => {
   return dataSource
     .getRepository(UserEntity)
     .createQueryBuilder("user_entity")
     .leftJoinAndSelect("user_entity.permission", "user_entity_permission")
+    .leftJoinAndSelect("user_entity.settings", "user_entity_settings")
     .where("user_entity.username = :username", { username: username })
     .getOne();
 };
@@ -27,6 +29,7 @@ const getUser = async (req: Request, res: Response) => {
 const userAuth = async (req: Request, res: Response) => {
   try {
     const user = new User(req.body);
+    console.log(user);
 
     // Wait for LDAP authentication to complete
     const authenticated = await user.ldapAuthenticate();
@@ -42,11 +45,15 @@ const userAuth = async (req: Request, res: Response) => {
     if (!userExist) {
       const permission = await dataSource
         .getRepository(UserPermissionEntity)
-        .save(new UserPermissionEntity(true, false, false));
+        .save(new UserPermissionEntity());
+
+      const settings = await dataSource
+        .getRepository(UserSettingsEntity)
+        .save(new UserSettingsEntity());
 
       await dataSource
         .getRepository(UserEntity)
-        .save(new UserEntity(user.username, user.domain, permission));
+        .save(new UserEntity(user.username, user.domain, permission, settings));
 
       userExist = await findUser(user.username);
 

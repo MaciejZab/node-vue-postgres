@@ -1,10 +1,10 @@
 import { authenticate } from "ldap-authentication";
 import { ILogin } from "../../interfaces/user/ILogin";
 
-class User {
-  public readonly username: string;
-  public readonly domain: string;
-  public readonly password: string;
+class User implements ILogin {
+  username: string;
+  domain: string;
+  password: string;
 
   constructor(login: ILogin) {
     this.username = login.username;
