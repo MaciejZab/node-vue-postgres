@@ -96,9 +96,7 @@ const messagesPresent = computed(() => Object.keys(messages.value).length === 0)
 axios
   .get("http://www.7timer.info/bin/api.pl?lon=18.01&lat=53.12&product=civil&output=json")
   .then(function (response) {
-    console.log(response);
     messages.value = getCurrentForecast(response.data.init, response.data.dataseries, 4);
-    console.log(messages.value);
   })
   .catch(function (error) {
     console.log(error);

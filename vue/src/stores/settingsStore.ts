@@ -21,7 +21,7 @@ export const useSettingsStore = defineStore("settings", () => {
     return true;
   };
 
-  const info = (): ISettings | false => {
+  const info = (): ISettings => {
     try {
       const json: string | null = localStorage.getItem("settings");
       if (!json) throw new Error("No settings data found in localStorage");
@@ -30,7 +30,7 @@ export const useSettingsStore = defineStore("settings", () => {
       return settings;
     } catch (error) {
       console.error("Error retrieving settings info:", error);
-      return false;
+      return settings.value; // default settings
     }
   };
 

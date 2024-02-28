@@ -1,4 +1,5 @@
 interface ISettings {
+  id: number | null;
   theme: string;
 }
 

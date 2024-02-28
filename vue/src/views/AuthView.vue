@@ -9,6 +9,7 @@ import { nodeConfig } from "../config/env";
 import { endpoints } from "../config/endpoints";
 import { User } from "../models/user/User";
 import { Permission } from "../models/user/Permission";
+import { useSettingsStore } from "../stores/settingsStore";
 
 // Router
 const router = useRouter();
@@ -16,6 +17,7 @@ const router = useRouter();
 // Stores
 const permissionStore = usePermissionStore();
 const userStore = useUserStore();
+const settingsStore = useSettingsStore();
 
 // Form reference
 const login = ref<typeof VForm | null>(null);
@@ -74,7 +76,7 @@ const submitLogin = (): void => {
   if (validation.value) {
     loginError.value = null;
     loading(true);
-    const reqUrl: string = `${nodeConfig.origin}:${nodeConfig.port}${endpoints.roleAuthPath}`;
+    const reqUrl: string = `${nodeConfig.origin}:${nodeConfig.port}${endpoints.userAuthPath}`;
     data.value.username.toLocaleLowerCase();
     const reqData: LoginData = data.value;
 
@@ -83,6 +85,9 @@ const submitLogin = (): void => {
       .then(function (response) {
         userStore.set(new User(response.data.userExist));
         permissionStore.set(new Permission(response.data.userExist.permission));
+
+        settingsStore.set(response.data.userExist.settings);
+
         router.push({ path: "/pages" });
       })
       .catch(function (error) {

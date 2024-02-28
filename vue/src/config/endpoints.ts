@@ -1,8 +1,10 @@
 interface Endpoints {
-  roleAuthPath: string;
+  userAuthPath: string;
+  userSettingsThemePath: string;
 }
 const endpoints: Endpoints = {
-  roleAuthPath: "/api/user",
+  userAuthPath: "/api/user",
+  userSettingsThemePath: "/api/user/settings/theme",
 };
 
 export { endpoints };

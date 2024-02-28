@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { dataSource } from "../config/orm/dataSource";
-import { UserEntity } from "../orm/entity/user/UserEntity";
-import { User } from "../models/user/User";
-import { UserPermissionEntity } from "../orm/entity/user/UserPermissionEntity";
-import { UserSettingsEntity } from "../orm/entity/user/UserSettingsEntity";
+import { dataSource } from "../../config/orm/dataSource";
+import { UserEntity } from "../../orm/entity/user/UserEntity";
+import { User } from "../../models/user/User";
+import { UserPermissionEntity } from "../../orm/entity/user/UserPermissionEntity";
+import { UserSettingsEntity } from "../../orm/entity/user/UserSettingsEntity";
 
 const findUser = async (username: string): Promise<UserEntity> => {
   return dataSource
@@ -21,7 +21,7 @@ const getUser = async (req: Request, res: Response) => {
 
     res.status(200).json({ user, message: "User found." });
   } catch (err) {
-    console.log(err);
+    console.error("Error retrieving user:", err);
     res.status(404).json({ err, message: "Unknown error occurred. Failed to retrieve user." });
   }
 };
@@ -29,7 +29,6 @@ const getUser = async (req: Request, res: Response) => {
 const userAuth = async (req: Request, res: Response) => {
   try {
     const user = new User(req.body);
-    console.log(user);
 
     // Wait for LDAP authentication to complete
     const authenticated = await user.ldapAuthenticate();
@@ -64,8 +63,8 @@ const userAuth = async (req: Request, res: Response) => {
       res.status(200).json({ userExist, message: "Authentication successful." });
     }
   } catch (err) {
-    console.log(err);
-    res.status(404).json({ err, message: "Unknown error occurred. Failed to authenticate user." });
+    console.error("Error authenticating user:", err);
+    res.status(404).json({ message: "Unknown error occurred. Failed to authenticate user." });
   }
 };
 
