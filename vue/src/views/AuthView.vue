@@ -10,6 +10,9 @@ import { endpoints } from "../config/endpoints";
 import { User } from "../models/user/User";
 import { Permission } from "../models/user/Permission";
 import { useSettingsStore } from "../stores/settingsStore";
+import { ResponseStatus } from "../models/common/ResponseStatus";
+import { IResponseStatus } from "../interfaces/common/IResponseStatus";
+import alertResponseStatus from "../components/common/alertResponseStatus.vue";
 
 // Router
 const router = useRouter();
@@ -38,13 +41,9 @@ const data = ref<LoginData>({
   password: "",
 });
 
-// Response error
-interface LoginError {
-  title: string;
-  text: string;
-}
+const responseStatus = ref<IResponseStatus | null>(null);
 
-const loginError = ref<LoginError | null>(null);
+// const loginError = ref<LoginError | null>(null);
 
 // Password
 const passwordVisibility = ref<boolean>(false);
@@ -74,7 +73,7 @@ const loading = (bool: boolean): boolean => {
 
 const submitLogin = (): void => {
   if (validation.value) {
-    loginError.value = null;
+    responseStatus.value = null;
     loading(true);
     const reqUrl: string = `${nodeConfig.origin}:${nodeConfig.port}${endpoints.userAuthPath}`;
     data.value.username.toLocaleLowerCase();
@@ -85,49 +84,38 @@ const submitLogin = (): void => {
       .then(function (response) {
         userStore.set(new User(response.data.userExist));
         permissionStore.set(new Permission(response.data.userExist.permission));
-
         settingsStore.set(response.data.userExist.settings);
-
         router.push({ path: "/pages" });
       })
       .catch(function (error) {
         console.log(error);
+
         loading(false);
         reset();
-        switch (error.response.status) {
-          case 404:
-            loginError.value = {
-              title: error.response.statusText,
-              text: error.response.data.message,
-            };
-            break;
-          default:
-            loginError.value = {
-              title: "Unknown error occurred",
-              text: "Please try again later",
-            };
-            break;
-        }
+        responseStatus.value = new ResponseStatus({
+          code: error.response.status,
+          message: error.response.data.message,
+        });
       });
   }
 };
 
-const proceed = (): void => {
-  loading(true);
-  const user = {
-    id: null,
-    username: null,
-    domain: null,
-  };
-  const permission = {
-    read: true,
-    write: false,
-    control: false,
-  };
-  userStore.set(new User(user));
-  permissionStore.set(new Permission(permission));
-  router.push({ path: "/pages" });
-};
+// const proceed = (): void => {
+//   loading(true);
+//   const user = {
+//     id: null,
+//     username: null,
+//     domain: null,
+//   };
+//   const permission = {
+//     read: true,
+//     write: false,
+//     control: false,
+//   };
+//   userStore.set(new User(user));
+//   permissionStore.set(new Permission(permission));
+//   router.push({ path: "/pages" });
+// };
 </script>
 
 <template>
@@ -181,22 +169,16 @@ const proceed = (): void => {
                       />
                     </v-row>
                   </v-container>
-                  <v-btn type="submit" class="bg-primaryVariant text-onPrimary" variant="tonal"
-                    >Login</v-btn
-                  >
+                  <v-btn type="submit" class="bg-secondary" variant="tonal">Login</v-btn>
                 </v-form>
               </v-col>
             </v-row>
             <v-row>
               <v-col>
-                <v-alert
-                  v-if="loginError"
-                  type="error"
-                  :text="`${loginError?.title}: ${loginError?.text}`"
-                ></v-alert>
+                <alert-response-status :status="responseStatus" :persist="true" />
               </v-col>
             </v-row>
-            <v-row>
+            <!-- <v-row>
               <v-col>
                 <v-form ref="continue" class="d-flex flex-column" @submit.prevent="proceed">
                   <v-btn type="submit" class="bg-primaryVariant text-onPrimary" variant="tonal"
@@ -204,8 +186,8 @@ const proceed = (): void => {
                   >
                 </v-form>
               </v-col>
-            </v-row>
-            <v-spacer v-if="!loginError"></v-spacer>
+            </v-row> -->
+            <v-spacer v-if="!responseStatus"></v-spacer>
           </v-container>
 
           <v-progress-linear

@@ -29,7 +29,6 @@ export const useSettingsStore = defineStore("settings", () => {
       const settings: ISettings = JSON.parse(json);
       return settings;
     } catch (error) {
-      console.error("Error retrieving settings info:", error);
       return settings.value; // default settings
     }
   };

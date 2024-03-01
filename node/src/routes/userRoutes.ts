@@ -9,5 +9,6 @@ router.get("/", getUser);
 router.post("/", userAuth);
 
 router.post("/settings/theme", setSettingsTheme);
+// router.post("/settings/permission", setSettingsPermission);
 
 export { router as userRoutes };

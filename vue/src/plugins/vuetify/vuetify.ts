@@ -26,6 +26,7 @@ const lightTheme: ThemeDefinition = {
     onSurface: "#000000", // Black
 
     error: "#B00020",
+    onError: "#ffffff",
   },
 };
 
@@ -38,15 +39,16 @@ const darkTheme: ThemeDefinition = {
 
     secondary: "#45ae52", // Reconext Green
     secondaryVariant: "#c6e0bc", // Reconext Light Green
-    onSecondary: "#000000", // Black
+    onSecondary: "#ffffff", // White
 
-    background: "#2c2e35", // Dark Grey
+    background: "black", // Dark Grey
     onBackground: "#ffffff", // White
 
     surface: "#2c2e35", // Dark Grey
     onSurface: "#ffffff", // White
 
     error: "#B00020",
+    onError: "#ffffff",
   },
 };
 

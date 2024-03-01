@@ -15,10 +15,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-app class="bg-background font-size-handler">
+  <v-app class="font-size-handler h-screen">
     <!-- vue-router -->
     <router-view></router-view>
   </v-app>
 </template>
-
-<style scoped></style>

@@ -18,23 +18,30 @@ const username: ComputedRef<string> = computed(() => {
 const listItems = [
   {
     id: 1,
-    link: "/",
-    content: "Logout",
-    icon: "account-arrow-left",
-    onClick: "",
-  },
-  {
-    id: 1,
     link: "/pages/home",
     content: "Home",
     icon: "home",
     onClick: "",
   },
   {
-    id: 4,
-    link: "/settings",
+    id: 2,
+    link: "/pages/tools",
+    content: "Tools",
+    icon: "tools",
+    onClick: "",
+  },
+  {
+    id: 3,
+    link: "/pages/settings",
     content: "Settings",
     icon: "cogs",
+    onClick: "",
+  },
+  {
+    id: 4,
+    link: "/",
+    content: "Logout",
+    icon: "account-arrow-left",
     onClick: "",
   },
 ];

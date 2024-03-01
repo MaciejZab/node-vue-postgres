@@ -1,4 +1,5 @@
 /.env
+/notes.txt
 
 /vue/dist
 /vue/node_modules

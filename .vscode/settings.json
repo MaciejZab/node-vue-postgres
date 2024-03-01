@@ -1,3 +1,32 @@
 {
-  "cSpell.words": ["teleplan"]
+  "cSpell.words": [
+    "clearday",
+    "clearnight",
+    "cloudyday",
+    "cloudynight",
+    "dataseries",
+    "humidday",
+    "humidnight",
+    "ishowerday",
+    "ishowernight",
+    "lightrainday",
+    "lightrainnight",
+    "lightsnowday",
+    "lightsnownight",
+    "mcloudyday",
+    "mcloudynight",
+    "oshowerday",
+    "oshowernight",
+    "pcloudyday",
+    "pcloudynight",
+    "rainday",
+    "rainnight",
+    "rainsnowday",
+    "rainsnownight",
+    "snowday",
+    "snownight",
+    "teleplan",
+    "timepoint",
+    "Timepoints"
+  ]
 }

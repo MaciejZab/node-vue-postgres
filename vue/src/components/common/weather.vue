@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import axios from "axios";
 import { ref, computed } from "vue";
+const smallScreen = window.innerWidth < 960;
+const dotSize: string = smallScreen ? "x-small" : "large";
 
 const getWeather = (weatherType: string, icon: boolean = false): string => {
   switch (weatherType) {
@@ -45,7 +47,7 @@ const getWeather = (weatherType: string, icon: boolean = false): string => {
   }
 };
 
-const knotsToKmPerHour = (knots: number): string => `${knots * 1.852}km/h`;
+const knotsToKmPerHour = (knots: number): string => `${(knots * 1.852).toFixed(2)}km/h`;
 
 interface Weather {
   timepoint: number; //timepoint
@@ -104,31 +106,26 @@ axios
 </script>
 
 <template>
-  <v-skeleton-loader
-    v-if="messagesPresent"
-    class="bg-primaryVariant"
-    type="article"
-  ></v-skeleton-loader>
-  <v-card v-else title="Weather" class="bg-surface text-onSurface">
+  <v-skeleton-loader v-if="messagesPresent" class="bg-secondary" type="article"></v-skeleton-loader>
+  <v-card v-else title="Weather" class="bg-surface mt-4 mt-8" elevation="6">
     <v-card-text>
       <div class="font-weight-bold ms-1 mb-2">Today</div>
 
-      <v-timeline density="compact" dot-size="12" align="start">
+      <v-timeline density="compact" align="start">
         <v-timeline-item
           v-for="message in messages"
           :key="message.timepoint"
           :icon="`mdi-${message.icon}`"
-          icon-color="onPrimary"
-          size="large"
-          dot-color="primary"
+          icon-color="onSecondary"
+          dot-color="secondary"
+          :size="dotSize"
         >
           <div class="mb-4">
             <div>
-              @<span class="font-weight-bold">{{ ` ${message.time}` }}</span>
+              <span class="font-weight-bold">{{ ` ${message.time}` }}</span>
             </div>
             <div>
-              <span>{{ `${message.temp}°C` }}</span
-              >{{ `, ${message.desc}` }}
+              <span>{{ `${message.temp}°C, ${message.desc}` }}</span>
             </div>
           </div>
         </v-timeline-item>
@@ -136,5 +133,3 @@ axios
     </v-card-text>
   </v-card>
 </template>
-
-<style lang="scss" scoped></style>

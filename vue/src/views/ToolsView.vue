@@ -1,0 +1,94 @@
+<script setup lang="ts">
+let screen: string;
+const screenWidth: number = window.innerWidth;
+
+if (screenWidth < 600) screen = "mobile";
+else if (screenWidth >= 600 && screenWidth < 960) screen = "tablet";
+else screen = "desktop";
+
+let cols: number;
+
+switch (screen) {
+  case "mobile":
+    cols = 12;
+    break;
+  case "tablet":
+    cols = 6;
+    break;
+  case "desktop":
+    cols = 4;
+    break;
+}
+
+const tools = [
+  {
+    id: 1,
+    title: "Documents",
+    text: "Document management system.",
+    icon: "file-document",
+    image: "../tools/docs.png",
+  },
+
+  {
+    id: 2,
+    title: "Training",
+    text: "Enhancing skills and certifications among operators.",
+    icon: "book-open-variant-outline",
+    image: "../tools/training.png",
+  },
+  {
+    id: 3,
+    title: "CN",
+    text: "Creation and approval of change notices.",
+    icon: "file-document-edit",
+    image: "../tools/change.png",
+  },
+  {
+    id: 4,
+    title: "Core",
+    text: "Managing data that is utilized by other tools.",
+    icon: "database",
+    image: "../tools/matrix.png",
+  },
+  {
+    id: 5,
+    title: "8D",
+    text: "Address complaints and internal issues efficiently.",
+    icon: "alert-octagon",
+    image: "../tools/analytics.png",
+  },
+];
+</script>
+
+<template>
+  <v-container class="fill-height">
+    <v-row>
+      <v-col :cols="cols" v-for="tool in tools" :key="tool.id">
+        <v-card
+          class="ma-4 bg-surface"
+          elevation="6"
+          rel="noopener"
+          href="https://github.com/vuetifyjs/vuetify/"
+          target="_blank"
+        >
+          <v-container>
+            <v-row class="align-center">
+              <v-icon
+                class="ma-4 mr-0"
+                color="secondary"
+                :icon="`mdi-${tool.icon}`"
+                size="38"
+              ></v-icon>
+              <v-card-title class="mr-auto">{{ tool.title }}</v-card-title>
+              <!-- <v-icon class="ma-4" color="secondary" icon="mdi-open-in-new" size="38"></v-icon> -->
+            </v-row>
+          </v-container>
+
+          <v-img class="mx-auto" height="300" :src="tool.image"> </v-img>
+
+          <v-card-text>{{ tool.text }}</v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>

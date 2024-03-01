@@ -4,6 +4,7 @@ import { UserEntity } from "../../orm/entity/user/UserEntity";
 import { User } from "../../models/user/User";
 import { UserPermissionEntity } from "../../orm/entity/user/UserPermissionEntity";
 import { UserSettingsEntity } from "../../orm/entity/user/UserSettingsEntity";
+import { adminsConfig } from "../../config/admins";
 
 const findUser = async (username: string): Promise<UserEntity> => {
   return dataSource
@@ -42,9 +43,20 @@ const userAuth = async (req: Request, res: Response) => {
 
     // Create new UserEntity if user doesn't exist in database
     if (!userExist) {
+      const admins = adminsConfig.admins;
+      const adminPermission = {
+        read: true,
+        write: true,
+        control: true,
+      };
+
+      const permissionEntity: UserPermissionEntity = admins.includes(user.username)
+        ? new UserPermissionEntity(adminPermission)
+        : new UserPermissionEntity();
+
       const permission = await dataSource
         .getRepository(UserPermissionEntity)
-        .save(new UserPermissionEntity());
+        .save(permissionEntity);
 
       const settings = await dataSource
         .getRepository(UserSettingsEntity)

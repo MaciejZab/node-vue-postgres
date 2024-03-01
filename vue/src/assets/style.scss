@@ -1,5 +1,9 @@
 @import "./colors.scss";
 
+.html,
+.body {
+  background-color: transparent !important;
+}
 #app {
   width: 100%;
 }
