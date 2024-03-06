@@ -7,6 +7,7 @@ import { Permission } from "../../models/user/Permission";
 import { IPermission } from "../../interfaces/user/IPermission";
 import { UserPermissionEntity } from "../../orm/entity/user/UserPermissionEntity";
 import { IUser } from "../../interfaces/user/IUser";
+import { HttpResponseMessage } from "../../enums/response";
 
 const findUser = async (id: number): Promise<UserEntity> => {
   return dataSource
@@ -23,22 +24,72 @@ const setSettingsTheme = async (req: Request, res: Response) => {
 
     const user = await findUser(settings.id);
 
-    if (!user) return res.status(404).json({ message: "User settings not found." });
+    if (!user)
+      return res.status(404).json({
+        message: "User settings not found.",
+        statusMessage: HttpResponseMessage.PUT_ERROR,
+      });
 
     const userSettings = user.settings;
 
     if (!userSettings) {
-      return res.status(404).json({ message: "User settings not found." });
+      return res.status(404).json({
+        message: "User settings not found.",
+        statusMessage: HttpResponseMessage.PUT_ERROR,
+      });
     }
 
     userSettings.theme = settings.theme;
 
     await dataSource.getRepository(UserSettingsEntity).save(userSettings);
 
-    return res.status(200).json({ message: "Theme updated successfully." });
+    return res.status(200).json({
+      message: "Theme updated successfully.",
+      statusMessage: HttpResponseMessage.PUT_SUCCESS,
+    });
   } catch (error) {
     console.error("Error setting theme:", error);
-    return res.status(404).json({ message: "Unknown error occurred. Failed to update theme." });
+    return res.status(404).json({
+      message: "Unknown error occurred. Failed to update theme.",
+      statusMessage: HttpResponseMessage.UNKNOWN,
+    });
+  }
+};
+
+const setSettingsLanguage = async (req: Request, res: Response) => {
+  try {
+    const settings = new Settings(req.body);
+
+    const user = await findUser(settings.id);
+
+    if (!user)
+      return res.status(404).json({
+        message: "User settings not found.",
+        statusMessage: HttpResponseMessage.PUT_ERROR,
+      });
+
+    const userSettings = user.settings;
+
+    if (!userSettings)
+      return res.status(404).json({
+        message: "User settings not found.",
+        statusMessage: HttpResponseMessage.PUT_ERROR,
+      });
+
+    userSettings.language = settings.language;
+
+    await dataSource.getRepository(UserSettingsEntity).save(userSettings);
+
+    return res.status(200).json({
+      message: "Language updated successfully.",
+      statusMessage: HttpResponseMessage.PUT_SUCCESS,
+    });
+  } catch (error) {
+    console.error("Error setting theme:", error);
+    return res.status(404).json({
+      message: "Unknown error occurred. Failed to update language.",
+      statusMessage: HttpResponseMessage.UNKNOWN,
+    });
   }
 };
 
@@ -66,4 +117,4 @@ const setSettingsPermission = async (req: Request, res: Response) => {
   // }
 };
 
-export { setSettingsTheme };
+export { setSettingsTheme, setSettingsLanguage };

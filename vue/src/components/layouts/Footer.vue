@@ -27,7 +27,7 @@ const slides = [
 </script>
 
 <template>
-  <v-footer class="d-flex w-100">
+  <v-footer class="layout-footer d-flex w-100 bg-primary">
     <div class="d-flex w-100">
       <v-carousel
         v-if="smallScreen"
@@ -45,7 +45,7 @@ const slides = [
           </v-sheet>
         </v-carousel-item>
       </v-carousel>
-      <div v-else class="d-flex w-100 justify-center align-center ga-4 bg-primary">
+      <div v-else class="d-flex w-100 justify-center align-center ga-4">
         <span>ISO® 9001</span>
         <span>ISO® 14001</span>
         <span>ISO® 45001</span>
@@ -55,11 +55,3 @@ const slides = [
     </div>
   </v-footer>
 </template>
-
-<style scoped>
-.v-footer {
-  padding: 0;
-  position: fixed;
-  bottom: 0;
-}
-</style>

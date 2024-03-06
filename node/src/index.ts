@@ -11,8 +11,10 @@ app.use(cors(corsOptionsDelegate));
 
 // Routes
 import { userRoutes } from "./routes/userRoutes";
+import { documentRoutes } from "./routes/documentRoutes";
 
 app.use("/api/user", userRoutes);
+app.use("/api/document", documentRoutes);
 
 // DataSource instance initialize
 import { dataSource } from "./config/orm/dataSource";

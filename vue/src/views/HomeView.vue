@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import weather from "../components/common/weather.vue";
+import { useI18n } from "vue-i18n";
 
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 const boardCols = computed((): number => (smallScreen.value ? 12 : 8));
@@ -58,14 +59,6 @@ async function load(): Promise<void> {
 }
 
 const toggleDetails = (cardId: number) => {
-  // const card: HTMLElement | null = document.querySelector(`#card_${cardId}`);
-  // const details: HTMLElement | null | undefined = card?.querySelector(".details");
-  // if (details) {
-  //   const showAttr: string | null = details.getAttribute("v-show");
-  //   details.style.display = showAttr === "true" ? "none" : "block";
-  //   details.setAttribute("v-show", showAttr === "true" ? "false" : "true");
-  // }
-
   const card = items.value.find((detail) => detail.id === cardId);
   if (card) {
     card.show = !card.show;
@@ -76,10 +69,13 @@ const computedShowValue = (itemId: number) => {
   const item = items.value.find((item) => item.id === itemId);
   return item ? item.show : false;
 };
+
+const { t } = useI18n();
+const exploreBtn = computed(() => t("common.default_layout.pages.home.card.explore"));
 </script>
 
 <template>
-  <v-container class="d-flex flex-column mt-3">
+  <v-container class="layout-view-container d-flex flex-column mt-3">
     <v-row>
       <v-col :cols="boardCols">
         <v-infinite-scroll :items="items" :onLoad="load" color="secondary">
@@ -96,10 +92,10 @@ const computedShowValue = (itemId: number) => {
                 <v-card-subtitle>{{ item.subtitle }}</v-card-subtitle>
               </v-card-item>
 
-              <v-card-text class="line-clamp">{{ item.text }}</v-card-text>
-
               <v-card-actions>
-                <v-btn class="bg-secondary" @click="() => toggleDetails(item.id)">Explore</v-btn>
+                <v-btn class="bg-secondary" @click="() => toggleDetails(item.id)">{{
+                  exploreBtn
+                }}</v-btn>
               </v-card-actions>
 
               <v-expand-transition>
@@ -124,14 +120,3 @@ const computedShowValue = (itemId: number) => {
     </v-row>
   </v-container>
 </template>
-
-<style scoped>
-.line-clamp {
-  height: 76px;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-</style>

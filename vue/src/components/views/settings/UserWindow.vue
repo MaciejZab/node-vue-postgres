@@ -2,7 +2,7 @@
 import { ref, watch } from "vue";
 import axios from "axios";
 import { nodeConfig } from "../../../config/env";
-import { endpoints } from "../../../config/endpoints";
+import { Endpoints } from "../../../config/Endpoints";
 import { IResponseStatus } from "../../../interfaces/common/IResponseStatus";
 import { ResponseStatus } from "../../../models/common/ResponseStatus";
 import { IUser } from "../../../interfaces/user/IUser";
@@ -13,7 +13,7 @@ const responseStatus = ref<IResponseStatus | null>(null);
 const emit = defineEmits(["response-status"]);
 
 watch(privilegeKey, () => {
-  const reqUrl: string = `${nodeConfig.origin}:${nodeConfig.port}${endpoints.userSettingsPermissionPath}`;
+  const reqUrl: string = `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.UserSettingsPermission}`;
 
   const userStore = useUserStore();
   const user = userStore.info();
@@ -54,3 +54,4 @@ watch(privilegeKey, () => {
     hint="Ask your administrator for the key to acquire additional privileges."
   ></v-text-field>
 </template>
+../../../config/Endpoints

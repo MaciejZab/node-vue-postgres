@@ -6,12 +6,14 @@ export const useSettingsStore = defineStore("settings", () => {
   const settings = ref<ISettings>({
     id: null,
     theme: "light",
+    language: "en",
   });
 
   const set = (data: ISettings): boolean => {
     try {
       settings.value.id = data.id;
       settings.value.theme = data.theme;
+      settings.value.language = data.language;
 
       localStorage.setItem("settings", JSON.stringify(settings.value));
     } catch (error) {

@@ -6,7 +6,7 @@ import { usePermissionStore } from "../stores/permissionStore";
 import { useUserStore } from "../stores/userStore";
 import { useRouter } from "vue-router";
 import { nodeConfig } from "../config/env";
-import { endpoints } from "../config/endpoints";
+import { Endpoints } from "../config/Endpoints";
 import { User } from "../models/user/User";
 import { Permission } from "../models/user/Permission";
 import { useSettingsStore } from "../stores/settingsStore";
@@ -75,7 +75,7 @@ const submitLogin = (): void => {
   if (validation.value) {
     responseStatus.value = null;
     loading(true);
-    const reqUrl: string = `${nodeConfig.origin}:${nodeConfig.port}${endpoints.userAuthPath}`;
+    const reqUrl: string = `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.UserAuth}`;
     data.value.username.toLocaleLowerCase();
     const reqData: LoginData = data.value;
 
@@ -94,7 +94,7 @@ const submitLogin = (): void => {
         reset();
         responseStatus.value = new ResponseStatus({
           code: error.response.status,
-          message: error.response.data.message,
+          message: error.response.data.statusMessage,
         });
       });
   }
@@ -119,11 +119,11 @@ const submitLogin = (): void => {
 </script>
 
 <template>
-  <v-container class="fill-height">
+  <v-container class="layout-view-container">
     <v-row>
-      <v-col>
-        <v-sheet :width="300" border class="d-flex flex-column mx-auto">
-          <v-container>
+      <v-col class="match-screen-height d-flex flex-column justify-center">
+        <v-sheet :width="300" border class="h-auto d-flex flex-column align-center mx-auto">
+          <v-container fluid>
             <v-row>
               <v-col>
                 <v-img :width="268" src="../intranet-logo.svg" class="d-flex flex-column"></v-img>
@@ -201,3 +201,4 @@ const submitLogin = (): void => {
     </v-row>
   </v-container>
 </template>
+../config/Endpoints

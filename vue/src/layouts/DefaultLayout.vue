@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import DefaultNavDrawer from "./../components/layouts/default/NavigationDrawer.vue";
 import DefaultAppBar from "./../components/layouts/default/AppBar.vue";
-import DefaultBreadcrumbs from "../components/layouts/default/Breadcrumbs.vue";
-import DefaultFooter from "../components/layouts/default/Footer.vue";
+import LayoutBreadcrumbs from "../components/layouts/Breadcrumbs.vue";
+import LayoutFooter from "../components/layouts/Footer.vue";
 
 import { ref } from "vue";
 
@@ -20,15 +20,15 @@ const toggleDrawer = () => {
 </script>
 
 <template>
-  <v-sheet class="d-flex flex-column fill-height" @click="hideDrawer">
+  <v-sheet class="d-flex flex-column" @click="hideDrawer">
     <default-app-bar @toggle-drawer="toggleDrawer" />
     <default-nav-drawer :drawer-visible="drawerVisible" />
 
     <v-main class="bg-background">
-      <default-breadcrumbs />
+      <layout-breadcrumbs />
       <router-view></router-view>
     </v-main>
 
-    <default-footer />
+    <layout-footer />
   </v-sheet>
 </template>

@@ -23,54 +23,54 @@ switch (screen) {
 const tools = [
   {
     id: 1,
-    title: "Documents",
-    text: "Document management system.",
+    name: "documents",
+    href: "/tool/documents",
     icon: "file-document",
     image: "../tools/docs.png",
   },
-
   {
     id: 2,
-    title: "Training",
-    text: "Enhancing skills and certifications among operators.",
+    name: "training",
+    href: "",
     icon: "book-open-variant-outline",
     image: "../tools/training.png",
   },
   {
     id: 3,
-    title: "CN",
-    text: "Creation and approval of change notices.",
+    name: "cn",
+    href: "",
     icon: "file-document-edit",
     image: "../tools/change.png",
   },
   {
     id: 4,
-    title: "Core",
-    text: "Managing data that is utilized by other tools.",
+    name: "matrix",
+    href: "/tool/matrix",
     icon: "database",
     image: "../tools/matrix.png",
   },
   {
     id: 5,
-    title: "8D",
-    text: "Address complaints and internal issues efficiently.",
+    name: "8d",
+    href: "",
     icon: "alert-octagon",
     image: "../tools/analytics.png",
+  },
+  {
+    id: 6,
+    name: "boss",
+    href: "",
+    icon: "account-tie",
+    image: "../tools/boss.png",
   },
 ];
 </script>
 
 <template>
-  <v-container class="fill-height">
+  <v-container class="layout-view-container">
     <v-row>
       <v-col :cols="cols" v-for="tool in tools" :key="tool.id">
-        <v-card
-          class="ma-4 bg-surface"
-          elevation="6"
-          rel="noopener"
-          href="https://github.com/vuetifyjs/vuetify/"
-          target="_blank"
-        >
+        <v-card class="ma-4 bg-surface" elevation="6" rel="noopener" :href="tool.href">
           <v-container>
             <v-row class="align-center">
               <v-icon
@@ -79,14 +79,16 @@ const tools = [
                 :icon="`mdi-${tool.icon}`"
                 size="38"
               ></v-icon>
-              <v-card-title class="mr-auto">{{ tool.title }}</v-card-title>
+              <v-card-title class="mr-auto">{{
+                $t(`common.default_layout.pages.tools.${tool.name}.title`)
+              }}</v-card-title>
               <!-- <v-icon class="ma-4" color="secondary" icon="mdi-open-in-new" size="38"></v-icon> -->
             </v-row>
           </v-container>
 
           <v-img class="mx-auto" height="300" :src="tool.image"> </v-img>
 
-          <v-card-text>{{ tool.text }}</v-card-text>
+          <v-card-text>{{ $t(`common.default_layout.pages.tools.${tool.name}.text`) }}</v-card-text>
         </v-card>
       </v-col>
     </v-row>

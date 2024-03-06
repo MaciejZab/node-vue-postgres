@@ -51,6 +51,7 @@ export class User1708720253714 implements MigrationInterface {
             generationStrategy: "increment",
           },
           { name: "theme", type: "varchar" },
+          { name: "language", type: "varchar" },
         ],
       })
     );

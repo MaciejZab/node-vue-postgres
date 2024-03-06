@@ -5,6 +5,8 @@ import HomeView from "../../views/HomeView.vue";
 import AuthView from "../../views/AuthView.vue";
 import SettingsView from "../../views/SettingsView.vue";
 import ToolsView from "../../views/ToolsView.vue";
+import DocumentsView from "../../views/tools/DocumentsView.vue";
+import MatrixView from "../../views/tools/MatrixView.vue";
 
 // 2. Define routes
 const routes = [
@@ -16,6 +18,12 @@ const routes = [
       read: false,
       write: false,
       control: false,
+      breadcrumbs: {
+        include: false,
+        parent: "",
+        name: "",
+        path: "",
+      },
     },
   },
   {
@@ -31,6 +39,12 @@ const routes = [
           read: true,
           write: false,
           control: false,
+          breadcrumbs: {
+            include: true,
+            parent: "pages",
+            name: "home",
+            path: "/pages/home",
+          },
         },
       },
       {
@@ -41,6 +55,12 @@ const routes = [
           read: true,
           write: false,
           control: false,
+          breadcrumbs: {
+            include: false,
+            parent: "",
+            name: "",
+            path: "",
+          },
         },
       },
       {
@@ -51,6 +71,12 @@ const routes = [
           read: true,
           write: false,
           control: false,
+          breadcrumbs: {
+            include: true,
+            parent: "pages",
+            name: "settings",
+            path: "",
+          },
         },
       },
       {
@@ -59,8 +85,69 @@ const routes = [
         component: ToolsView,
         meta: {
           read: true,
-          write: true,
+          write: false,
           control: false,
+          breadcrumbs: {
+            include: true,
+            parent: "pages",
+            name: "tools",
+            path: "",
+          },
+        },
+      },
+    ],
+  },
+  {
+    path: "/tool",
+    name: "tool",
+    component: DefaultLayout,
+    children: [
+      {
+        path: "",
+        name: "redirectDocuments",
+        redirect: { name: "documents" },
+        meta: {
+          read: true,
+          write: false,
+          control: false,
+          breadcrumbs: {
+            include: true,
+            parent: "pages",
+            name: "tools",
+            path: "/pages/tools",
+          },
+        },
+      },
+      {
+        path: "documents",
+        name: "documents",
+        component: DocumentsView,
+        meta: {
+          reaD: true,
+          write: false,
+          control: false,
+          breadcrumbs: {
+            include: true,
+            parent: "tool",
+            name: "documents",
+            path: "",
+          },
+        },
+      },
+      {
+        path: "matrix",
+        name: "matrix",
+        component: MatrixView,
+        meta: {
+          reaD: true,
+          write: false,
+          control: false,
+          breadcrumbs: {
+            include: true,
+            parent: "tool",
+            name: "matrix",
+            path: "",
+          },
         },
       },
     ],
@@ -68,7 +155,7 @@ const routes = [
   {
     path: "/:pathMatch(.*)*",
     name: "notFound",
-    redirect: { name: "home" }, // Redirect to home page or any other page you want
+    redirect: { name: "home" },
   },
 ];
 

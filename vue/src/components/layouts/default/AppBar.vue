@@ -1,14 +1,19 @@
 <script setup lang="ts">
-
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 const emits = defineEmits(["toggle-drawer"]);
 
 const toggleDrawer = () => emits("toggle-drawer");
+
+const { t } = useI18n();
+
+const intranet = computed(() => t("common.default_layout.bar"));
 </script>
 
 <template>
-  <v-app-bar :elevation="2" class="bg-primary">
+  <v-app-bar :elevation="2" class="layout-app-bar bg-primary">
     <v-app-bar-nav-icon @click="toggleDrawer" />
-    <v-app-bar-title class="text-onPrimary">Intranet</v-app-bar-title>
+    <v-app-bar-title class="text-h4 text-onPrimary">{{ intranet }}</v-app-bar-title>
   </v-app-bar>
 </template>

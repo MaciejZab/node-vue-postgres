@@ -7,8 +7,11 @@ export class UserSettingsEntity {
   id: number;
   @Column()
   theme: string;
+  @Column()
+  language: string;
 
   constructor(settings: ISettings | null = null) {
     this.theme = settings?.theme ?? "light";
+    this.language = settings?.language ?? "en";
   }
 }

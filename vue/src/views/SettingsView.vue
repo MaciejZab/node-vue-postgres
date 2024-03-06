@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import alertResponseStatus from "../components/common/alertResponseStatus.vue";
 import ApplicationWindow from "../components/views/settings/ApplicationWindow.vue";
 import UserWindow from "../components/views/settings/UserWindow.vue";
 import { IResponseStatus } from "../interfaces/common/IResponseStatus";
+import { useI18n } from "vue-i18n";
 
 const responseStatus = ref<IResponseStatus | null>(null);
 
 const handleResponseStatus = (status: IResponseStatus) => (responseStatus.value = status);
 const tab = ref<number>(1);
+
+const { t } = useI18n();
+
+const settingsApp = computed(() => t("common.default_layout.pages.settings.application.name"));
+const settingsUser = computed(() => t("common.default_layout.pages.settings.user.name"));
 </script>
 
 <template>
-  <v-container>
+  <v-container class="layout-view-container">
     <v-row>
       <v-col cols="12">
         <v-card class="bg-surface text-onSurface mt-3">
@@ -25,8 +31,8 @@ const tab = ref<number>(1);
             <v-row>
               <v-col cols="12">
                 <v-tabs v-model="tab" align-tabs="center">
-                  <v-tab :value="1">Application</v-tab>
-                  <v-tab :value="2">User</v-tab>
+                  <v-tab :value="1">{{ settingsApp }}</v-tab>
+                  <v-tab :value="2">{{ settingsUser }}</v-tab>
                 </v-tabs>
                 <v-window v-model="tab">
                   <v-window-item :value="1">

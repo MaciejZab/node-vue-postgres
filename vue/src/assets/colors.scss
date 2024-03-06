@@ -1,9 +1,24 @@
 // Brand colors
-$reconext-blue: #375ea9;
-$reconext-light-blue: #a9bbe2;
-$reconext-light-green: #c6e0bc;
-$reconext-light-grayblue: #c5ceda;
-$reconext-light-graygreen: #cacaca;
-$reconext-cool-gray9: #76777a;
-$reconext-cool-gray7: #97999a;
-$reconext-green: #45ae52;
+// $reconext-blue: #375ea9;
+// $reconext-light-blue: #a9bbe2;
+// $reconext-light-green: #c6e0bc;
+// $reconext-light-grayblue: #c5ceda;
+// $reconext-light-graygreen: #cacaca;
+// $reconext-cool-gray9: #76777a;
+// $reconext-cool-gray7: #97999a;
+// $reconext-green: #45ae52;
+
+// @use "vuetify/data/colors";
+
+// $background: #f0f0f0; // Your desired light background color
+// $on-background: #000000; // Your desired text color on light background
+// $surface: #ffffff; // Your desired light surface color
+// $on-surface: #000000; // Your desired text color on light surface
+
+// $v-theme-dark {
+//   // Override dark theme variables (optional)
+//   $background: black;
+//   $on-background: #ffffff;
+//   $surface: #2c2e35;
+//   $on-surface: #ffffff;
+// }
