@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from "vue";
-import { nodeConfig } from "../../../../config/env";
-import { Endpoints } from "../../../../config/Endpoints";
-import axios from "axios";
 import { ResponseStatus } from "../../../../models/common/ResponseStatus";
 import { Chips } from "../../../../interfaces/document/Chips";
 import { Chip } from "../../../../interfaces/document/Chip";
@@ -24,6 +21,7 @@ const SubManager = new SubcategoriesManager();
 const documents = ref<Array<Chip>>([]);
 
 const level = ref<Level>(Level.Dep);
+const manager = ref<DepartmentsManager | CategoriesManager | SubcategoriesManager>(DepManager);
 
 const emitTableChange = () => {
   emit("table", level.value);
@@ -43,11 +41,17 @@ const category = ref<string | undefined>(undefined);
 watch(
   () => [props.chips?.department, props.chips?.category],
   ([dep, cat]) => {
+    const reqData: any = {
+      categoryName: cat,
+      departmentName: dep,
+    };
+
     if (cat) {
       (async () => {
         try {
-          documents.value = await SubManager.get(dep as string, cat as string);
+          documents.value = await SubManager.get(reqData);
           level.value = Level.Sub;
+          manager.value = SubManager;
         } catch (error) {
           console.log(error);
         }
@@ -55,8 +59,9 @@ watch(
     } else if (dep) {
       (async () => {
         try {
-          documents.value = await CatManager.get(dep as string);
+          documents.value = await CatManager.get(reqData);
           level.value = Level.Cat;
+          manager.value = CatManager;
         } catch (error) {
           console.log(error);
         }
@@ -66,6 +71,7 @@ watch(
         try {
           documents.value = await DepManager.get();
           level.value = Level.Dep;
+          manager.value = DepManager;
         } catch (error) {
           console.log(error);
         }
@@ -105,12 +111,6 @@ const editItem = (item: any) => {
   dialog.value = true;
 };
 
-const deleteItem = (item: any) => {
-  editedIndex.value = documents.value.indexOf(item);
-  editedItem.value = { ...item };
-  dialogDelete.value = true;
-};
-
 const deleteItemConfirm = () => {
   documents.value.splice(editedIndex.value, 1);
   closeDelete();
@@ -132,55 +132,50 @@ const closeDelete = () => {
   });
 };
 
+const deleteItem = (item: Chip) => {
+  editedIndex.value = documents.value.indexOf(item);
+  editedItem.value = { ...item };
+  dialogDelete.value = true;
+
+  // let endpoint: string;
+  // const itemId: number = editedItem.value.id;
+  // let callback: (() => Promise<void | Array<Chip>>) | undefined;
+
+  // switch (level.value) {
+  //   case Level.Dep:
+  //     endpoint = Endpoints.DocumentDepartment;
+  //     callback = async () => (documents.value = await DepManager.delete(itemId));
+
+  //     break;
+  //   case Level.Cat:
+  //     endpoint = Endpoints.DocumentCategory;
+  //     callback = async () => (documents.value = await CatManager.delete(itemId));
+
+  //     break;
+  //   case Level.Sub:
+  //     endpoint = Endpoints.DocumentSubcategory;
+  //     callback = async () => (documents.value = await SubManager.delete(itemId));
+
+  //     break;
+  //   default:
+  //     return;
+  // }
+};
+
 const save = async () => {
-  let endpoint: string;
-  let requestBody: any;
-  let callback: (() => Promise<void | Array<Chip>>) | undefined;
-
-  switch (level.value) {
-    case Level.Dep:
-      endpoint = Endpoints.DocumentDepartment;
-      requestBody = { name: editedItem.value.name };
-      callback = async () => (documents.value = await DepManager.get());
-
-      break;
-    case Level.Cat:
-      endpoint = Endpoints.DocumentCategory;
-      requestBody = {
-        name: editedItem.value.name,
-        departmentName: department.value,
-      };
-      callback = async () => (documents.value = await CatManager.get(department.value as string));
-
-      break;
-    case Level.Sub:
-      endpoint = Endpoints.DocumentSubcategory;
-      requestBody = {
-        name: editedItem.value.name,
-        categoryName: category.value,
-        departmentName: department.value,
-      };
-      callback = async () =>
-        (documents.value = await SubManager.get(
-          department.value as string,
-          category.value as string
-        ));
-
-      break;
-    default:
-      return;
-  }
+  const reqData: any = {
+    name: editedItem.value.name,
+    categoryName: category.value,
+    departmentName: department.value,
+  };
 
   if (editedIndex.value > -1) {
     Object.assign(documents.value[editedIndex.value], editedItem.value);
   } else {
     try {
-      await axios.post(`${nodeConfig.origin}:${nodeConfig.port}${endpoint}`, requestBody);
-
-      if (callback) {
-        await callback();
-        emitTableChange();
-      }
+      await manager.value.post(reqData);
+      documents.value = await manager.value.get(reqData);
+      emitTableChange();
     } catch (error: any) {
       console.log(error);
       responseStatus.value = new ResponseStatus({

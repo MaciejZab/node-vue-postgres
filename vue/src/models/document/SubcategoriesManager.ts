@@ -6,11 +6,34 @@ import { Endpoints } from "../../config/Endpoints";
 class SubcategoriesManager {
   constructor() {}
 
-  public get = async (departmentName: string, categoryName: string): Promise<Array<Chip>> => {
+  public post = async (reqData: any): Promise<Array<Chip>> => {
+    const requestData = {
+      name: reqData.name,
+      departmentName: reqData.departmentName,
+      categoryName: reqData.categoryName,
+    };
+
+    const response = await axios.post(
+      `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentSubcategory}`,
+      requestData
+    );
+    return response.data.added;
+  };
+
+  public get = async (reqData: any): Promise<Array<Chip>> => {
+    const departmentName: string = reqData.departmentName;
+    const categoryName: string = reqData.categoryName;
     const response = await axios.get(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentSubcategory}/${departmentName}/${categoryName}`
     );
     return response.data.got;
+  };
+
+  public delete = async (id: number): Promise<Array<Chip>> => {
+    const response = await axios.delete(
+      `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentSubcategory}/${id}`
+    );
+    return response.data.deleted;
   };
 }
 

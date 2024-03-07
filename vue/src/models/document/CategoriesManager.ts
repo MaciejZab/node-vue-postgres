@@ -6,11 +6,32 @@ import { Endpoints } from "../../config/Endpoints";
 class CategoriesManager {
   constructor() {}
 
-  public get = async (departmentName: string): Promise<Array<Chip>> => {
+  public post = async (reqData: any): Promise<Array<Chip>> => {
+    const requestData = {
+      name: reqData.name,
+      departmentName: reqData.departmentName,
+    };
+
+    const response = await axios.post(
+      `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentCategory}`,
+      requestData
+    );
+    return response.data.added;
+  };
+
+  public get = async (reqData: any): Promise<Array<Chip>> => {
+    const departmentName: string = reqData.departmentName;
     const response = await axios.get(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentCategory}/${departmentName}`
     );
     return response.data.got;
+  };
+
+  public delete = async (id: number): Promise<Array<Chip>> => {
+    const response = await axios.delete(
+      `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentCategory}/${id}`
+    );
+    return response.data.deleted;
   };
 }
 

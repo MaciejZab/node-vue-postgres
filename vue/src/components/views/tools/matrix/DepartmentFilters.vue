@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import axios from "axios";
 import { computed, ref, watch } from "vue";
-import { nodeConfig } from "../../../../config/env";
-import { Endpoints } from "../../../../config/Endpoints";
 import { Chips } from "../../../../interfaces/document/Chips";
 import { Chip } from "../../../../interfaces/document/Chip";
 import { Level } from "../../../../interfaces/document/Level";
+import { DepartmentsManager } from "../../../../models/document/DepartmentsManager";
+import { CategoriesManager } from "../../../../models/document/CategoriesManager";
+import { SubcategoriesManager } from "../../../../models/document/SubcategoriesManager";
 
 const emit = defineEmits(["chips"]);
 
@@ -13,18 +13,15 @@ const props = defineProps<{
   table: Level | undefined;
 }>();
 
+const DepManager = new DepartmentsManager();
+const CatManager = new CategoriesManager();
+const SubManager = new SubcategoriesManager();
+
 const chips = ref<Chips>({
   department: "",
   category: "",
   subcategory: "",
 });
-
-const getDepartments = async (): Promise<Array<Chip> | null> => {
-  const response = await axios.get(
-    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentDepartment}`
-  );
-  return response.data.got;
-};
 
 const departments = ref<Array<Chip> | null>(null);
 const categories = ref<Array<Chip> | null>(null);
@@ -32,7 +29,7 @@ const subcategories = ref<Array<Chip> | null>(null);
 
 (async () => {
   try {
-    departments.value = await getDepartments();
+    departments.value = await DepManager.get();
   } catch (error) {
     console.log(error);
   }
@@ -80,30 +77,18 @@ const chipGroups = computed(() => [
   },
 ]);
 
-const getCategories = async (departmentName: string): Promise<Array<Chip> | null> => {
-  const response = await axios.get(
-    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentCategory}/${departmentName}`
-  );
-  return response.data.got;
-};
-
-const getSubcategories = async (
-  departmentName: string,
-  categoryName: string
-): Promise<Array<Chip> | null> => {
-  const response = await axios.get(
-    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentSubcategory}/${departmentName}/${categoryName}`
-  );
-  return response.data.got;
-};
-
 watch(
   () => [chips.value.department, chips.value.category, props.table],
   ([dep, cat, table]) => {
+    const reqData: any = {
+      categoryName: cat,
+      departmentName: dep,
+    };
+
     if (dep) {
       (async () => {
         try {
-          categories.value = await getCategories(dep as string);
+          categories.value = await CatManager.get(reqData);
         } catch (error) {
           console.log(error);
         }
@@ -112,7 +97,7 @@ watch(
     if (cat) {
       (async () => {
         try {
-          subcategories.value = await getSubcategories(dep as string, cat as string);
+          subcategories.value = await SubManager.get(reqData);
         } catch (error) {
           console.log(error);
         }
@@ -124,7 +109,7 @@ watch(
         case Level.Dep:
           (async () => {
             try {
-              departments.value = await getDepartments();
+              departments.value = await DepManager.get();
             } catch (error) {
               console.log(error);
             }
@@ -134,7 +119,7 @@ watch(
         case Level.Cat:
           (async () => {
             try {
-              categories.value = await getCategories(dep as string);
+              categories.value = await CatManager.get(reqData);
             } catch (error) {
               console.log(error);
             }
@@ -144,7 +129,7 @@ watch(
         case Level.Sub:
           (async () => {
             try {
-              subcategories.value = await getSubcategories(dep as string, cat as string);
+              subcategories.value = await SubManager.get(reqData);
             } catch (error) {
               console.log(error);
             }
