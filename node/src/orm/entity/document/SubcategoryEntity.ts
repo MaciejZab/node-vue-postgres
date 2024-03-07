@@ -1,22 +1,22 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
-import { CategoryEntity } from "./CategoryEntity";
-import { DocumentEntity } from "./DocumentEntity";
+import { Category } from "./CategoryEntity";
+import { Document } from "./DocumentEntity";
 
 @Entity()
-export class SubcategoryEntity {
+export class Subcategory {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   name: string;
 
-  @ManyToOne(() => CategoryEntity, (category) => category.subcategories)
-  category: CategoryEntity;
+  @ManyToOne(() => Category, (category) => category.subcategories)
+  category: Category;
 
-  @OneToMany(() => DocumentEntity, (document) => document.subcategory, { nullable: true })
-  documents: DocumentEntity[];
+  @OneToMany(() => Document, (document) => document.subcategory, { nullable: true })
+  documents: Array<Document>;
 
-  constructor(name: string, category: CategoryEntity) {
+  constructor(name: string, category: Category) {
     this.name = name;
     this.category = category;
   }

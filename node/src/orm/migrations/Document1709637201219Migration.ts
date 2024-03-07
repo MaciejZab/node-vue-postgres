@@ -5,7 +5,7 @@ export class Document1709637201219 implements MigrationInterface {
     // Create Department Entity
     await queryRunner.createTable(
       new Table({
-        name: "department_entity",
+        name: "department",
         columns: [
           {
             name: "id",
@@ -26,7 +26,7 @@ export class Document1709637201219 implements MigrationInterface {
     // Create Category Entity
     await queryRunner.createTable(
       new Table({
-        name: "category_entity",
+        name: "category",
         columns: [
           {
             name: "id",
@@ -50,7 +50,7 @@ export class Document1709637201219 implements MigrationInterface {
     // Create Subcategory Entity
     await queryRunner.createTable(
       new Table({
-        name: "subcategory_entity",
+        name: "subcategory",
         columns: [
           {
             name: "id",
@@ -75,7 +75,7 @@ export class Document1709637201219 implements MigrationInterface {
     // Create Document Entity
     await queryRunner.createTable(
       new Table({
-        name: "document_entity",
+        name: "document",
         columns: [
           {
             name: "id",
@@ -115,7 +115,7 @@ export class Document1709637201219 implements MigrationInterface {
     // Create Competence Entity
     await queryRunner.createTable(
       new Table({
-        name: "competence_entity",
+        name: "competence",
         columns: [
           {
             name: "id",
@@ -134,47 +134,47 @@ export class Document1709637201219 implements MigrationInterface {
 
     // Add Foreign Keys
     await queryRunner.createForeignKey(
-      "category_entity",
+      "category",
       new TableForeignKey({
         columnNames: ["departmentId"],
         referencedColumnNames: ["id"],
-        referencedTableName: "department_entity",
+        referencedTableName: "department",
       })
     );
 
     await queryRunner.createForeignKey(
-      "subcategory_entity",
+      "subcategory",
       new TableForeignKey({
         columnNames: ["categoryId"],
         referencedColumnNames: ["id"],
-        referencedTableName: "category_entity",
+        referencedTableName: "category",
       })
     );
 
     await queryRunner.createForeignKey(
-      "document_entity",
+      "document",
       new TableForeignKey({
         columnNames: ["subcategoryId"],
         referencedColumnNames: ["id"],
-        referencedTableName: "subcategory_entity",
+        referencedTableName: "subcategory",
       })
     );
 
     await queryRunner.createForeignKey(
-      "document_entity",
+      "document",
       new TableForeignKey({
         columnNames: ["competenceId"],
         referencedColumnNames: ["id"],
-        referencedTableName: "competence_entity",
+        referencedTableName: "competence",
       })
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable("document_entity");
-    await queryRunner.dropTable("document_competence_entity");
-    await queryRunner.dropTable("document_subcategory_entity");
-    await queryRunner.dropTable("document_category_entity");
-    await queryRunner.dropTable("department_entity");
+    await queryRunner.dropTable("document");
+    await queryRunner.dropTable("competence");
+    await queryRunner.dropTable("subcategory");
+    await queryRunner.dropTable("category");
+    await queryRunner.dropTable("department");
   }
 }

@@ -1,16 +1,16 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { CategoryEntity } from "./CategoryEntity";
+import { Category } from "./CategoryEntity";
 
 @Entity()
-export class DepartmentEntity {
+export class Department {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   name: string;
 
-  @OneToMany(() => CategoryEntity, (category) => category.department, { nullable: true })
-  categories: CategoryEntity[];
+  @OneToMany(() => Category, (category) => category.department, { nullable: true })
+  categories: Array<Category>;
 
   constructor(name: string) {
     this.name = name;

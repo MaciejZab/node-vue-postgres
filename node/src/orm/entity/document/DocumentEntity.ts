@@ -1,9 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import { CompetenceEntity } from "./CompetenceEntity";
-import { SubcategoryEntity } from "./SubcategoryEntity";
+import { Competence } from "./CompetenceEntity";
+import { Subcategory } from "./SubcategoryEntity";
 
 @Entity()
-export class DocumentEntity {
+export class Document {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -16,9 +16,9 @@ export class DocumentEntity {
   @Column()
   revision: number;
 
-  @ManyToOne(() => SubcategoryEntity, (subcategory) => subcategory.documents, { nullable: true })
-  subcategory: SubcategoryEntity;
+  @ManyToOne(() => Subcategory, (subcategory) => subcategory.documents, { nullable: true })
+  subcategory: Subcategory;
 
-  @ManyToOne(() => CompetenceEntity, (competence) => competence.documents, { nullable: true })
-  competence: CompetenceEntity;
+  @ManyToOne(() => Competence, (competence) => competence.documents, { nullable: true })
+  competence: Competence;
 }

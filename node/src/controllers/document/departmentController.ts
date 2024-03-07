@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 import { dataSource } from "../../config/orm/dataSource";
-import { DepartmentEntity } from "../../orm/entity/document/DepartmentEntity";
+import { Department } from "../../orm/entity/document/DepartmentEntity";
 import { HttpResponseMessage } from "../../enums/response";
 
 const addDepartment = async (req: Request, res: Response) => {
   try {
     const { name } = req.body;
 
-    const department = new DepartmentEntity(name);
+    const department = new Department(name);
 
-    await dataSource.getRepository(DepartmentEntity).save(department);
+    await dataSource.getRepository(Department).save(department);
 
     res.status(201).json({
       added: department,
@@ -37,7 +37,7 @@ const editDepartment = async (req: Request, res: Response) => {
   try {
     const { id, name } = req.params;
 
-    const department = await dataSource.getRepository(DepartmentEntity).findOne(id);
+    const department = await dataSource.getRepository(Department).findOne(id);
 
     if (!department) {
       return res.status(404).json({
@@ -48,7 +48,7 @@ const editDepartment = async (req: Request, res: Response) => {
 
     department.name = name;
 
-    await dataSource.getRepository(DepartmentEntity).save(department);
+    await dataSource.getRepository(Department).save(department);
 
     res.status(200).json({
       edited: department,
@@ -76,7 +76,7 @@ const removeDepartment = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const department = await dataSource.getRepository(DepartmentEntity).findOne(id);
+    const department = await dataSource.getRepository(Department).findOne(id);
 
     if (!department) {
       return res.status(404).json({
@@ -85,7 +85,7 @@ const removeDepartment = async (req: Request, res: Response) => {
       });
     }
 
-    await dataSource.getRepository(DepartmentEntity).remove(department);
+    await dataSource.getRepository(Department).remove(department);
 
     res.status(200).json({
       removed: department,
@@ -103,7 +103,7 @@ const removeDepartment = async (req: Request, res: Response) => {
 
 const getDepartments = async (req: Request, res: Response) => {
   try {
-    const departments = await dataSource.getRepository(DepartmentEntity).find();
+    const departments = await dataSource.getRepository(Department).find();
 
     res.status(200).json({
       got: departments,

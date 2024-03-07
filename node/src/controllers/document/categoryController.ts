@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 import { dataSource } from "../../config/orm/dataSource";
-import { CategoryEntity } from "../../orm/entity/document/CategoryEntity";
+import { Category } from "../../orm/entity/document/CategoryEntity";
 import { HttpResponseMessage } from "../../enums/response";
-import { DepartmentEntity } from "../../orm/entity/document/DepartmentEntity";
+import { Department } from "../../orm/entity/document/DepartmentEntity";
 
 const addCategory = async (req: Request, res: Response) => {
   try {
     const { name, departmentName } = req.body;
 
     const department = await dataSource
-      .getRepository(DepartmentEntity)
+      .getRepository(Department)
       .findOne({ where: { name: departmentName } });
 
     if (!department) {
@@ -19,13 +19,10 @@ const addCategory = async (req: Request, res: Response) => {
       });
     }
 
-    // Create a new category entity
-    const category = new CategoryEntity(name, department);
+    const category = new Category(name, department);
 
-    // Save the category entity to the database
-    await dataSource.getRepository(CategoryEntity).save(category);
+    await dataSource.getRepository(Category).save(category);
 
-    // Send success response
     res.status(201).json({
       added: category,
       message: "Category added successfully",
@@ -44,7 +41,7 @@ const editCategory = async (req: Request, res: Response) => {
   try {
     const { id, name } = req.params;
 
-    const category = await dataSource.getRepository(CategoryEntity).findOne(id);
+    const category = await dataSource.getRepository(Category).findOne(id);
 
     if (!category) {
       return res.status(404).json({
@@ -56,7 +53,7 @@ const editCategory = async (req: Request, res: Response) => {
     category.name = name;
 
     // Save the updated category
-    await dataSource.getRepository(CategoryEntity).save(category);
+    await dataSource.getRepository(Category).save(category);
 
     // Send success response
     res.status(200).json({
@@ -77,7 +74,7 @@ const removeCategory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const category = await dataSource.getRepository(CategoryEntity).findOne(id);
+    const category = await dataSource.getRepository(Category).findOne(id);
 
     if (!category) {
       return res.status(404).json({
@@ -86,7 +83,7 @@ const removeCategory = async (req: Request, res: Response) => {
       });
     }
 
-    await dataSource.getRepository(CategoryEntity).remove(category);
+    await dataSource.getRepository(Category).remove(category);
 
     res.status(200).json({
       removed: category,
@@ -107,7 +104,7 @@ const getCategories = async (req: Request, res: Response) => {
     const { departmentName } = req.params;
 
     const department = await dataSource
-      .getRepository(DepartmentEntity)
+      .getRepository(Department)
       .findOne({ where: { name: departmentName }, relations: ["categories"] });
     if (!department) {
       return res.status(404).json({

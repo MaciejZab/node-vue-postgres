@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
 import { dataSource } from "../../config/orm/dataSource";
 import { HttpResponseMessage } from "../../enums/response";
-import { SubcategoryEntity } from "../../orm/entity/document/SubcategoryEntity";
-import { CategoryEntity } from "../../orm/entity/document/CategoryEntity";
-import { DepartmentEntity } from "../../orm/entity/document/DepartmentEntity";
+import { Subcategory } from "../../orm/entity/document/SubcategoryEntity";
+import { Category } from "../../orm/entity/document/CategoryEntity";
+import { Department } from "../../orm/entity/document/DepartmentEntity";
 
 const addSubcategory = async (req: Request, res: Response) => {
   try {
     const { name, categoryName, departmentName } = req.body;
 
     const category = await dataSource
-      .getRepository(CategoryEntity)
+      .getRepository(Category)
       .findOne({ where: { name: categoryName, department: { name: departmentName } } });
 
     if (!category) {
@@ -20,9 +20,9 @@ const addSubcategory = async (req: Request, res: Response) => {
       });
     }
 
-    const subcategory = new SubcategoryEntity(name, category);
+    const subcategory = new Subcategory(name, category);
 
-    await dataSource.getRepository(SubcategoryEntity).save(subcategory);
+    await dataSource.getRepository(Subcategory).save(subcategory);
 
     res.status(201).json({
       added: subcategory,
@@ -42,7 +42,7 @@ const editSubcategory = async (req: Request, res: Response) => {
   try {
     const { id, name } = req.params;
 
-    const subcategory = await dataSource.getRepository(SubcategoryEntity).findOne(id);
+    const subcategory = await dataSource.getRepository(Subcategory).findOne(id);
 
     if (!subcategory) {
       return res.status(404).json({
@@ -53,7 +53,7 @@ const editSubcategory = async (req: Request, res: Response) => {
 
     subcategory.name = name;
 
-    await dataSource.getRepository(SubcategoryEntity).save(subcategory);
+    await dataSource.getRepository(Subcategory).save(subcategory);
 
     res.status(200).json({
       edited: subcategory,
@@ -73,7 +73,7 @@ const removeSubcategory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const subcategory = await dataSource.getRepository(SubcategoryEntity).findOne(id);
+    const subcategory = await dataSource.getRepository(Subcategory).findOne(id);
 
     if (!subcategory) {
       return res.status(404).json({
@@ -82,7 +82,7 @@ const removeSubcategory = async (req: Request, res: Response) => {
       });
     }
 
-    await dataSource.getRepository(SubcategoryEntity).remove(subcategory);
+    await dataSource.getRepository(Subcategory).remove(subcategory);
 
     res.status(200).json({
       removed: subcategory,
@@ -103,7 +103,7 @@ const getSubcategories = async (req: Request, res: Response) => {
     const { departmentName, categoryName } = req.params;
 
     const department = await dataSource
-      .getRepository(DepartmentEntity)
+      .getRepository(Department)
       .findOne({ where: { name: departmentName }, relations: ["categories"] });
 
     if (!department) {
@@ -120,9 +120,7 @@ const getSubcategories = async (req: Request, res: Response) => {
       });
     }
 
-    const subcategories = await dataSource
-      .getRepository(SubcategoryEntity)
-      .find({ where: { category } });
+    const subcategories = await dataSource.getRepository(Subcategory).find({ where: { category } });
 
     res.status(200).json({
       got: subcategories,

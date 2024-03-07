@@ -1,14 +1,5 @@
 <script setup lang="ts">
 
-/* 
-
-- BUG: kiedy nie odznacze dalszej kategorii i zmienie department wypierdala jakies 404
-
-- mozliwa zmiana categorii
-
-
-*/
-
 import axios from "axios";
 import { computed, ref, watch } from "vue";
 import { nodeConfig } from "../../../../config/env";

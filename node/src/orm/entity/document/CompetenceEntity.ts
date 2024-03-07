@@ -1,14 +1,14 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
-import { DocumentEntity } from "./DocumentEntity";
+import { Document } from "./DocumentEntity";
 
 @Entity()
-export class CompetenceEntity {
+export class Competence {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   name: string;
 
-  @OneToMany(() => DocumentEntity, (document) => document.competence, { nullable: true })
-  documents: DocumentEntity[];
+  @OneToMany(() => Document, (document) => document.competence, { nullable: true })
+  documents: Array<Document>;
 }
