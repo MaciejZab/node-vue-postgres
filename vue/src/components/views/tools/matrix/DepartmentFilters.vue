@@ -1,13 +1,17 @@
 <script setup lang="ts">
-
 import axios from "axios";
 import { computed, ref, watch } from "vue";
 import { nodeConfig } from "../../../../config/env";
 import { Endpoints } from "../../../../config/Endpoints";
 import { Chips } from "../../../../interfaces/document/Chips";
 import { Chip } from "../../../../interfaces/document/Chip";
+import { Level } from "../../../../interfaces/document/Level";
 
 const emit = defineEmits(["chips"]);
+
+const props = defineProps<{
+  table: Level | undefined;
+}>();
 
 const chips = ref<Chips>({
   department: "",
@@ -94,8 +98,8 @@ const getSubcategories = async (
 };
 
 watch(
-  () => [chips.value.department, chips.value.category],
-  ([dep, cat]) => {
+  () => [chips.value.department, chips.value.category, props.table],
+  ([dep, cat, table]) => {
     if (dep) {
       (async () => {
         try {
@@ -114,13 +118,50 @@ watch(
         }
       })();
     }
+
+    if (table !== undefined) {
+      switch (table as Level) {
+        case Level.Dep:
+          (async () => {
+            try {
+              departments.value = await getDepartments();
+            } catch (error) {
+              console.log(error);
+            }
+          })();
+          break;
+
+        case Level.Cat:
+          (async () => {
+            try {
+              categories.value = await getCategories(dep as string);
+            } catch (error) {
+              console.log(error);
+            }
+          })();
+          break;
+
+        case Level.Sub:
+          (async () => {
+            try {
+              subcategories.value = await getSubcategories(dep as string, cat as string);
+            } catch (error) {
+              console.log(error);
+            }
+          })();
+          break;
+
+        default:
+          break;
+      }
+    }
   }
 );
 
 const emitChipsChange = () => {
   emit("chips", chips.value);
 };
-</>
+</script>
 
 <template>
   <v-card>

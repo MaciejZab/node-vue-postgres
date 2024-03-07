@@ -6,48 +6,32 @@ import axios from "axios";
 import { ResponseStatus } from "../../../../models/common/ResponseStatus";
 import { Chips } from "../../../../interfaces/document/Chips";
 import { Chip } from "../../../../interfaces/document/Chip";
+import { Level } from "../../../../interfaces/document/Level";
+import { DepartmentsManager } from "../../../../models/document/DepartmentsManager";
+import { SubcategoriesManager } from "../../../../models/document/SubcategoriesManager";
+import { CategoriesManager } from "../../../../models/document/CategoriesManager";
+
+const emit = defineEmits(["table"]);
 
 const props = defineProps<{
   chips: Chips | undefined;
 }>();
 
+const DepManager = new DepartmentsManager();
+const CatManager = new CategoriesManager();
+const SubManager = new SubcategoriesManager();
+
 const documents = ref<Array<Chip>>([]);
-
-const getSubcategories = async (
-  departmentName: string,
-  categoryName: string
-): Promise<Array<Chip>> => {
-  const response = await axios.get(
-    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentSubcategory}/${departmentName}/${categoryName}`
-  );
-  return response.data.got;
-};
-
-const getCategories = async (departmentName: string): Promise<Array<Chip>> => {
-  const response = await axios.get(
-    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentCategory}/${departmentName}`
-  );
-  return response.data.got;
-};
-
-const getDepartments = async (): Promise<Array<Chip>> => {
-  const response = await axios.get(
-    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentDepartment}`
-  );
-  return response.data.got;
-};
-
-enum Level {
-  Dep,
-  Cat,
-  Sub,
-}
 
 const level = ref<Level>(Level.Dep);
 
+const emitTableChange = () => {
+  emit("table", level.value);
+};
+
 (async () => {
   try {
-    documents.value = await getDepartments();
+    documents.value = await DepManager.get();
   } catch (error) {
     console.log(error);
   }
@@ -62,7 +46,7 @@ watch(
     if (cat) {
       (async () => {
         try {
-          documents.value = await getSubcategories(dep as string, cat as string);
+          documents.value = await SubManager.get(dep as string, cat as string);
           level.value = Level.Sub;
         } catch (error) {
           console.log(error);
@@ -71,7 +55,7 @@ watch(
     } else if (dep) {
       (async () => {
         try {
-          documents.value = await getCategories(dep as string);
+          documents.value = await CatManager.get(dep as string);
           level.value = Level.Cat;
         } catch (error) {
           console.log(error);
@@ -80,7 +64,7 @@ watch(
     } else {
       (async () => {
         try {
-          documents.value = await getDepartments();
+          documents.value = await DepManager.get();
           level.value = Level.Dep;
         } catch (error) {
           console.log(error);
@@ -151,11 +135,14 @@ const closeDelete = () => {
 const save = async () => {
   let endpoint: string;
   let requestBody: any;
+  let callback: (() => Promise<void | Array<Chip>>) | undefined;
 
   switch (level.value) {
     case Level.Dep:
       endpoint = Endpoints.DocumentDepartment;
       requestBody = { name: editedItem.value.name };
+      callback = async () => (documents.value = await DepManager.get());
+
       break;
     case Level.Cat:
       endpoint = Endpoints.DocumentCategory;
@@ -163,7 +150,8 @@ const save = async () => {
         name: editedItem.value.name,
         departmentName: department.value,
       };
-      console.log(requestBody);
+      callback = async () => (documents.value = await CatManager.get(department.value as string));
+
       break;
     case Level.Sub:
       endpoint = Endpoints.DocumentSubcategory;
@@ -172,6 +160,12 @@ const save = async () => {
         categoryName: category.value,
         departmentName: department.value,
       };
+      callback = async () =>
+        (documents.value = await SubManager.get(
+          department.value as string,
+          category.value as string
+        ));
+
       break;
     default:
       return;
@@ -182,6 +176,11 @@ const save = async () => {
   } else {
     try {
       await axios.post(`${nodeConfig.origin}:${nodeConfig.port}${endpoint}`, requestBody);
+
+      if (callback) {
+        await callback();
+        emitTableChange();
+      }
     } catch (error: any) {
       console.log(error);
       responseStatus.value = new ResponseStatus({
@@ -192,6 +191,7 @@ const save = async () => {
 
     if (!responseStatus) documents.value.push(editedItem.value);
   }
+
   close();
 };
 </script>

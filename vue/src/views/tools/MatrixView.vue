@@ -3,6 +3,7 @@ import { ref } from "vue";
 import DepartmentFilters from "../../components/views/tools/matrix/DepartmentFilters.vue";
 import DepartmentTable from "../../components/views/tools/matrix/DepartmentTable.vue";
 import { Chips } from "../../interfaces/document/Chips";
+import { Level } from "../../interfaces/document/Level";
 
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 
@@ -17,8 +18,10 @@ const tabs = [
 const currentTab = ref<number>(1);
 
 const chips = ref<Chips | undefined>(undefined);
+const table = ref<Level | undefined>(undefined);
 
 const handleChips = (newValue: Chips): Chips => (chips.value = newValue);
+const handleTable = (newValue: Level): Level => (table.value = newValue);
 </script>
 
 <template>
@@ -42,8 +45,8 @@ const handleChips = (newValue: Chips): Chips => (chips.value = newValue);
             </v-tabs>
             <v-window v-model="currentTab" class="w-100">
               <v-window-item :value="1">
-                <department-filters @chips="handleChips"></department-filters>
-                <DepartmentTable :chips="chips"></DepartmentTable>
+                <department-filters @chips="handleChips" :table="table"></department-filters>
+                <DepartmentTable @table="handleTable" :chips="chips"></DepartmentTable>
               </v-window-item>
             </v-window>
           </div>
