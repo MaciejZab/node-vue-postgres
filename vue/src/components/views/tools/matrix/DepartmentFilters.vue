@@ -1,4 +1,14 @@
 <script setup lang="ts">
+
+/* 
+
+- BUG: kiedy nie odznacze dalszej kategorii i zmienie department wypierdala jakies 404
+
+- mozliwa zmiana categorii
+
+
+*/
+
 import axios from "axios";
 import { computed, ref, watch } from "vue";
 import { nodeConfig } from "../../../../config/env";
@@ -16,9 +26,9 @@ const chips = ref<Chips>({
 
 const getDepartments = async (): Promise<Array<Chip> | null> => {
   const response = await axios.get(
-    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentDepartments}`
+    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentDepartment}`
   );
-  return response.data.departments;
+  return response.data.got;
 };
 
 const departments = ref<Array<Chip> | null>(null);
@@ -75,20 +85,21 @@ const chipGroups = computed(() => [
   },
 ]);
 
-const getCategories = async (depName: string): Promise<Array<Chip> | null> => {
+const getCategories = async (departmentName: string): Promise<Array<Chip> | null> => {
   const response = await axios.get(
-    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentCatByDep}`,
-    { data: { depName: depName } }
+    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentCategory}/${departmentName}`
   );
-  return response.data.categories;
+  return response.data.got;
 };
 
-const getSubcategories = async (depName: string, catName: string): Promise<Array<Chip> | null> => {
+const getSubcategories = async (
+  departmentName: string,
+  categoryName: string
+): Promise<Array<Chip> | null> => {
   const response = await axios.get(
-    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentSubcategoriesByDepCat}`,
-    { data: { departmentName: depName, categoryName: catName } }
+    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentSubcategory}/${departmentName}/${categoryName}`
   );
-  return response.data.subcategories;
+  return response.data.got;
 };
 
 watch(
@@ -98,7 +109,6 @@ watch(
       (async () => {
         try {
           categories.value = await getCategories(dep as string);
-          console.log(categories.value);
         } catch (error) {
           console.log(error);
         }
@@ -119,7 +129,7 @@ watch(
 const emitChipsChange = () => {
   emit("chips", chips.value);
 };
-</script>
+</>
 
 <template>
   <v-card>

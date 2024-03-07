@@ -3,11 +3,11 @@ enum Endpoints {
   UserSettingsTheme = "/api/user/settings/theme",
   UserSettingsLanguage = "/api/user/settings/language",
   UserSettingsPermission = "/api/user/settings/permission",
-  DocumentDepartments = "/api/document/department",
-  DocumentCategories = "/api/document/category",
-  DocumentCatByDep = "/api/document/category/byDepName",
-  DocumentSubcategories = "/api/document/subcategory",
-  DocumentSubcategoriesByDepCat = "/api/document/subcategory/byDepCatName",
+
+  // documents
+  DocumentDepartment = "/api/document/department",
+  DocumentCategory = "/api/document/category",
+  DocumentSubcategory = "/api/document/subcategory",
 }
 
 export { Endpoints };

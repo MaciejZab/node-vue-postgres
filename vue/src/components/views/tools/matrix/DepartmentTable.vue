@@ -13,27 +13,28 @@ const props = defineProps<{
 
 const documents = ref<Array<Chip>>([]);
 
-const getSubcategories = async (depName: string, catName: string): Promise<Array<Chip>> => {
+const getSubcategories = async (
+  departmentName: string,
+  categoryName: string
+): Promise<Array<Chip>> => {
   const response = await axios.get(
-    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentSubcategoriesByDepCat}`,
-    { data: { departmentName: depName, categoryName: catName } }
+    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentSubcategory}/${departmentName}/${categoryName}`
   );
-  return response.data.subcategories;
+  return response.data.got;
 };
 
-const getCategories = async (depName: string): Promise<Array<Chip>> => {
+const getCategories = async (departmentName: string): Promise<Array<Chip>> => {
   const response = await axios.get(
-    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentCatByDep}`,
-    { data: { depName: depName } }
+    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentCategory}/${departmentName}`
   );
-  return response.data.categories;
+  return response.data.got;
 };
 
 const getDepartments = async (): Promise<Array<Chip>> => {
   const response = await axios.get(
-    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentDepartments}`
+    `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentDepartment}`
   );
-  return response.data.departments;
+  return response.data.got;
 };
 
 enum Level {
@@ -153,11 +154,11 @@ const save = async () => {
 
   switch (level.value) {
     case Level.Dep:
-      endpoint = Endpoints.DocumentDepartments;
+      endpoint = Endpoints.DocumentDepartment;
       requestBody = { name: editedItem.value.name };
       break;
     case Level.Cat:
-      endpoint = Endpoints.DocumentCategories;
+      endpoint = Endpoints.DocumentCategory;
       requestBody = {
         name: editedItem.value.name,
         departmentName: department.value,
@@ -165,7 +166,7 @@ const save = async () => {
       console.log(requestBody);
       break;
     case Level.Sub:
-      endpoint = Endpoints.DocumentSubcategories;
+      endpoint = Endpoints.DocumentSubcategory;
       requestBody = {
         name: editedItem.value.name,
         categoryName: category.value,

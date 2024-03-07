@@ -20,14 +20,14 @@ const addCategory = async (req: Request, res: Response) => {
     }
 
     // Create a new category entity
-    const added = new CategoryEntity(name, department);
+    const category = new CategoryEntity(name, department);
 
     // Save the category entity to the database
-    await dataSource.getRepository(CategoryEntity).save(added);
+    await dataSource.getRepository(CategoryEntity).save(category);
 
     // Send success response
     res.status(201).json({
-      added,
+      added: category,
       message: "Category added successfully",
       statusMessage: HttpResponseMessage.POST_SUCCESS,
     });
@@ -42,9 +42,8 @@ const addCategory = async (req: Request, res: Response) => {
 
 const editCategory = async (req: Request, res: Response) => {
   try {
-    const { id, name } = req.body;
+    const { id, name } = req.params;
 
-    // Find the category by id
     const category = await dataSource.getRepository(CategoryEntity).findOne(id);
 
     if (!category) {
@@ -61,7 +60,7 @@ const editCategory = async (req: Request, res: Response) => {
 
     // Send success response
     res.status(200).json({
-      category,
+      edited: category,
       message: "Category updated successfully",
       statusMessage: HttpResponseMessage.PUT_SUCCESS,
     });
@@ -76,9 +75,8 @@ const editCategory = async (req: Request, res: Response) => {
 
 const removeCategory = async (req: Request, res: Response) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
 
-    // Find the category by id
     const category = await dataSource.getRepository(CategoryEntity).findOne(id);
 
     if (!category) {
@@ -88,11 +86,10 @@ const removeCategory = async (req: Request, res: Response) => {
       });
     }
 
-    // Remove the category
     await dataSource.getRepository(CategoryEntity).remove(category);
 
-    // Send success response
     res.status(200).json({
+      removed: category,
       message: "Category removed successfully",
       statusMessage: HttpResponseMessage.DELETE_SUCCESS,
     });
@@ -105,14 +102,24 @@ const removeCategory = async (req: Request, res: Response) => {
   }
 };
 
-const getAllCategories = async (req: Request, res: Response) => {
+const getCategories = async (req: Request, res: Response) => {
   try {
-    // Fetch all categories from the database
-    const categories = await dataSource.getRepository(CategoryEntity).find();
+    const { departmentName } = req.params;
 
-    // Send success response
+    const department = await dataSource
+      .getRepository(DepartmentEntity)
+      .findOne({ where: { name: departmentName }, relations: ["categories"] });
+    if (!department) {
+      return res.status(404).json({
+        message: "Categories not found",
+        statusMessage: HttpResponseMessage.DELETE_ERROR,
+      });
+    }
+
+    const categories = department.categories;
+
     res.status(200).json({
-      categories,
+      got: categories,
       message: "Categories retrieved successfully",
       statusMessage: HttpResponseMessage.GET_SUCCESS,
     });
@@ -125,30 +132,4 @@ const getAllCategories = async (req: Request, res: Response) => {
   }
 };
 
-const getCatByDepName = async (req: Request, res: Response) => {
-  try {
-    const { depName } = req.body;
-
-    const categories = await dataSource
-      .getRepository(CategoryEntity)
-      .createQueryBuilder("category_entity")
-      .leftJoinAndSelect("category_entity.department", "category_entity_department")
-      .where("department_entity.name = :depName", { depName })
-      .getMany();
-
-    // Send success response
-    res.status(200).json({
-      categories,
-      message: "Categories retrieved successfully",
-      statusMessage: HttpResponseMessage.GET_SUCCESS,
-    });
-  } catch (error) {
-    console.error("Error retrieving categories: ", error);
-    res.status(404).json({
-      message: "Unknown error occurred. Failed to retrieve categories.",
-      statusMessage: HttpResponseMessage.UNKNOWN,
-    });
-  }
-};
-
-export { addCategory, editCategory, removeCategory, getAllCategories, getCatByDepName };
+export { addCategory, editCategory, removeCategory, getCategories };

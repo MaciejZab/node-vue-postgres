@@ -7,27 +7,35 @@ const addDepartment = async (req: Request, res: Response) => {
   try {
     const { name } = req.body;
 
-    const added = new DepartmentEntity(name);
+    const department = new DepartmentEntity(name);
 
-    await dataSource.getRepository(DepartmentEntity).save(added);
+    await dataSource.getRepository(DepartmentEntity).save(department);
 
     res.status(201).json({
-      added,
+      added: department,
       message: "Department added successfully",
       statusMessage: HttpResponseMessage.POST_SUCCESS,
     });
   } catch (error) {
-    console.error("Error adding department: ", error);
-    res.status(404).json({
-      message: "Unknown error occurred. Failed to add department.",
-      statusMessage: HttpResponseMessage.UNKNOWN,
-    });
+    if (error.code === "23505") {
+      // Unique constraint violation error code
+      return res.status(400).json({
+        message: "Department with this name already exists",
+        statusMessage: HttpResponseMessage.PUT_ERROR,
+      });
+    } else {
+      console.error("Error adding department: ", error);
+      res.status(404).json({
+        message: "Unknown error occurred. Failed to add department.",
+        statusMessage: HttpResponseMessage.UNKNOWN,
+      });
+    }
   }
 };
 
 const editDepartment = async (req: Request, res: Response) => {
   try {
-    const { id, name } = req.body;
+    const { id, name } = req.params;
 
     const department = await dataSource.getRepository(DepartmentEntity).findOne(id);
 
@@ -43,22 +51,30 @@ const editDepartment = async (req: Request, res: Response) => {
     await dataSource.getRepository(DepartmentEntity).save(department);
 
     res.status(200).json({
-      department,
+      edited: department,
       message: "Department updated successfully",
       statusMessage: HttpResponseMessage.PUT_SUCCESS,
     });
   } catch (error) {
-    console.error("Error updating department: ", error);
-    res.status(404).json({
-      message: "Unknown error occurred. Failed to update department.",
-      statusMessage: HttpResponseMessage.UNKNOWN,
-    });
+    if (error.code === "23505") {
+      // Unique constraint violation error code
+      return res.status(400).json({
+        message: "Department with this name already exists",
+        statusMessage: HttpResponseMessage.PUT_ERROR,
+      });
+    } else {
+      console.error("Error updating department: ", error);
+      res.status(404).json({
+        message: "Unknown error occurred. Failed to update department.",
+        statusMessage: HttpResponseMessage.UNKNOWN,
+      });
+    }
   }
 };
 
 const removeDepartment = async (req: Request, res: Response) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
 
     const department = await dataSource.getRepository(DepartmentEntity).findOne(id);
 
@@ -72,6 +88,7 @@ const removeDepartment = async (req: Request, res: Response) => {
     await dataSource.getRepository(DepartmentEntity).remove(department);
 
     res.status(200).json({
+      removed: department,
       message: "Department removed successfully",
       statusMessage: HttpResponseMessage.DELETE_SUCCESS,
     });
@@ -84,12 +101,12 @@ const removeDepartment = async (req: Request, res: Response) => {
   }
 };
 
-const getAllDepartments = async (req: Request, res: Response) => {
+const getDepartments = async (req: Request, res: Response) => {
   try {
     const departments = await dataSource.getRepository(DepartmentEntity).find();
 
     res.status(200).json({
-      departments,
+      got: departments,
       message: "Departments retrieved successfully",
       statusMessage: HttpResponseMessage.GET_SUCCESS,
     });
@@ -102,4 +119,4 @@ const getAllDepartments = async (req: Request, res: Response) => {
   }
 };
 
-export { addDepartment, editDepartment, removeDepartment, getAllDepartments };
+export { addDepartment, editDepartment, removeDepartment, getDepartments };

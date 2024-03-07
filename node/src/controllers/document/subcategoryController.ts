@@ -3,6 +3,7 @@ import { dataSource } from "../../config/orm/dataSource";
 import { HttpResponseMessage } from "../../enums/response";
 import { SubcategoryEntity } from "../../orm/entity/document/SubcategoryEntity";
 import { CategoryEntity } from "../../orm/entity/document/CategoryEntity";
+import { DepartmentEntity } from "../../orm/entity/document/DepartmentEntity";
 
 const addSubcategory = async (req: Request, res: Response) => {
   try {
@@ -19,15 +20,12 @@ const addSubcategory = async (req: Request, res: Response) => {
       });
     }
 
-    // Create a new subcategory entity
-    const added = new SubcategoryEntity(name, category);
+    const subcategory = new SubcategoryEntity(name, category);
 
-    // Save the subcategory entity to the database
-    await dataSource.getRepository(SubcategoryEntity).save(added);
+    await dataSource.getRepository(SubcategoryEntity).save(subcategory);
 
-    // Send success response
     res.status(201).json({
-      added,
+      added: subcategory,
       message: "Subcategory added successfully",
       statusMessage: HttpResponseMessage.POST_SUCCESS,
     });
@@ -42,9 +40,8 @@ const addSubcategory = async (req: Request, res: Response) => {
 
 const editSubcategory = async (req: Request, res: Response) => {
   try {
-    const { id, name } = req.body;
+    const { id, name } = req.params;
 
-    // Find the subcategory by id
     const subcategory = await dataSource.getRepository(SubcategoryEntity).findOne(id);
 
     if (!subcategory) {
@@ -56,12 +53,10 @@ const editSubcategory = async (req: Request, res: Response) => {
 
     subcategory.name = name;
 
-    // Save the updated subcategory
     await dataSource.getRepository(SubcategoryEntity).save(subcategory);
 
-    // Send success response
     res.status(200).json({
-      subcategory,
+      edited: subcategory,
       message: "Subcategory updated successfully",
       statusMessage: HttpResponseMessage.PUT_SUCCESS,
     });
@@ -76,9 +71,8 @@ const editSubcategory = async (req: Request, res: Response) => {
 
 const removeSubcategory = async (req: Request, res: Response) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
 
-    // Find the subcategory by id
     const subcategory = await dataSource.getRepository(SubcategoryEntity).findOne(id);
 
     if (!subcategory) {
@@ -88,11 +82,10 @@ const removeSubcategory = async (req: Request, res: Response) => {
       });
     }
 
-    // Remove the subcategory
     await dataSource.getRepository(SubcategoryEntity).remove(subcategory);
 
-    // Send success response
     res.status(200).json({
+      removed: subcategory,
       message: "Subcategory removed successfully",
       statusMessage: HttpResponseMessage.DELETE_SUCCESS,
     });
@@ -105,42 +98,34 @@ const removeSubcategory = async (req: Request, res: Response) => {
   }
 };
 
-const getAllSubcategories = async (req: Request, res: Response) => {
+const getSubcategories = async (req: Request, res: Response) => {
   try {
-    // Fetch all subcategories from the database
-    const subcategories = await dataSource.getRepository(SubcategoryEntity).find();
+    const { departmentName, categoryName } = req.params;
 
-    // Send success response
-    res.status(200).json({
-      subcategories,
-      message: "Subcategories retrieved successfully",
-      statusMessage: HttpResponseMessage.GET_SUCCESS,
-    });
-  } catch (error) {
-    console.error("Error retrieving subcategories: ", error);
-    res.status(404).json({
-      message: "Unknown error occurred. Failed to retrieve subcategories.",
-      statusMessage: HttpResponseMessage.UNKNOWN,
-    });
-  }
-};
+    const department = await dataSource
+      .getRepository(DepartmentEntity)
+      .findOne({ where: { name: departmentName }, relations: ["categories"] });
 
-const getSubcategoriesByDepartmentAndCategoryName = async (req: Request, res: Response) => {
-  try {
-    const { departmentName, categoryName } = req.body;
+    if (!department) {
+      return res.status(404).json({
+        message: "Department not found",
+      });
+    }
+
+    const category = department.categories.find((category) => category.name === categoryName);
+
+    if (!category) {
+      return res.status(404).json({
+        message: "Category not found within the department",
+      });
+    }
 
     const subcategories = await dataSource
       .getRepository(SubcategoryEntity)
-      .createQueryBuilder("subcategory")
-      .leftJoin("subcategory.category", "category")
-      .leftJoin("category.department", "department")
-      .where("department.name = :departmentName", { departmentName })
-      .andWhere("category.name = :categoryName", { categoryName })
-      .getMany();
+      .find({ where: { category } });
 
-    // Send success response
     res.status(200).json({
-      subcategories,
+      got: subcategories,
       message: "Subcategories retrieved successfully",
       statusMessage: HttpResponseMessage.GET_SUCCESS,
     });
@@ -153,10 +138,4 @@ const getSubcategoriesByDepartmentAndCategoryName = async (req: Request, res: Re
   }
 };
 
-export {
-  addSubcategory,
-  editSubcategory,
-  removeSubcategory,
-  getAllSubcategories,
-  getSubcategoriesByDepartmentAndCategoryName,
-};
+export { addSubcategory, editSubcategory, removeSubcategory, getSubcategories };

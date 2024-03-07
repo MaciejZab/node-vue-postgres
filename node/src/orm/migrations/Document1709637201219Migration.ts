@@ -16,6 +16,7 @@ export class Document1709637201219 implements MigrationInterface {
             name: "name",
             type: "varchar",
             isNullable: false,
+            isUnique: true,
           },
         ],
       }),
