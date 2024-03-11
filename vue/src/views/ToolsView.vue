@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useRouter } from "vue-router";
+
 let screen: string;
 const screenWidth: number = window.innerWidth;
 
@@ -64,13 +66,20 @@ const tools = [
     image: "../tools/boss.png",
   },
 ];
+
+const router = useRouter();
 </script>
 
 <template>
-  <v-container class="layout-view-container">
+  <v-container class="layout-view-container bg-background mt-0 pt-0">
     <v-row>
       <v-col :cols="cols" v-for="tool in tools" :key="tool.id">
-        <v-card class="ma-4 bg-surface" elevation="6" rel="noopener" :href="tool.href">
+        <v-card
+          class="ma-4 bg-surface-1 text-on-surface rounded-xl elevation-6"
+          rel="noopener"
+          :href="undefined"
+          @click="router.push({ path: tool.href })"
+        >
           <v-container>
             <v-row class="align-center">
               <v-icon

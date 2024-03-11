@@ -51,6 +51,11 @@ watchEffect(() => {
     <v-row>
       <v-col cols="12">
         <v-breadcrumbs :items="breadcrumbs" class="text-h5">
+          <template v-slot:item="{ item }">
+            <v-breadcrumbs-item :to="item.href" :disabled="item.disabled" exact>
+              {{ item.title }}
+            </v-breadcrumbs-item>
+          </template>
           <template v-slot:divider>
             <v-icon icon="mdi-chevron-right"></v-icon>
           </template>

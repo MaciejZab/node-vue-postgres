@@ -57,7 +57,7 @@ const hello = computed(() => t("common.default_layout.drawer.hello"));
     :location="drawerLocation"
     temporary
     v-model="props.drawerVisible"
-    class="bg-primary"
+    class="bg-layout text-on-surface rounded-xl mt-8"
   >
     <v-list>
       <v-list-item>
@@ -74,6 +74,7 @@ const hello = computed(() => t("common.default_layout.drawer.hello"));
         :link="item.link ? true : undefined"
         :to="item.link"
         @click="item.onClick"
+        :class="item.content === 'logout' ? 'mt-12' : ''"
       >
         <v-list-item-icon>
           <v-icon :icon="`mdi-${item.icon}`"></v-icon>

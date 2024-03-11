@@ -95,29 +95,47 @@ const messages = ref<Array<Weather>>([]);
 
 const messagesPresent = computed(() => Object.keys(messages.value).length === 0);
 
+let retried = false;
+
 axios
   .get("http://www.7timer.info/bin/api.pl?lon=18.01&lat=53.12&product=civil&output=json")
   .then(function (response) {
     messages.value = getCurrentForecast(response.data.init, response.data.dataseries, 4);
   })
   .catch(function (error) {
-    console.log(error);
+    console.log("First weather attempt failed:", error);
+    if (!retried) {
+      retried = true;
+      axios
+        .get("http://www.7timer.info/bin/api.pl?lon=18.01&lat=53.12&product=civil&output=json")
+        .then(function (response) {
+          messages.value = getCurrentForecast(response.data.init, response.data.dataseries, 4);
+        })
+        .catch(function (error) {
+          console.log("Second attempt failed:", error);
+        });
+    }
   });
 </script>
 
 <template>
-  <v-skeleton-loader v-if="messagesPresent" class="bg-secondary" type="article"></v-skeleton-loader>
-  <v-card v-else title="Weather" class="bg-surface mt-4 mt-8" elevation="6">
-    <v-card-text>
-      <div class="font-weight-bold ms-1 mb-2">Today</div>
+  <!-- <v-skeleton-loader v-if="messagesPresent" class="bg-surface-1" type="article"></v-skeleton-loader> -->
 
-      <v-timeline density="compact" align="start">
+  <v-card class="bg-surface-1 rounded-xl mt-5 mr-4" style="height: 435.96px">
+    <v-card-text v-if="messagesPresent" class="d-flex justify-center">
+      <v-progress-circular color="bg-surface-1" indeterminate></v-progress-circular>
+    </v-card-text>
+    <v-card-text v-else>
+      <v-card-title class="pt-4">Weather</v-card-title>
+      <v-card-subtitle class="font-weight-bold ms-1 mb-2">Today</v-card-subtitle>
+
+      <v-timeline class="pl-4" density="compact" align="start">
         <v-timeline-item
           v-for="message in messages"
           :key="message.timepoint"
           :icon="`mdi-${message.icon}`"
-          icon-color="onSecondary"
-          dot-color="secondary"
+          icon-color="on-surface-1"
+          dot-color="surface-1"
           :size="dotSize"
         >
           <div class="mb-4">

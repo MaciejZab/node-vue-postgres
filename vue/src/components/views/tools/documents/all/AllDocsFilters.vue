@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { Chips } from "../../../../interfaces/document/Chips";
-import { Chip } from "../../../../interfaces/document/Chip";
-import { Level } from "../../../../interfaces/document/Level";
-import { DepartmentsManager } from "../../../../models/document/DepartmentsManager";
-import { CategoriesManager } from "../../../../models/document/CategoriesManager";
-import { SubcategoriesManager } from "../../../../models/document/SubcategoriesManager";
+import { Chips } from "../../../../../interfaces/document/Chips";
+import { Chip } from "../../../../../interfaces/document/Chip";
+import { Level } from "../../../../../interfaces/document/Level";
+import { DepartmentsManager } from "../../../../../models/document/DepartmentsManager";
+import { CategoriesManager } from "../../../../../models/document/CategoriesManager";
+import { SubcategoriesManager } from "../../../../../models/document/SubcategoriesManager";
 
 const emit = defineEmits(["chips"]);
 
@@ -46,12 +46,14 @@ const chipGroups = computed(() => [
     },
     set chipsModel(value) {
       chips.value.department = value;
+      chips.value.category = "";
+      chips.value.subcategory = "";
       emitChipsChange();
     },
   },
   {
     id: 2,
-    subtitle: "Category",
+    subtitle: "Program",
     chipsIf: chips.value.department,
     chips: categories.value,
     get chipsModel() {
@@ -59,12 +61,13 @@ const chipGroups = computed(() => [
     },
     set chipsModel(value) {
       chips.value.category = value;
+      chips.value.subcategory = "";
       emitChipsChange();
     },
   },
   {
     id: 3,
-    subtitle: "Subcategory",
+    subtitle: "Workstation",
     chipsIf: chips.value.category,
     chips: subcategories.value,
     get chipsModel() {
@@ -79,66 +82,22 @@ const chipGroups = computed(() => [
 
 watch(
   () => [chips.value.department, chips.value.category, props.table],
-  ([dep, cat, table]) => {
-    const reqData: any = {
-      categoryName: cat,
-      departmentName: dep,
-    };
+  async ([dep, cat, table]) => {
+    const reqData: any = { categoryName: cat, departmentName: dep };
 
-    if (dep) {
-      (async () => {
-        try {
-          categories.value = await CatManager.get(reqData);
-        } catch (error) {
-          console.log(error);
-        }
-      })();
-    }
-    if (cat) {
-      (async () => {
-        try {
-          subcategories.value = await SubManager.get(reqData);
-        } catch (error) {
-          console.log(error);
-        }
-      })();
-    }
+    if (dep) categories.value = await CatManager.get(reqData);
+    if (cat) subcategories.value = await SubManager.get(reqData);
 
-    if (table !== undefined) {
-      switch (table as Level) {
-        case Level.Dep:
-          (async () => {
-            try {
-              departments.value = await DepManager.get();
-            } catch (error) {
-              console.log(error);
-            }
-          })();
-          break;
-
-        case Level.Cat:
-          (async () => {
-            try {
-              categories.value = await CatManager.get(reqData);
-            } catch (error) {
-              console.log(error);
-            }
-          })();
-          break;
-
-        case Level.Sub:
-          (async () => {
-            try {
-              subcategories.value = await SubManager.get(reqData);
-            } catch (error) {
-              console.log(error);
-            }
-          })();
-          break;
-
-        default:
-          break;
-      }
+    switch (table as Level) {
+      case Level.Dep:
+        departments.value = await DepManager.get();
+        break;
+      case Level.Cat:
+        categories.value = await CatManager.get(reqData);
+        break;
+      case Level.Sub:
+        subcategories.value = await SubManager.get(reqData);
+        break;
     }
   }
 );
@@ -149,11 +108,11 @@ const emitChipsChange = () => {
 </script>
 
 <template>
-  <v-card>
-    <template v-for="group in chipGroups" :key="group.id">
-      <v-card-text v-if="!!group.chipsIf">
+  <v-card class="rounded-xl elevation-0">
+    <template v-for="(group, index) in chipGroups" :key="group.id">
+      <v-card-text v-if="!!group.chipsIf" :class="index !== 0 ? 'pt-0' : ''">
         <v-card-subtitle class="text-subtitle-1">
-          <v-icon>mdi-tag</v-icon> {{ group.subtitle }}
+          <v-icon size="20">mdi-tag</v-icon> {{ group.subtitle }}
         </v-card-subtitle>
         <v-chip-group v-model="group.chipsModel" column color="secondary">
           <v-chip

@@ -1,4 +1,4 @@
-const pl = {
+const plC = {
   common: {
     default_layout: {
       bar: "Intranet",
@@ -104,4 +104,4 @@ const pl = {
   },
 };
 
-export { pl };
+export { plC };

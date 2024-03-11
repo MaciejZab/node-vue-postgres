@@ -27,7 +27,7 @@ const slides = [
 </script>
 
 <template>
-  <v-footer class="layout-footer d-flex w-100 bg-primary">
+  <v-footer class="layout-footer d-flex w-100 bg-primary-container text-on-primary-container">
     <div class="d-flex w-100">
       <v-carousel
         v-if="smallScreen"
@@ -38,7 +38,7 @@ const slides = [
         :show-arrows="false"
       >
         <v-carousel-item v-for="slide in slides" :key="slide.id">
-          <v-sheet color="primary" height="100%">
+          <v-sheet class="bg-primary-container text-on-primary-container" height="100%">
             <div class="d-flex fill-height justify-center align-center">
               <div>{{ slide.text }}</div>
             </div>

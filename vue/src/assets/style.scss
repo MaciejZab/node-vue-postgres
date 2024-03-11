@@ -1,19 +1,15 @@
 @import "./colors.scss";
 
-.html,
-.body {
+html,
+body {
   background-color: transparent !important;
 }
 #app {
   width: 100%;
-
-  .v-sheet {
-    height: 100vh;
-  }
 }
 
 $bar-height: 64px;
-$breadcrumb-height: 100px;
+$breadcrumb-height: 84px;
 $footer-height: 32px;
 $margin-bottom: 32px;
 $padding: 8px;
@@ -28,22 +24,8 @@ $padding: 8px;
   }
 
   &-view-container {
-    $total-height: calc(100vh - #{$bar-height} - #{$breadcrumb-height} - #{$footer-height});
-
-    min-height: $total-height !important;
-
-    @media (min-width: 768px) {
-      // Adjust breakpoint accordingly
-      margin-bottom: $margin-bottom !important;
-    }
-
-    .match-min-height {
-      height: calc($total-height - #{$padding}) !important;
-    }
-
-    .match-screen-height {
-      height: calc(100vh - #{$padding});
-    }
+    height: auto;
+    margin-bottom: calc($breadcrumb-height + $footer-height) !important;
   }
 
   &-footer {

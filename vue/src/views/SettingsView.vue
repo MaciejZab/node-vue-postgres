@@ -18,10 +18,10 @@ const settingsUser = computed(() => t("common.default_layout.pages.settings.user
 </script>
 
 <template>
-  <v-container class="layout-view-container">
+  <v-container class="layout-view-container bg-background">
     <v-row>
       <v-col cols="12">
-        <v-card class="bg-surface text-onSurface mt-3">
+        <v-card class="bg-surface-1 text-on-surface rounded-xl elevation-6">
           <v-container fluid>
             <v-row>
               <v-col cols="12">

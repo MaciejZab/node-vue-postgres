@@ -41,7 +41,7 @@ const editCategory = async (req: Request, res: Response) => {
   try {
     const { id, name } = req.params;
 
-    const category = await dataSource.getRepository(Category).findOne(id);
+    const category = await dataSource.getRepository(Category).findOne({ where: { id } });
 
     if (!category) {
       return res.status(404).json({
@@ -74,7 +74,7 @@ const removeCategory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const category = await dataSource.getRepository(Category).findOne(id);
+    const category = await dataSource.getRepository(Category).findOne({ where: { id } });
 
     if (!category) {
       return res.status(404).json({

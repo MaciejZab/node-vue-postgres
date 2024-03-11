@@ -27,6 +27,15 @@ class CategoriesManager {
     return response.data.got;
   };
 
+  public put = async (reqData: any): Promise<Array<Chip>> => {
+    const id: string = reqData.id;
+    const name: string = reqData.name;
+    const response = await axios.put(
+      `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentCategory}/${id}/${name}`
+    );
+    return response.data.edited;
+  };
+
   public delete = async (id: number): Promise<Array<Chip>> => {
     const response = await axios.delete(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentCategory}/${id}`

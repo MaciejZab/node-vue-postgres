@@ -97,7 +97,10 @@ watch(language, () => {
 watch(locale, () => {
   themeOptions.value = [
     { title: t("common.default_layout.pages.settings.application.theme.dark"), value: "dark" },
-    { title: t("common.default_layout.pages.settings.application.theme.light"), value: "light" },
+    {
+      title: t("common.default_layout.pages.settings.application.theme.light"),
+      value: "light",
+    },
   ];
   languageOptions.value = [
     { title: t("common.default_layout.pages.settings.application.language.english"), value: "en" },

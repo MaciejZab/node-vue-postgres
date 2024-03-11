@@ -1,4 +1,4 @@
-const ua = {
+const uaC = {
   common: {
     default_layout: {
       bar: "Інтранет",
@@ -104,4 +104,4 @@ const ua = {
   },
 };
 
-export { ua };
+export { uaC };

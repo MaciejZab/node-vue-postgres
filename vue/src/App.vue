@@ -18,7 +18,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-app class="font-size-handler">
+  <v-app class="bg-background">
     <!-- vue-router -->
     <router-view></router-view>
   </v-app>

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import DepartmentFilters from "../../components/views/tools/matrix/DepartmentFilters.vue";
-import DepartmentTable from "../../components/views/tools/matrix/DepartmentTable.vue";
+import DepartmentFilters from "../../components/views/tools/matrix/department/DepartmentFilters.vue";
+import DepartmentTable from "../../components/views/tools/matrix/department/DepartmentTable.vue";
+import DocumentFilters from "../../components/views/tools/matrix/document/DocumentFilters.vue";
+import DocumentTable from "../../components/views/tools/matrix/document/DocumentTable.vue";
 import { Chips } from "../../interfaces/document/Chips";
 import { Level } from "../../interfaces/document/Level";
 
@@ -13,6 +15,11 @@ const tabs = [
     name: "departments",
     icon: "mdi-office-building",
   },
+  {
+    id: 2,
+    name: "documents",
+    icon: "mdi-file-document",
+  },
 ];
 
 const currentTab = ref<number>(1);
@@ -20,37 +27,74 @@ const currentTab = ref<number>(1);
 const chips = ref<Chips | undefined>(undefined);
 const table = ref<Level | undefined>(undefined);
 
-const handleChips = (newValue: Chips): Chips => (chips.value = newValue);
-const handleTable = (newValue: Level): Level => (table.value = newValue);
+const handleChips = (newValue: Chips): void => {
+  chips.value = newValue;
+};
+const handleTable = (newValue: Level): void => {
+  table.value = newValue;
+  setTimeout(() => {
+    table.value = undefined;
+  }, 0);
+};
 </script>
 
 <template>
-  <v-container class="layout-view-container">
+  <v-container class="layout-view-container bg-background">
     <v-row>
       <v-col>
-        <v-card elevation="6">
-          <v-toolbar color="secondary" height="32px">
-            <v-toolbar-title></v-toolbar-title>
-          </v-toolbar>
-          <div class="d-flex" :class="smallScreen ? 'flex-column' : 'flex-row'">
-            <v-tabs
-              v-model="currentTab"
-              color="secondary"
-              :direction="smallScreen ? 'horizontal' : 'vertical'"
-            >
-              <v-tab v-for="tab in tabs" :key="tab.id" :value="tab.id">
-                <v-icon size="large">{{ tab.icon }}</v-icon>
-                {{ smallScreen ? "" : $t(`common.default_layout.tool.matrix.tabs.${tab.name}`) }}
-              </v-tab>
-            </v-tabs>
-            <v-window v-model="currentTab" class="w-100">
-              <v-window-item :value="1">
-                <department-filters @chips="handleChips" :table="table"></department-filters>
-                <DepartmentTable @table="handleTable" :chips="chips"></DepartmentTable>
-              </v-window-item>
-            </v-window>
-          </div>
-        </v-card>
+        <v-container
+          fluid
+          class="d-flex bg-surface-1 rounded-xl"
+          :class="smallScreen ? 'flex-column' : 'flex-row'"
+        >
+          <v-row :class="smallScreen ? '' : 'w-25'">
+            <v-col>
+              <v-card class="rounded-xl bg-surface-2 elevation-0">
+                <v-tabs
+                  v-model="currentTab"
+                  color="secondary"
+                  class="ma-4"
+                  :direction="smallScreen ? 'horizontal' : 'vertical'"
+                >
+                  <v-tab v-for="tab in tabs" :key="tab.id" :value="tab.id" class="rounded">
+                    <v-icon size="28">{{ tab.icon }}</v-icon>
+                    {{ smallScreen ? "" : $t(`tools.matrix.tabs.${tab.name}`) }}
+                  </v-tab>
+                </v-tabs>
+              </v-card>
+            </v-col>
+          </v-row>
+          <v-row :class="smallScreen ? 'mt-1' : 'w-75 ml-1 pl-0 mt-n3'">
+            <v-col class="h-100">
+              <v-window v-model="currentTab" class="w-100">
+                <v-window-item :value="1">
+                  <department-filters
+                    @chips="handleChips"
+                    :table="table"
+                    class="bg-surface-2 mb-4"
+                  ></department-filters>
+                  <department-table
+                    @table="handleTable"
+                    :chips="chips"
+                    class="bg-surface-2"
+                  ></department-table>
+                </v-window-item>
+                <v-window-item :value="2">
+                  <document-filters
+                    @chips="handleChips"
+                    :table="table"
+                    class="bg-surface-2 mb-4"
+                  ></document-filters>
+                  <document-table
+                    @table="handleTable"
+                    :chips="chips"
+                    class="bg-surface-2"
+                  ></document-table>
+                </v-window-item>
+              </v-window>
+            </v-col>
+          </v-row>
+        </v-container>
       </v-col>
     </v-row>
   </v-container>
@@ -64,3 +108,4 @@ const handleTable = (newValue: Level): Level => (table.value = newValue);
   }
 }
 </style>
+../../components/views/tools/matrix/department/DepartmentFilters.vue../../components/views/tools/matrix/department/DepartmentTable.vue

@@ -37,7 +37,7 @@ const editDepartment = async (req: Request, res: Response) => {
   try {
     const { id, name } = req.params;
 
-    const department = await dataSource.getRepository(Department).findOne(id);
+    const department = await dataSource.getRepository(Department).findOne({ where: { id } });
 
     if (!department) {
       return res.status(404).json({
@@ -74,9 +74,9 @@ const editDepartment = async (req: Request, res: Response) => {
 
 const removeDepartment = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id }: { id: number } = req.params;
 
-    const department = await dataSource.getRepository(Department).findOne(id);
+    const department = await dataSource.getRepository(Department).findOne({ where: { id } });
 
     if (!department) {
       return res.status(404).json({
@@ -101,7 +101,7 @@ const removeDepartment = async (req: Request, res: Response) => {
   }
 };
 
-const getDepartments = async (req: Request, res: Response) => {
+const getDepartments = async (_req: Request, res: Response) => {
   try {
     const departments = await dataSource.getRepository(Department).find();
 

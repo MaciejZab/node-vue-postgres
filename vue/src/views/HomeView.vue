@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import weather from "../components/common/weather.vue";
 import { useI18n } from "vue-i18n";
+import frequentlyUsed from "../components/views/home/frequentlyUsed.vue";
 
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 const boardCols = computed((): number => (smallScreen.value ? 12 : 8));
@@ -27,7 +28,7 @@ async function api(): Promise<Item[]> {
           id: 1,
           title: "Item 1",
           subtitle: "Subtitle 1",
-          imgPath: imgPlaceholder,
+          imgPath: "../home/welcome.jpg",
           text: "Text 1",
           show: false,
         },
@@ -75,27 +76,30 @@ const exploreBtn = computed(() => t("common.default_layout.pages.home.card.explo
 </script>
 
 <template>
-  <v-container class="layout-view-container d-flex flex-column mt-3">
+  <v-container class="layout-view-container d-flex flex-column bg-background pt-0 mt-0">
     <v-row>
-      <v-col :cols="boardCols">
+      <frequently-used />
+    </v-row>
+    <v-row>
+      <v-col class="pt-0" :cols="boardCols">
         <v-infinite-scroll :items="items" :onLoad="load" color="secondary">
           <template v-for="item in items" :key="item.id">
-            <v-card :id="`card_${item.id}`" class="ma-4 bg-surface" elevation="6">
-              <v-img
-                height="300"
-                src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
-                cover
-              ></v-img>
+            <v-card class="ma-4 bg-surface-1 text-on-surface rounded-xl">
+              <v-img height="300" :src="item.imgPath" cover></v-img>
 
               <v-card-item>
                 <v-card-title>{{ item.title }}</v-card-title>
                 <v-card-subtitle>{{ item.subtitle }}</v-card-subtitle>
               </v-card-item>
 
-              <v-card-actions>
-                <v-btn class="bg-secondary" @click="() => toggleDetails(item.id)">{{
-                  exploreBtn
-                }}</v-btn>
+              <v-card-actions class="pb-4 px-4">
+                <v-btn
+                  variant="outlined"
+                  color="secondary"
+                  class="rounded-pill"
+                  @click="() => toggleDetails(item.id)"
+                  :text="exploreBtn"
+                />
               </v-card-actions>
 
               <v-expand-transition>
@@ -114,9 +118,6 @@ const exploreBtn = computed(() => t("common.default_layout.pages.home.card.explo
       <v-col v-if="!smallScreen" cols="4">
         <weather></weather>
       </v-col>
-    </v-row>
-    <v-row>
-      <v-col> </v-col>
     </v-row>
   </v-container>
 </template>

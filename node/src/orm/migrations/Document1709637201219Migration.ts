@@ -112,6 +112,51 @@ export class Document1709637201219 implements MigrationInterface {
       true
     );
 
+    // Create Language Entity
+    await queryRunner.createTable(
+      new Table({
+        name: "language",
+        columns: [
+          {
+            name: "id",
+            type: "serial",
+            isPrimary: true,
+          },
+          {
+            name: "name",
+            type: "varchar",
+            isNullable: false,
+          },
+        ],
+      }),
+      true
+    );
+
+    // Create Document Language Entity
+    await queryRunner.createTable(
+      new Table({
+        name: "document_language",
+        columns: [
+          {
+            name: "documentId",
+            type: "int",
+            isPrimary: true,
+          },
+          {
+            name: "languageId",
+            type: "int",
+            isPrimary: true,
+          },
+          {
+            name: "location",
+            type: "varchar",
+            isNullable: true,
+          },
+        ],
+      }),
+      true
+    );
+
     // Create Competence Entity
     await queryRunner.createTable(
       new Table({
@@ -159,6 +204,21 @@ export class Document1709637201219 implements MigrationInterface {
         referencedTableName: "subcategory",
       })
     );
+
+    await queryRunner.createForeignKeys("document_language", [
+      new TableForeignKey({
+        columnNames: ["documentId"],
+        referencedColumnNames: ["id"],
+        referencedTableName: "document",
+        onDelete: "CASCADE",
+      }),
+      new TableForeignKey({
+        columnNames: ["languageId"],
+        referencedColumnNames: ["id"],
+        referencedTableName: "language",
+        onDelete: "CASCADE",
+      }),
+    ]);
 
     await queryRunner.createForeignKey(
       "document",

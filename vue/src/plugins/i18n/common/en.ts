@@ -1,4 +1,4 @@
-const en = {
+const enC = {
   common: {
     default_layout: {
       bar: "Intranet",
@@ -104,4 +104,4 @@ const en = {
   },
 };
 
-export { en };
+export { enC };
