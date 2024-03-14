@@ -245,7 +245,7 @@ const save = async () => {
                 {{ tableItem }}
               </v-btn>
             </template>
-            <v-card>
+            <v-card class="rounded-xl">
               <v-card-title>
                 <span class="text-h5">{{ formTitle }}</span>
               </v-card-title>
@@ -272,7 +272,7 @@ const save = async () => {
             </v-card>
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="500px">
-            <v-card class="bg-surface">
+            <v-card class="bg-surface rounded-xl">
               <v-card-title class="text-h6">Are you sure you want to proceed?</v-card-title>
               <v-alert
                 class="mx-4 mb-8"

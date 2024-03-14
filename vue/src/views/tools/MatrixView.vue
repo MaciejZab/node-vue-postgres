@@ -108,4 +108,3 @@ const handleTable = (newValue: Level): void => {
   }
 }
 </style>
-../../components/views/tools/matrix/department/DepartmentFilters.vue../../components/views/tools/matrix/department/DepartmentTable.vue

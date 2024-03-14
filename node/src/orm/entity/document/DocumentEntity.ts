@@ -23,10 +23,25 @@ export class Document {
   @ManyToOne(() => Competence, (competence) => competence.documents, { nullable: true })
   competence: Competence;
 
-  constructor(document: IDocument) {
-    this.name = document.name;
-    this.description = document.description;
-    this.revision = document.revision;
-    this.subcategory = document.subcategory;
+  // constructor(document: IDocument, competence: Competence = null) {
+  //   this.name = document.name;
+  //   this.description = document.description;
+  //   this.revision = document.revision;
+  //   this.subcategory = document.subcategory;
+  //   this.competence = competence;
+  // }
+
+  constructor(
+    name: string,
+    description: string,
+    revision: number,
+    subcategory: Subcategory,
+    competence: Competence = null
+  ) {
+    this.name = name;
+    this.description = description;
+    this.revision = revision;
+    this.subcategory = subcategory;
+    this.competence = competence;
   }
 }

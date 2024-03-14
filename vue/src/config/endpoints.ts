@@ -5,6 +5,7 @@ enum Endpoints {
   UserSettingsPermission = "/api/user/settings/permission",
 
   // documents
+  Document = "/api/document",
   DocumentDepartment = "/api/document/department",
   DocumentCategory = "/api/document/category",
   DocumentSubcategory = "/api/document/subcategory",

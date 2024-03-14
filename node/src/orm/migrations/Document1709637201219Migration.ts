@@ -100,7 +100,7 @@ export class Document1709637201219 implements MigrationInterface {
           {
             name: "subcategoryId",
             type: "int",
-            isNullable: true,
+            isNullable: false,
           },
           {
             name: "competenceId",
@@ -184,6 +184,7 @@ export class Document1709637201219 implements MigrationInterface {
         columnNames: ["departmentId"],
         referencedColumnNames: ["id"],
         referencedTableName: "department",
+        onDelete: "CASCADE",
       })
     );
 
@@ -193,6 +194,7 @@ export class Document1709637201219 implements MigrationInterface {
         columnNames: ["categoryId"],
         referencedColumnNames: ["id"],
         referencedTableName: "category",
+        onDelete: "CASCADE",
       })
     );
 
@@ -202,6 +204,7 @@ export class Document1709637201219 implements MigrationInterface {
         columnNames: ["subcategoryId"],
         referencedColumnNames: ["id"],
         referencedTableName: "subcategory",
+        onDelete: "CASCADE",
       })
     );
 
@@ -231,10 +234,12 @@ export class Document1709637201219 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.dropTable("document_language");
     await queryRunner.dropTable("document");
     await queryRunner.dropTable("competence");
     await queryRunner.dropTable("subcategory");
     await queryRunner.dropTable("category");
     await queryRunner.dropTable("department");
+    await queryRunner.dropTable("language");
   }
 }

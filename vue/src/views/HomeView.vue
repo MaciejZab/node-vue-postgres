@@ -15,7 +15,7 @@ interface Item {
   text: string;
   show: boolean;
 }
-const imgPlaceholder = "https://cdn.vuetifyjs.com/images/cards/cooking.png";
+const imgPlaceholder = "../home/welcome.jpg";
 //href The card becomes an anchor with the href prop. with target="_blank" and append-icon="mdi-open-in-new"
 
 const items = ref<Item[]>([]);
@@ -26,26 +26,26 @@ async function api(): Promise<Item[]> {
       const newItems: Item[] = [
         {
           id: 1,
-          title: "Item 1",
-          subtitle: "Subtitle 1",
+          title: "Lorem",
+          subtitle: "Lorem Ipsum",
           imgPath: "../home/welcome.jpg",
-          text: "Text 1",
+          text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed accumsan leo ut tellus feugiat, ac molestie nisi mattis. Nulla facilisi. Nullam efficitur, lorem non bibendum vestibulum, lectus justo ultricies nisi, a tempus velit sem sit amet elit.",
           show: false,
         },
         {
           id: 2,
-          title: "Item 2",
-          subtitle: "Subtitle 2",
+          title: "Lorem",
+          subtitle: "Lorem Ipsum",
           imgPath: imgPlaceholder,
-          text: "Text 2",
+          text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed accumsan leo ut tellus feugiat, ac molestie nisi mattis. Nulla facilisi. Nullam efficitur, lorem non bibendum vestibulum, lectus justo ultricies nisi, a tempus velit sem sit amet elit.",
           show: false,
         },
         {
           id: 3,
-          title: "Item 3",
-          subtitle: "Subtitle 3",
+          title: "Lorem",
+          subtitle: "Lorem Ipsum",
           imgPath: imgPlaceholder,
-          text: "Text 3",
+          text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed accumsan leo ut tellus feugiat, ac molestie nisi mattis. Nulla facilisi. Nullam efficitur, lorem non bibendum vestibulum, lectus justo ultricies nisi, a tempus velit sem sit amet elit.",
           show: false,
         },
       ];

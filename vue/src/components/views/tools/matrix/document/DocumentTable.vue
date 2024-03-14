@@ -8,7 +8,10 @@ import { Level } from "../../../../../interfaces/document/Level";
 import { DepartmentsManager } from "../../../../../models/document/DepartmentsManager";
 import { SubcategoriesManager } from "../../../../../models/document/SubcategoriesManager";
 import { CategoriesManager } from "../../../../../models/document/CategoriesManager";
+import Stepper from "./Stepper.vue";
 import { useI18n } from "vue-i18n";
+import { FileItem } from "../../../../../interfaces/document/FileItem";
+import { DocumentManager } from "../../../../../models/document/DocumentManager";
 
 const emit = defineEmits(["table"]);
 
@@ -21,6 +24,7 @@ const { t } = useI18n();
 const DepManager = new DepartmentsManager();
 const CatManager = new CategoriesManager();
 const SubManager = new SubcategoriesManager();
+const DocManager = new DocumentManager();
 
 const documents = ref<Array<Document>>([]);
 
@@ -108,14 +112,11 @@ watch(
 const responseStatus = ref<ResponseStatus | null>(null);
 
 const headers: any = [
-  {
-    title: "Name",
-    align: "start",
-    key: "name",
-  },
+  { title: "Name", align: "start", key: "name" },
   { title: "Description", key: "description" },
+  { title: "Language", key: "language" },
   { title: "Competence", key: "competence" },
-  { title: "Favorite", key: "favorite", sortable: false },
+  { title: "Revision", key: "revision", sortable: false },
   { title: "Actions", key: "actions", sortable: false },
 ];
 
@@ -124,10 +125,70 @@ const dialog = ref<boolean>(false);
 const dialogDelete = ref<boolean>(false);
 const editedIndex = ref<number>(-1);
 
-const editedItem = ref<Document>({ id: 0, name: "", description: "", competence: "" });
-const defaultItem: Document = { id: 0, name: "", description: "", competence: "" };
+const editedItem = ref<Document>({
+  id: 1,
+  name: "",
+  description: "",
+  language: "",
+  competence: "",
+  revision: 1,
+});
+const defaultItem: Document = {
+  id: 1,
+  name: "",
+  description: "",
+  language: "",
+  competence: "",
+  revision: 1,
+};
 
 const formTitle = computed(() => (editedIndex.value === -1 ? `New Document` : `Edit Document`));
+
+interface DocumentEntity {
+  name: string;
+  description: string;
+  revision: number;
+  competence: string | null;
+  departmentName: string;
+  categoryName: string;
+  subcategoryName: string;
+}
+
+const docFormFiles = ref<Array<FileItem> | null>(null);
+const docFormData = ref<DocumentEntity | null>(null);
+const newDocData = ref<any>(null);
+
+const handleNewDocData = (data: any) => (newDocData.value = data);
+
+const verified = ref<boolean>(false);
+const handleVerified = (v: boolean) => {
+  verified.value = v;
+};
+
+watch(
+  newDocData,
+  (nV: any) => {
+    const v = nV.value;
+    const docData: DocumentEntity = {
+      name: v.name,
+      description: v.description,
+      revision: v.revision,
+      competence: null,
+
+      departmentName: department.value as string,
+      categoryName: category.value as string,
+      subcategoryName: subcategory.value as string,
+    };
+
+    const docFiles: Array<FileItem> = v.files;
+
+    docFormData.value = docData;
+    docFormFiles.value = docFiles;
+  },
+  { deep: true }
+);
+
+// FORM FUNCTIONS
 
 const editItem = (item: any) => {
   editedIndex.value = documents.value.indexOf(item);
@@ -183,18 +244,38 @@ const deleteItem = async (item: Document) => {
 };
 
 const save = async () => {
-  const reqData: any = {
-    id: editedItem.value.id,
-    name: editedItem.value.name,
-    categoryName: category.value,
-    departmentName: department.value,
+  const formData: any = new FormData();
+  const formDataValue = docFormData.value;
+
+  const base = {
+    name: formDataValue?.name,
+    description: formDataValue?.description,
+    revision: formDataValue?.revision,
+    departmentName: formDataValue?.departmentName,
+    categoryName: formDataValue?.categoryName,
+    subcategoryName: formDataValue?.subcategoryName,
   };
+
+  formData.append("base", JSON.stringify(base));
+
+  interface Langs {
+    langs: Array<string>;
+  }
+
+  const filesLangs: Array<Langs> = [];
+
+  docFormFiles.value?.forEach((file: FileItem) => {
+    formData.append(`file_${file.id}`, file.file?.at(0));
+
+    filesLangs.push({
+      langs: file.langs as Array<string>,
+    });
+  });
+
+  formData.append(`files_langs`, JSON.stringify(filesLangs));
 
   if (editedIndex.value > -1) {
     try {
-      await manager.value.put(reqData);
-      // documents.value = await manager.value.get(reqData);
-      emitTableChange();
     } catch (error: any) {
       console.log(error);
       responseStatus.value = new ResponseStatus({
@@ -203,10 +284,8 @@ const save = async () => {
       });
     }
   } else {
+    await DocManager.post(formData);
     try {
-      await manager.value.post(reqData);
-      // documents.value = await manager.value.get(reqData);
-      emitTableChange();
     } catch (error: any) {
       console.log(error);
       responseStatus.value = new ResponseStatus({
@@ -214,8 +293,6 @@ const save = async () => {
         message: error.response.data.statusMessage,
       });
     }
-
-    // if (!responseStatus) documents.value.push(editedItem.value);
   }
 
   close();
@@ -232,7 +309,7 @@ const save = async () => {
       class="bg-surface-2"
     >
       <template v-slot:top>
-        <v-toolbar flat density="compact" class="pa-n4">
+        <v-toolbar flat density="compact" class="bg-surface-2 pa-n4">
           <v-toolbar-title class="ml-0">{{ `Documents` }}</v-toolbar-title>
           <v-text-field
             v-model="search"
@@ -258,7 +335,7 @@ const save = async () => {
                 {{ tableAdd }}
               </v-btn>
             </template>
-            <v-card>
+            <v-card class="rounded-xl">
               <v-card-title>
                 <span class="text-h5">{{ formTitle }}</span>
               </v-card-title>
@@ -266,8 +343,12 @@ const save = async () => {
               <v-card-text>
                 <v-container>
                   <v-row>
-                    <v-col cols="12">
-                      <v-text-field v-model="editedItem.name" label="Name"></v-text-field>
+                    <v-col cols="12" class="pa-0">
+                      <stepper
+                        @verified="handleVerified"
+                        @newDocData="handleNewDocData"
+                        :editedItem="editedItem"
+                      ></stepper>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -275,10 +356,14 @@ const save = async () => {
 
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn class="rounded-xl" color="primary" variant="text" @click="close">
+                <v-btn class="rounded-xl" color="primary" variant="outlined" @click="close">
                   Cancel
                 </v-btn>
-                <v-btn class="bg-primary text-on-primary mr-4 rounded-xl" @click="save">
+                <v-btn
+                  class="bg-primary text-on-primary mr-4 rounded-xl"
+                  @click="save"
+                  :disabled="verified"
+                >
                   Save
                 </v-btn>
               </v-card-actions>

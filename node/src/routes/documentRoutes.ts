@@ -1,4 +1,6 @@
 import express from "express";
+import multer from "multer";
+
 import {
   addDepartment,
   editDepartment,
@@ -17,9 +19,10 @@ import {
   getSubcategories,
   removeSubcategory,
 } from "../controllers/document/subcategoryController";
+import { addDocument } from "../controllers/document/documentController";
 
 const router = express.Router();
-
+const upload = multer({ dest: `${__dirname}/../uploads` });
 // Define routes
 router.post("/department", addDepartment);
 router.get("/department", getDepartments);
@@ -35,5 +38,7 @@ router.post("/subcategory", addSubcategory);
 router.get("/subcategory/:departmentName/:categoryName", getSubcategories);
 router.put("/subcategory/:id/:name", editSubcategory);
 router.delete("/subcategory/:id", removeSubcategory);
+
+router.post("/", upload.any(), addDocument);
 
 export { router as documentRoutes };
