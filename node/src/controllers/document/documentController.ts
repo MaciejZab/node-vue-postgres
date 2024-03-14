@@ -13,12 +13,9 @@ const addDocument = async (req: Request, res: Response) => {
 
     const base = JSON.parse(body.base);
     const files_langs = JSON.parse(body.files_langs);
-
     const uploadedFiles = req.files;
 
-    // Iterate over uploaded files
     uploadedFiles.forEach((file, index) => {
-      // Extract original name and languages
       const originalName = path.parse(file.originalname).name;
       const langs = files_langs[index].langs.join("_");
 
@@ -26,7 +23,7 @@ const addDocument = async (req: Request, res: Response) => {
       const newName = `${originalName}_${langs}${path.extname(file.originalname)}`;
 
       // Rename and move file to destination folder
-      fs.renameSync(file.path, path.join(__dirname, "..", "..", "uploads", newName));
+      fs.renameSync(file.path, path.join(__dirname, "..", "..", "..", "uploads", newName));
     });
 
     const subcategory = await dataSource.getRepository(Subcategory).findOne({

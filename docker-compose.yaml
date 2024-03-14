@@ -9,6 +9,8 @@ services:
     ports:
       - ${NODE_PORT}:${NODE_PORT}
     restart: no
+    volumes:
+      - ./node/uploads:/usr/src/app/uploads
     depends_on:
       - postgres
 

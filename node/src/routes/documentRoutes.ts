@@ -22,7 +22,7 @@ import {
 import { addDocument } from "../controllers/document/documentController";
 
 const router = express.Router();
-const upload = multer({ dest: `${__dirname}/../uploads` });
+const upload = multer({ dest: `${__dirname}/../../uploads` });
 // Define routes
 router.post("/department", addDepartment);
 router.get("/department", getDepartments);
