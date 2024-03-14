@@ -24,16 +24,22 @@ const selectedLanguagesCount = computed(() =>
   fileData.value.langs?.length ? fileData.value.langs?.length - 1 : ""
 );
 
+const languageOrder = ["en", "pl", "ua"];
+
 watch(
   fileData,
   (newValue) => {
     if (newValue.file !== undefined && newValue.langs !== null) {
+      newValue.langs = newValue.langs.sort((a, b) => {
+        return languageOrder.indexOf(a) - languageOrder.indexOf(b);
+      });
       emit("file-change", newValue);
     }
   },
   { deep: true }
 );
 </script>
+C:\Users\maciej.zablocki\Documents\node-vue-postgres\node\uploads\dummy_en_pl_ua.pdf
 
 <template>
   <div class="d-flex">

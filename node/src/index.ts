@@ -12,7 +12,9 @@ app.use(cors(corsOptionsDelegate));
 // Routes
 import { userRoutes } from "./routes/userRoutes";
 import { documentRoutes } from "./routes/documentRoutes";
+import path from "path";
 
+app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 app.use("/api/user", userRoutes);
 app.use("/api/document", documentRoutes);
 
