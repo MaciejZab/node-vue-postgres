@@ -1,6 +1,6 @@
 interface Breadcrumb {
   title: string;
-  disabled: false;
+  disabled: boolean;
   href: string;
 }
 

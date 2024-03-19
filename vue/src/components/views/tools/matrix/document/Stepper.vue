@@ -2,13 +2,13 @@
 import { computed, ref, watchEffect } from "vue";
 import VerifyTables from "./VerifyTables.vue";
 import FilesForm from "./FilesForm.vue";
-import { Document } from "../../../../../interfaces/document/Document";
 import { FileItem } from "../../../../../interfaces/document/FileItem";
+import { DocumentEntity } from "../../../../../interfaces/document/DocumentEntity";
 
 const emit = defineEmits(["newDocData", "verified"]);
 
 const props = defineProps<{
-  editedItem: Document;
+  editedItem: Partial<DocumentEntity>;
 }>();
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 
@@ -26,7 +26,7 @@ const nextStep = () => {
 const prevable = computed(() => activeStep.value > 1);
 const nextable = computed(() => activeStep.value < 3);
 
-const document = ref<Document>(props.editedItem);
+const document = ref<Partial<DocumentEntity>>(props.editedItem);
 
 const files = ref<Array<FileItem>>([]);
 const hasFiles = computed<boolean>(() => files.value.length > 0);

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
+import { usePermissionStore } from "../stores/permissionStore";
+import { IPermission } from "../interfaces/user/IPermission";
 
 let screen: string;
 const screenWidth: number = window.innerWidth;
@@ -22,6 +24,8 @@ switch (screen) {
     break;
 }
 
+const permissionStore = usePermissionStore();
+
 const tools = [
   {
     id: 1,
@@ -29,6 +33,11 @@ const tools = [
     href: "/tool/documents",
     icon: "file-document",
     image: "../tools/docs.png",
+    permissions: {
+      read: true,
+      write: false,
+      control: false,
+    },
   },
   {
     id: 2,
@@ -36,6 +45,11 @@ const tools = [
     href: "",
     icon: "book-open-variant-outline",
     image: "../tools/training.png",
+    permissions: {
+      read: true,
+      write: true,
+      control: false,
+    },
   },
   {
     id: 3,
@@ -43,6 +57,11 @@ const tools = [
     href: "",
     icon: "file-document-edit",
     image: "../tools/change.png",
+    permissions: {
+      read: true,
+      write: true,
+      control: false,
+    },
   },
   {
     id: 4,
@@ -50,6 +69,11 @@ const tools = [
     href: "/tool/matrix",
     icon: "database",
     image: "../tools/matrix.png",
+    permissions: {
+      read: true,
+      write: true,
+      control: false,
+    },
   },
   {
     id: 5,
@@ -57,6 +81,11 @@ const tools = [
     href: "",
     icon: "alert-octagon",
     image: "../tools/analytics.png",
+    permissions: {
+      read: true,
+      write: true,
+      control: false,
+    },
   },
   {
     id: 6,
@@ -64,8 +93,18 @@ const tools = [
     href: "",
     icon: "account-tie",
     image: "../tools/boss.png",
+    permissions: {
+      read: true,
+      write: true,
+      control: true,
+    },
   },
 ];
+
+const filteredTools = tools.filter((tool) => {
+  const toolPermissions: IPermission = tool.permissions;
+  return permissionStore.check(toolPermissions);
+});
 
 const router = useRouter();
 </script>
@@ -73,7 +112,7 @@ const router = useRouter();
 <template>
   <v-container class="layout-view-container bg-background mt-0 pt-0">
     <v-row>
-      <v-col :cols="cols" v-for="tool in tools" :key="tool.id">
+      <v-col :cols="cols" v-for="tool in filteredTools" :key="tool.id">
         <v-card
           class="ma-4 bg-surface-1 text-on-surface rounded-xl elevation-6"
           rel="noopener"

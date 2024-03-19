@@ -16,7 +16,10 @@ const plC = {
           tools: "Narzędzia",
         },
         tool: {
-          documents: "Dokumenty",
+          documents: {
+            browse: "Dokumenty",
+            view: "Widok",
+          },
           matrix: "Macierz",
         },
       },

@@ -206,4 +206,3 @@ const submitLogin = (): void => {
     </v-row>
   </v-container>
 </template>
-../config/Endpoints

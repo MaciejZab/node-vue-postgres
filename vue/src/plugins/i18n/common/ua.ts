@@ -16,7 +16,10 @@ const uaC = {
           tools: "Інструменти",
         },
         tool: {
-          documents: "Документи",
+          documents: {
+            browse: "Документи",
+            view: "Перегляд",
+          },
           matrix: "Матриця",
         },
       },

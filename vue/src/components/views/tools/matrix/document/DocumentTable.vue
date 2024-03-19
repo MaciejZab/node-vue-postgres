@@ -2,110 +2,69 @@
 import { computed, nextTick, ref, watch } from "vue";
 import { ResponseStatus } from "../../../../../models/common/ResponseStatus";
 import { Chips } from "../../../../../interfaces/document/Chips";
-// import { Chip } from "../../../../../interfaces/document/Chip";
-import { Document } from "../../../../../interfaces/document/Document";
 import { Level } from "../../../../../interfaces/document/Level";
-import { DepartmentsManager } from "../../../../../models/document/DepartmentsManager";
-import { SubcategoriesManager } from "../../../../../models/document/SubcategoriesManager";
-import { CategoriesManager } from "../../../../../models/document/CategoriesManager";
 import Stepper from "./Stepper.vue";
 import { useI18n } from "vue-i18n";
 import { FileItem } from "../../../../../interfaces/document/FileItem";
 import { DocumentManager } from "../../../../../models/document/DocumentManager";
+import { DocumentEntity } from "../../../../../interfaces/document/DocumentEntity";
+import { DocumentForm } from "../../../../../interfaces/document/DocumentForm";
 
 const emit = defineEmits(["table"]);
 
-const props = defineProps<{
-  chips: Chips | undefined;
-}>();
-
-const { t } = useI18n();
-
-const DepManager = new DepartmentsManager();
-const CatManager = new CategoriesManager();
-const SubManager = new SubcategoriesManager();
-const DocManager = new DocumentManager();
-
-const documents = ref<Array<Document>>([]);
-
 const level = ref<Level>(Level.Dep);
-const manager = ref<DepartmentsManager | CategoriesManager | SubcategoriesManager>(DepManager);
-
 const emitTableChange = () => {
   emit("table", level.value);
 };
 
+const manager = new DocumentManager();
+const documents = ref<Array<DocumentEntity>>([]);
+
+const chips = ref<Chips>({
+  department: "",
+  category: "",
+  subcategory: "",
+});
+
 (async () => {
   try {
-    // documents.value = await DepManager.get();
+    documents.value = await manager.get(chips.value);
   } catch (error) {
     console.log(error);
   }
 })();
 
-const department = ref<string | undefined>(undefined);
-const category = ref<string | undefined>(undefined);
-const subcategory = ref<string | undefined>(undefined);
-
 // const tableItem = ref<string>("Department");
+
+const { t } = useI18n();
 
 const tableAddDisabled = ref<boolean>(true);
 const tableAdd = computed(() => t("tools.matrix.documents.add_button"));
 
+const props = defineProps<{
+  chips: Chips | undefined;
+}>();
+
 watch(
   () => [props.chips?.department, props.chips?.category, props.chips?.subcategory],
-  ([dep, cat, sub]) => {
-    // const reqData: any = {
-    //   categoryName: cat,
-    //   departmentName: dep,
-    // };
-
-    if (sub) {
-      (async () => {
-        try {
-          tableAddDisabled.value = false;
-        } catch (error) {
-          console.log(error);
-        }
-      })();
-    } else if (cat) {
-      (async () => {
-        try {
-          // documents.value = await SubManager.get(reqData);
-          level.value = Level.Sub;
-          manager.value = SubManager;
-          tableAddDisabled.value = true;
-        } catch (error) {
-          console.log(error);
-        }
-      })();
+  async ([dep, cat, sub]) => {
+    if (sub) tableAddDisabled.value = false;
+    else if (cat) {
+      level.value = Level.Sub;
+      tableAddDisabled.value = true;
     } else if (dep) {
-      (async () => {
-        try {
-          // documents.value = await CatManager.get(reqData);
-          level.value = Level.Cat;
-          manager.value = CatManager;
-          tableAddDisabled.value = true;
-        } catch (error) {
-          console.log(error);
-        }
-      })();
+      level.value = Level.Cat;
+      tableAddDisabled.value = true;
     } else {
-      (async () => {
-        try {
-          // documents.value = await DepManager.get();
-          level.value = Level.Dep;
-          manager.value = DepManager;
-          tableAddDisabled.value = true;
-        } catch (error) {
-          console.log(error);
-        }
-      })();
+      level.value = Level.Dep;
+      tableAddDisabled.value = true;
     }
 
-    department.value = dep;
-    category.value = cat;
-    subcategory.value = sub;
+    chips.value.department = dep !== undefined ? dep : "";
+    chips.value.category = cat !== undefined ? cat : "";
+    chips.value.subcategory = sub !== undefined ? sub : "";
+
+    documents.value = await manager.get(chips.value);
   }
 );
 
@@ -114,8 +73,7 @@ const responseStatus = ref<ResponseStatus | null>(null);
 const headers: any = [
   { title: "Name", align: "start", key: "name" },
   { title: "Description", key: "description" },
-  { title: "Language", key: "language" },
-  { title: "Competence", key: "competence" },
+  { title: "Languages", key: "languages" },
   { title: "Revision", key: "revision", sortable: false },
   { title: "Actions", key: "actions", sortable: false },
 ];
@@ -125,37 +83,23 @@ const dialog = ref<boolean>(false);
 const dialogDelete = ref<boolean>(false);
 const editedIndex = ref<number>(-1);
 
-const editedItem = ref<Document>({
-  id: 1,
+const editedItem = ref<Partial<DocumentEntity>>({
   name: "",
   description: "",
-  language: "",
-  competence: "",
+  competence: null,
   revision: 1,
 });
-const defaultItem: Document = {
-  id: 1,
+const defaultItem: Partial<DocumentEntity> = {
   name: "",
   description: "",
-  language: "",
-  competence: "",
+  competence: null,
   revision: 1,
 };
 
 const formTitle = computed(() => (editedIndex.value === -1 ? `New Document` : `Edit Document`));
 
-interface DocumentEntity {
-  name: string;
-  description: string;
-  revision: number;
-  competence: string | null;
-  departmentName: string;
-  categoryName: string;
-  subcategoryName: string;
-}
-
 const docFormFiles = ref<Array<FileItem> | null>(null);
-const docFormData = ref<DocumentEntity | null>(null);
+const docFormData = ref<DocumentForm | null>(null);
 const newDocData = ref<any>(null);
 
 const handleNewDocData = (data: any) => (newDocData.value = data);
@@ -169,15 +113,15 @@ watch(
   newDocData,
   (nV: any) => {
     const v = nV.value;
-    const docData: DocumentEntity = {
+    const docData: DocumentForm = {
       name: v.name,
       description: v.description,
       revision: v.revision,
-      competence: null,
+      competence: v.competence,
 
-      departmentName: department.value as string,
-      categoryName: category.value as string,
-      subcategoryName: subcategory.value as string,
+      departmentName: chips.value.department,
+      categoryName: chips.value.category,
+      subcategoryName: chips.value.subcategory,
     };
 
     const docFiles: Array<FileItem> = v.files;
@@ -203,10 +147,10 @@ const deleteItemConfirm = async () => {
   //   departmentName: department.value,
   // };
 
-  const itemId: number = editedItem.value.id;
+  // const itemId: number = editedItem.value.id;
 
   try {
-    await manager.value.delete(itemId);
+    // await manager.delete(itemId);
     // documents.value = await manager.value.get(reqData);
     emitTableChange();
   } catch (error: any) {
@@ -237,7 +181,7 @@ const closeDelete = async () => {
   });
 };
 
-const deleteItem = async (item: Document) => {
+const deleteItem = async (item: DocumentEntity) => {
   editedIndex.value = documents.value.indexOf(item);
   editedItem.value = { ...item };
   dialogDelete.value = true;
@@ -284,7 +228,9 @@ const save = async () => {
       });
     }
   } else {
-    await DocManager.post(formData);
+    await manager.post(formData);
+
+    documents.value = await manager.get(chips.value);
     try {
     } catch (error: any) {
       console.log(error);
@@ -297,10 +243,30 @@ const save = async () => {
 
   close();
 };
+
+enum LangDictionary {
+  en = "English",
+  pl = "Polish",
+  ua = "Ukrainian",
+}
+
+// Type alias mimicking the enum with string-based access
+type LangDictionaryStringMap = {
+  [key: string]: LangDictionary[keyof LangDictionary];
+};
+
+const languages = (item: DocumentEntity) => {
+  return item.languages.map((lang: string) => ({
+    title: lang
+      .split("_")
+      .map((code: string) => (LangDictionary as LangDictionaryStringMap)[code])
+      .join(", "),
+  }));
+};
 </script>
 
 <template>
-  <v-card class="rounded-xl elevation-0 pa-4">
+  <v-card class="rounded-xl elevation-2 pa-4">
     <v-data-table
       :headers="headers"
       :items="documents"
@@ -388,6 +354,11 @@ const save = async () => {
             </v-card>
           </v-dialog>
         </v-toolbar>
+      </template>
+      <template v-slot:item.languages="{ item }">
+        <v-list-item class="pl-0" density="compact" v-for="(lang, i) in languages(item)" :key="i">
+          <v-list-item-title class="text-body-2"> {{ lang.title }}</v-list-item-title>
+        </v-list-item>
       </template>
       <template v-slot:item.actions="{ item }">
         <v-btn

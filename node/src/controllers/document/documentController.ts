@@ -3,9 +3,13 @@ import { Document } from "../../orm/entity/document/DocumentEntity";
 import { HttpResponseMessage } from "../../enums/response";
 import { dataSource } from "../../config/orm/dataSource";
 import { Subcategory } from "../../orm/entity/document/SubcategoryEntity";
-// import { unlink } from "fs/promises";
 import * as fs from "fs";
 import * as path from "path";
+import { v4 as uuidv4 } from "uuid";
+import { Language } from "../../orm/entity/document/LanguageEntity";
+import { Department } from "../../orm/entity/document/DepartmentEntity";
+import { Category } from "../../orm/entity/document/CategoryEntity";
+import { In } from "typeorm";
 
 const addDocument = async (req: Request, res: Response) => {
   try {
@@ -15,39 +19,66 @@ const addDocument = async (req: Request, res: Response) => {
     const files_langs = JSON.parse(body.files_langs);
     const uploadedFiles = req.files;
 
-    uploadedFiles.forEach((file, index) => {
-      const originalName = path.parse(file.originalname).name;
-      const langs = files_langs[index].langs.join("_");
-
-      // Construct new file name
-      const newName = `${originalName}_${langs}${path.extname(file.originalname)}`;
-
-      // Rename and move file to destination folder
-      fs.renameSync(file.path, path.join(__dirname, "..", "..", "..", "uploads", newName));
-    });
-
-    const subcategory = await dataSource.getRepository(Subcategory).findOne({
-      where: {
-        name: base.subcategoryName,
-        category: {
-          name: base.categoryName,
-          department: {
-            name: base.departmentName,
+    await dataSource.transaction(async (transactionalEntityManager) => {
+      const subcategory = await transactionalEntityManager.getRepository(Subcategory).findOne({
+        where: {
+          name: base.subcategoryName,
+          category: {
+            name: base.categoryName,
+            department: {
+              name: base.departmentName,
+            },
           },
         },
-      },
-    });
+      });
 
-    const document = new Document(base.name, base.description, base.revision, subcategory);
+      const document = new Document(
+        uuidv4(),
+        base.name,
+        base.description,
+        base.revision,
+        subcategory
+      );
 
-    const savedDocument = await dataSource.getRepository(Document).save(document);
+      const savedDocument = await transactionalEntityManager.getRepository(Document).save(document);
 
-    // Handle associated files
+      // const languageEntities: Array<Language> = [];
 
-    res.status(201).json({
-      added: savedDocument,
-      message: "Document added successfully",
-      statusMessage: HttpResponseMessage.POST_SUCCESS,
+      for (const [index, file] of uploadedFiles.entries()) {
+        const originalName = path.parse(file.originalname).name;
+        const languageName = files_langs[index].langs.join("_");
+
+        const savedLanguage = await transactionalEntityManager
+          .getRepository(Language)
+          .save(new Language(languageName, savedDocument));
+
+        // languageEntities.push(savedLanguage);
+
+        const params = {
+          langs: savedLanguage.name,
+          uuid: savedDocument.ref,
+        };
+
+        const queryString = new URLSearchParams(params).toString();
+
+        // Construct new file name
+        const newName = `${savedDocument.name}_qs_${queryString}${path.extname(file.originalname)}`;
+
+        // Rename and move file to destination folder
+        fs.renameSync(
+          file.path,
+          path.join(__dirname, "..", "..", "..", "uploads", "documents", newName)
+        );
+      }
+
+      // savedDocument.languages = languageEntities;
+      // await transactionalEntityManager.getRepository(Document).save(savedDocument);
+
+      res.status(201).json({
+        added: JSON.stringify(savedDocument),
+        message: "Document added successfully",
+        statusMessage: HttpResponseMessage.POST_SUCCESS,
+      });
     });
   } catch (error) {
     console.error("Error adding document: ", error);
@@ -137,32 +168,244 @@ const addDocument = async (req: Request, res: Response) => {
 //   }
 // };
 
-// const getDocument = async (req: Request, res: Response) => {
-//   try {
-//     const { id } = req.params;
+const getDocuments = async (_req: Request, res: Response) => {
+  try {
+    const docs = await dataSource.getRepository(Document).find({ relations: ["languages"] });
 
-//     const document = await getRepository(Document).findOne(id);
+    if (!docs) {
+      return res.status(404).json({
+        message: "Documents not found",
+        statusMessage: HttpResponseMessage.GET_ERROR,
+      });
+    }
 
-//     if (!document) {
-//       return res.status(404).json({
-//         message: "Document not found",
-//         statusMessage: HttpResponseMessage.GET_ERROR,
-//       });
-//     }
+    // Add languages array to each document record
+    const documents = docs.map((document) => {
+      return {
+        ...document,
+        languages: document.languages.map((language) => language.name),
+      };
+    });
 
-//     res.status(200).json({
-//       document: document,
-//       message: "Document retrieved successfully",
-//       statusMessage: HttpResponseMessage.GET_SUCCESS,
-//     });
-//   } catch (error) {
-//     console.error("Error retrieving document: ", error);
-//     res.status(500).json({
-//       message: "Failed to retrieve document.",
-//       statusMessage: HttpResponseMessage.UNKNOWN,
-//     });
-//   }
-// };
+    res.status(200).json({
+      documents: documents,
+      message: "Documents retrieved successfully",
+      statusMessage: HttpResponseMessage.GET_SUCCESS,
+    });
+  } catch (error) {
+    console.error("Error retrieving documents: ", error);
+    res.status(404).json({
+      message: "Failed to retrieve documents.",
+      statusMessage: HttpResponseMessage.UNKNOWN,
+    });
+  }
+};
+
+const getDocumentsByDep = async (req: Request, res: Response) => {
+  try {
+    const { departmentName } = req.params;
+
+    const depOptions = {
+      where: {
+        name: departmentName,
+      },
+    };
+    const departmentEntity = await dataSource.getRepository(Department).find(depOptions);
+
+    if (!departmentEntity) {
+      return res.status(404).json({
+        message: "Department not found",
+        statusMessage: HttpResponseMessage.GET_ERROR,
+      });
+    }
+
+    const docOptions = {
+      where: {
+        subcategory: {
+          category: {
+            department: departmentEntity,
+          },
+        },
+      },
+    };
+
+    const documents = await dataSource.getRepository(Document).find(docOptions);
+
+    if (!documents) {
+      return res.status(404).json({
+        message: "Documents not found",
+        statusMessage: HttpResponseMessage.GET_ERROR,
+      });
+    }
+
+    res.status(200).json({
+      documents: documents,
+      message: "Documents retrieved successfully",
+      statusMessage: HttpResponseMessage.GET_SUCCESS,
+    });
+  } catch (error) {
+    console.error("Error retrieving documents: ", error);
+    res.status(404).json({
+      message: "Failed to retrieve documents.",
+      statusMessage: HttpResponseMessage.UNKNOWN,
+    });
+  }
+};
+
+const getDocumentsByDepCat = async (req: Request, res: Response) => {
+  try {
+    const { departmentName, categoryName } = req.params;
+
+    const depOptions = {
+      where: {
+        name: departmentName,
+      },
+    };
+    const departmentEntity = await dataSource.getRepository(Department).find(depOptions);
+
+    if (!departmentEntity) {
+      return res.status(404).json({
+        message: "Department not found",
+        statusMessage: HttpResponseMessage.GET_ERROR,
+      });
+    }
+
+    const catOptions = {
+      where: {
+        name: categoryName,
+        department: departmentEntity,
+      },
+    };
+    const categoryEntity = await dataSource.getRepository(Category).find(catOptions);
+
+    if (!categoryEntity) {
+      return res.status(404).json({
+        message: "Category not found",
+        statusMessage: HttpResponseMessage.GET_ERROR,
+      });
+    }
+
+    const subOptions = {
+      where: {
+        category: categoryEntity,
+      },
+    };
+    const subcategories = await dataSource.getRepository(Subcategory).find(subOptions);
+
+    // Extract subcategory IDs to use in the document query
+    const subcategoryIds = subcategories.map((subcategory) => subcategory.id);
+
+    const docOptions = {
+      where: {
+        subcategory: In(subcategoryIds),
+      },
+    };
+    const documents = await dataSource.getRepository(Document).find(docOptions);
+
+    if (!documents) {
+      return res.status(404).json({
+        message: "Documents not found",
+        statusMessage: HttpResponseMessage.GET_ERROR,
+      });
+    }
+
+    res.status(200).json({
+      documents: documents,
+      message: "Documents retrieved successfully",
+      statusMessage: HttpResponseMessage.GET_SUCCESS,
+    });
+  } catch (error) {
+    console.error("Error retrieving documents: ", error);
+    res.status(404).json({
+      message: "Failed to retrieve documents.",
+      statusMessage: HttpResponseMessage.UNKNOWN,
+    });
+  }
+};
+
+const getDocumentsByDepCatSub = async (req: Request, res: Response) => {
+  try {
+    const { departmentName, categoryName, subcategoryName } = req.params;
+    console.log(departmentName, categoryName, subcategoryName);
+    const depOptions = {
+      where: {
+        name: departmentName,
+      },
+    };
+    const departmentEntity = await dataSource.getRepository(Department).find(depOptions);
+    console.log(departmentEntity);
+    if (!departmentEntity) {
+      return res.status(404).json({
+        message: "Department not found",
+        statusMessage: HttpResponseMessage.GET_ERROR,
+      });
+    }
+
+    const catOptions = {
+      relations: {
+        department: true,
+      },
+      where: {
+        name: categoryName,
+        department: departmentEntity,
+      },
+    };
+    const categoryEntity = await dataSource.getRepository(Category).find(catOptions);
+    console.log(categoryEntity);
+    if (!categoryEntity) {
+      return res.status(404).json({
+        message: "Category not found",
+        statusMessage: HttpResponseMessage.GET_ERROR,
+      });
+    }
+
+    const subOptions = {
+      relations: {
+        category: {
+          department: true,
+        },
+      },
+      where: {
+        name: subcategoryName,
+        category: categoryEntity,
+      },
+    };
+    const subcategoryEntity = await dataSource.getRepository(Subcategory).find(subOptions);
+    console.log(subcategoryEntity);
+    const docOptions = {
+      where: {
+        subcategory: subcategoryEntity,
+      },
+    };
+    const documents = await dataSource.getRepository(Document).find(docOptions);
+    // console.log(documents);
+
+    if (!documents) {
+      return res.status(404).json({
+        message: "Documents not found",
+        statusMessage: HttpResponseMessage.GET_ERROR,
+      });
+    }
+
+    res.status(200).json({
+      documents: documents,
+      message: "Documents retrieved successfully",
+      statusMessage: HttpResponseMessage.GET_SUCCESS,
+    });
+  } catch (error) {
+    console.error("Error retrieving documents: ", error);
+    res.status(404).json({
+      message: "Failed to retrieve documents.",
+      statusMessage: HttpResponseMessage.UNKNOWN,
+    });
+  }
+};
 
 // export { addDocument, editDocument, removeDocument };
-export { addDocument };
+export {
+  addDocument,
+  getDocuments,
+  getDocumentsByDep,
+  getDocumentsByDepCat,
+  getDocumentsByDepCatSub,
+};

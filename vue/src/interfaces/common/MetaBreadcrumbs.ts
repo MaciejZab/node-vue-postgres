@@ -3,6 +3,7 @@ interface MetaBreadcrumbs {
   parent: string;
   name: string;
   path: string;
+  disabled: boolean;
 }
 
 export type { MetaBreadcrumbs };

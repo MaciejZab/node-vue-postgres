@@ -39,7 +39,6 @@ watch(
   { deep: true }
 );
 </script>
-C:\Users\maciej.zablocki\Documents\node-vue-postgres\node\uploads\dummy_en_pl_ua.pdf
 
 <template>
   <div class="d-flex">

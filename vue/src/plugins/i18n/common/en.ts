@@ -16,7 +16,10 @@ const enC = {
           tools: "Tools",
         },
         tool: {
-          documents: "Documents",
+          documents: {
+            browse: "Documents",
+            view: "View",
+          },
           matrix: "Matrix",
         },
       },

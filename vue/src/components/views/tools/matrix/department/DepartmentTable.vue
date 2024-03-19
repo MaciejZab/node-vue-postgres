@@ -211,7 +211,7 @@ const save = async () => {
 </script>
 
 <template>
-  <v-card class="rounded-xl elevation-0 pa-4">
+  <v-card class="rounded-xl elevation-2 pa-4">
     <v-data-table
       :headers="headers"
       :items="documents"

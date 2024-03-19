@@ -83,6 +83,11 @@ export class Document1709637201219 implements MigrationInterface {
             isPrimary: true,
           },
           {
+            name: "ref",
+            type: "varchar",
+            isNullable: false,
+          },
+          {
             name: "name",
             type: "varchar",
             isNullable: false,
@@ -127,30 +132,10 @@ export class Document1709637201219 implements MigrationInterface {
             type: "varchar",
             isNullable: false,
           },
-        ],
-      }),
-      true
-    );
-
-    // Create Document Language Entity
-    await queryRunner.createTable(
-      new Table({
-        name: "document_language",
-        columns: [
           {
             name: "documentId",
             type: "int",
-            isPrimary: true,
-          },
-          {
-            name: "languageId",
-            type: "int",
-            isPrimary: true,
-          },
-          {
-            name: "location",
-            type: "varchar",
-            isNullable: true,
+            isNullable: false,
           },
         ],
       }),
@@ -178,6 +163,7 @@ export class Document1709637201219 implements MigrationInterface {
     );
 
     // Add Foreign Keys
+
     await queryRunner.createForeignKey(
       "category",
       new TableForeignKey({
@@ -198,43 +184,37 @@ export class Document1709637201219 implements MigrationInterface {
       })
     );
 
-    await queryRunner.createForeignKey(
-      "document",
+    await queryRunner.createForeignKeys("document", [
       new TableForeignKey({
         columnNames: ["subcategoryId"],
         referencedColumnNames: ["id"],
         referencedTableName: "subcategory",
         onDelete: "CASCADE",
-      })
-    );
-
-    await queryRunner.createForeignKeys("document_language", [
-      new TableForeignKey({
-        columnNames: ["documentId"],
-        referencedColumnNames: ["id"],
-        referencedTableName: "document",
-        onDelete: "CASCADE",
       }),
-      new TableForeignKey({
-        columnNames: ["languageId"],
-        referencedColumnNames: ["id"],
-        referencedTableName: "language",
-        onDelete: "CASCADE",
-      }),
-    ]);
-
-    await queryRunner.createForeignKey(
-      "document",
       new TableForeignKey({
         columnNames: ["competenceId"],
         referencedColumnNames: ["id"],
         referencedTableName: "competence",
+        onDelete: "SET NULL",
+      }),
+    ]);
+
+    await queryRunner.createForeignKey(
+      "language",
+      new TableForeignKey({
+        columnNames: ["documentId"],
+        referencedColumnNames: ["id"],
+        referencedTableName: "document",
+        onDelete: "SET NULL",
       })
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable("document_language");
+    let table = await queryRunner.getTable("language");
+    const foreignKey = table.foreignKeys.find((fk) => fk.columnNames.indexOf("documentId") !== -1);
+    await queryRunner.dropForeignKey("language", foreignKey);
+
     await queryRunner.dropTable("document");
     await queryRunner.dropTable("competence");
     await queryRunner.dropTable("subcategory");

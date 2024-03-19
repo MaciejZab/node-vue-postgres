@@ -34,7 +34,7 @@ const tabs = [
   },
 ];
 
-const currentTab = ref<number>(1);
+const currentTab = ref<number>(3);
 
 const chips = ref<Chips | undefined>(undefined);
 const table = ref<Level | undefined>(undefined);
@@ -61,14 +61,20 @@ const handleTable = (newValue: Level): void => {
         >
           <v-row :class="smallScreen ? '' : 'w-25'">
             <v-col>
-              <v-card class="rounded-xl bg-surface-2 text-on-surface">
+              <v-card class="rounded-xl elevation-2 bg-surface-2 text-on-surface">
                 <v-tabs
                   v-model="currentTab"
                   color="secondary"
                   class="ma-4"
                   :direction="smallScreen ? 'horizontal' : 'vertical'"
                 >
-                  <v-tab v-for="tab in tabs" :key="tab.id" :value="tab.id" class="rounded">
+                  <v-tab
+                    v-for="tab in tabs"
+                    :key="tab.id"
+                    :value="tab.id"
+                    class="rounded"
+                    :disabled="tab.id === 1 || tab.id === 2 || tab.id === 4 ? true : false"
+                  >
                     <v-icon size="28">{{ tab.icon }}</v-icon>
                     {{ smallScreen ? "" : $t(`tools.documents.tabs.${tab.name}`) }}
                   </v-tab>

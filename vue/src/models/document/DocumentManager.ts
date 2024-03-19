@@ -13,14 +13,35 @@ class DocumentManager {
     return response.data.added;
   };
 
-  //   public get = async (_reqData?: any): Promise<Array<Chip>> => {
-  //     const response = await axios.get(
-  //       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentDepartment}`
-  //     );
-  //     return response.data.got;
-  //   };
+  public get = async (reqData: any): Promise<Array<any>> => {
+    let lvl: number = 0;
+    if (reqData.department) lvl = 1;
+    if (reqData.category) lvl = 2;
+    if (reqData.subcategory) lvl = 3;
 
-  //   public put = async (reqData: any): Promise<Array<Chip>> => {
+    let params: string = "";
+    switch (lvl) {
+      case 1:
+        params = `/${reqData.department}`;
+        break;
+      case 2:
+        params = `/${reqData.department}/${reqData.category}`;
+        break;
+      case 3:
+        params = `/${reqData.department}/${reqData.category}/${reqData.subcategory}`;
+        break;
+
+      default:
+        break;
+    }
+
+    const response = await axios.get(
+      `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.Document}${params}`
+    );
+    return response.data.documents;
+  };
+
+  // public put = async (reqData: any): Promise<Array<any>> => {
   //     const id: string = reqData.id;
   //     const name: string = reqData.name;
   //     const response = await axios.put(
@@ -28,13 +49,12 @@ class DocumentManager {
   //     );
   //     return response.data.edited;
   //   };
-
   //   public delete = async (id: number): Promise<Array<Chip>> => {
   //     const response = await axios.delete(
   //       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentDepartment}/${id}`
   //     );
-  //     return response.data.deleted;
-  //   };
+  // return response.data.deleted;
+  // };
 }
 
 export { DocumentManager };

@@ -10,22 +10,27 @@ const router = useRouter();
 
 const getBreadcrumbs = (): Array<Breadcrumb> => {
   const matchedRoutes = router.currentRoute.value.matched;
+
   const breadcrumbs: Array<Breadcrumb> = [];
 
   for (const routeRecord of matchedRoutes) {
-    const { path, meta, children } = routeRecord;
+    // const { path, meta, children, components } = routeRecord;
+    const { path, meta } = routeRecord;
 
-    let typedMeta: MetaBreadcrumbs;
+    // if (!components) continue;
 
-    if (children && children.length > 0)
-      typedMeta = children.at(0)?.meta?.breadcrumbs as MetaBreadcrumbs;
-    else typedMeta = meta.breadcrumbs as MetaBreadcrumbs;
+    // let typedMeta: MetaBreadcrumbs;
+
+    // if (children && children.length > 0)
+    //   typedMeta = children.at(0)?.meta?.breadcrumbs as MetaBreadcrumbs;
+    // else
+    const typedMeta: MetaBreadcrumbs = meta.breadcrumbs as MetaBreadcrumbs;
 
     if (!typedMeta.include) continue;
 
     const breadcrumb: Breadcrumb = {
       title: t(`common.default_layout.breadcrumbs.${typedMeta.parent}.${typedMeta.name}`),
-      disabled: false,
+      disabled: typedMeta.disabled ?? false,
       href: typedMeta.path ? typedMeta.path : path,
     };
 

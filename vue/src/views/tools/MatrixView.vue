@@ -49,7 +49,7 @@ const handleTable = (newValue: Level): void => {
         >
           <v-row :class="smallScreen ? '' : 'w-25'">
             <v-col>
-              <v-card class="rounded-xl bg-surface-2 elevation-0">
+              <v-card class="rounded-xl bg-surface-2 elevation-2">
                 <v-tabs
                   v-model="currentTab"
                   color="secondary"

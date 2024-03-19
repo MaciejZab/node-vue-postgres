@@ -108,7 +108,7 @@ const emitChipsChange = () => {
 </script>
 
 <template>
-  <v-card class="rounded-xl elevation-0">
+  <v-card class="rounded-xl elevation-2">
     <template v-for="(group, index) in chipGroups" :key="group.id">
       <v-card-text v-if="!!group.chipsIf" :class="index !== 0 ? 'pt-0' : ''">
         <v-card-subtitle class="text-subtitle-1">

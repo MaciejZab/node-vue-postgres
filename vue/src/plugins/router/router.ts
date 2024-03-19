@@ -11,6 +11,11 @@ const router = createRouter({
 });
 
 router.beforeEach((to, _from, next) => {
+  if (to.meta.title) {
+    const title = typeof to.meta.title === "function" ? to.meta.title(to) : to.meta.title;
+    document.title = title as string;
+  }
+
   const permissionStore = usePermissionStore();
 
   const meta = {

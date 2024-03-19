@@ -49,11 +49,7 @@ const cols = computed(() => (smallScreen ? 3 : 2));
 
 <template>
   <v-col :cols="cols" v-for="(tool, i) in toolsSorted" :key="tool.id">
-    <v-card
-      :class="`bg-${i === 0 ? 'tertiary' : 'secondary'}-container text-on-${
-        i === 0 ? 'tertiary' : 'secondary'
-      }-container rounded-xl mx-4`"
-    >
+    <v-card :class="`bg-tertiary-container text-on-tertiary-container rounded-xl mx-4`">
       <v-card-item class="text-center">
         <v-card-title>{{ tool.title }}</v-card-title>
         <v-card-subtitle>{{ toolSubtitle(i) }}</v-card-subtitle>

@@ -1,12 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
 import { Competence } from "./CompetenceEntity";
 import { Subcategory } from "./SubcategoryEntity";
-import { IDocument } from "../../../interfaces/document/IDocument";
+import { Language } from "./LanguageEntity";
 
 @Entity()
 export class Document {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  ref: string;
 
   @Column()
   name: string;
@@ -23,25 +26,20 @@ export class Document {
   @ManyToOne(() => Competence, (competence) => competence.documents, { nullable: true })
   competence: Competence;
 
-  // constructor(document: IDocument, competence: Competence = null) {
-  //   this.name = document.name;
-  //   this.description = document.description;
-  //   this.revision = document.revision;
-  //   this.subcategory = document.subcategory;
-  //   this.competence = competence;
-  // }
+  @OneToMany(() => Language, (language) => language.document)
+  languages: Array<Language>;
 
   constructor(
+    ref: string,
     name: string,
     description: string,
     revision: number,
-    subcategory: Subcategory,
-    competence: Competence = null
+    subcategory: Subcategory
   ) {
+    this.ref = ref;
     this.name = name;
     this.description = description;
     this.revision = revision;
     this.subcategory = subcategory;
-    this.competence = competence;
   }
 }

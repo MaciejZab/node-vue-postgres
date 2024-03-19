@@ -7,6 +7,8 @@ import SettingsView from "../../views/SettingsView.vue";
 import ToolsView from "../../views/ToolsView.vue";
 import DocumentsView from "../../views/tools/DocumentsView.vue";
 import MatrixView from "../../views/tools/MatrixView.vue";
+import DocumentView from "../../views/DocumentView.vue";
+import { RouteLocationNormalized } from "vue-router";
 
 // 2. Define routes
 const routes = [
@@ -20,9 +22,6 @@ const routes = [
       control: false,
       breadcrumbs: {
         include: false,
-        parent: "",
-        name: "",
-        path: "",
       },
     },
   },
@@ -30,6 +29,17 @@ const routes = [
     path: "/pages",
     name: "pages",
     component: DefaultLayout,
+    meta: {
+      read: true,
+      write: false,
+      control: false,
+      breadcrumbs: {
+        include: true,
+        parent: "pages",
+        name: "home",
+        path: "/pages/home",
+      },
+    },
     children: [
       {
         path: "",
@@ -40,10 +50,7 @@ const routes = [
           write: false,
           control: false,
           breadcrumbs: {
-            include: true,
-            parent: "pages",
-            name: "home",
-            path: "/pages/home",
+            include: false,
           },
         },
       },
@@ -57,9 +64,6 @@ const routes = [
           control: false,
           breadcrumbs: {
             include: false,
-            parent: "",
-            name: "",
-            path: "",
           },
         },
       },
@@ -75,7 +79,6 @@ const routes = [
             include: true,
             parent: "pages",
             name: "settings",
-            path: "",
           },
         },
       },
@@ -91,7 +94,6 @@ const routes = [
             include: true,
             parent: "pages",
             name: "tools",
-            path: "",
           },
         },
       },
@@ -101,6 +103,17 @@ const routes = [
     path: "/tool",
     name: "tool",
     component: DefaultLayout,
+    meta: {
+      read: true,
+      write: false,
+      control: false,
+      breadcrumbs: {
+        include: true,
+        parent: "pages",
+        name: "tools",
+        path: "/pages/tools",
+      },
+    },
     children: [
       {
         path: "",
@@ -111,29 +124,75 @@ const routes = [
           write: false,
           control: false,
           breadcrumbs: {
-            include: true,
-            parent: "pages",
-            name: "tools",
-            path: "/pages/tools",
+            include: false,
           },
         },
       },
       {
         path: "documents",
         name: "documents",
-        component: DocumentsView,
+        redirect: { name: "browseDocuments" },
         meta: {
-          reaD: true,
+          read: true,
           write: false,
           control: false,
           breadcrumbs: {
             include: true,
-            parent: "tool",
-            name: "documents",
+            parent: "tool.documents",
+            name: "browse",
             path: "",
           },
         },
+        children: [
+          {
+            path: "browse",
+            name: "browseDocuments",
+            component: DocumentsView,
+            meta: {
+              read: true,
+              write: false,
+              control: false,
+              breadcrumbs: {
+                include: false,
+              },
+            },
+          },
+          {
+            path: ":fileName/:fileLangs/:fileUUID",
+            name: "viewDocuments",
+            component: DocumentView,
+            meta: {
+              read: true,
+              write: false,
+              control: false,
+              title: (route: RouteLocationNormalized) => route.params.fileName,
+              breadcrumbs: {
+                include: true,
+                parent: "tool.documents",
+                name: "view",
+                path: "",
+                disabled: true,
+              },
+            },
+          },
+        ],
       },
+      // {
+      //   path: "documents/view/:file",
+      //   name: "view",
+      //   component: DocumentView,
+      //   meta: {
+      //     read: true,
+      //     write: false,
+      //     control: false,
+      //     breadcrumbs: {
+      //       include: true,
+      //       parent: "tool",
+      //       name: "documents",
+      //       path: "/tool/documents",
+      //     },
+      //   },
+      // },
       {
         path: "matrix",
         name: "matrix",
