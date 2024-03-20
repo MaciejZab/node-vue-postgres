@@ -106,6 +106,17 @@ const headers = ref<any>([
 ]);
 
 const search = ref<string>("");
+
+const filteredDocuments = computed(() => {
+  return documents.value.filter((document) => {
+    const name = document.name.toLowerCase();
+    const description = document.description.toLowerCase();
+    const searchTerm = search.value.toLowerCase();
+
+    return name.includes(searchTerm) || description.includes(searchTerm);
+  });
+});
+
 const dialog = ref<boolean>(false);
 const dialogDelete = ref<boolean>(false);
 const editedIndex = ref<number>(-1);
@@ -214,9 +225,8 @@ const save = async () => {
   <v-card class="rounded-xl elevation-2 pa-4">
     <v-data-table
       :headers="headers"
-      :items="documents"
+      :items="filteredDocuments"
       :sort-by="[{ key: 'name', order: 'asc' }]"
-      :search="search"
       class="bg-surface-2"
     >
       <template v-slot:top>

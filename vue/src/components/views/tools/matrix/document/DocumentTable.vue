@@ -73,12 +73,23 @@ const responseStatus = ref<ResponseStatus | null>(null);
 const headers: any = [
   { title: "Name", align: "start", key: "name" },
   { title: "Description", key: "description" },
-  { title: "Languages", key: "languages" },
+  { title: "Languages (files)", key: "languages" },
   { title: "Revision", key: "revision", sortable: false },
   { title: "Actions", key: "actions", sortable: false },
 ];
 
 const search = ref<string>("");
+
+const filteredDocuments = computed(() => {
+  return documents.value.filter((document) => {
+    const name = document.name.toLowerCase();
+    const description = document.description.toLowerCase();
+    const searchTerm = search.value.toLowerCase();
+
+    return name.includes(searchTerm) || description.includes(searchTerm);
+  });
+});
+
 const dialog = ref<boolean>(false);
 const dialogDelete = ref<boolean>(false);
 const editedIndex = ref<number>(-1);
@@ -269,9 +280,8 @@ const languages = (item: DocumentEntity) => {
   <v-card class="rounded-xl elevation-2 pa-4">
     <v-data-table
       :headers="headers"
-      :items="documents"
+      :items="filteredDocuments"
       :sort-by="[{ key: 'name', order: 'asc' }]"
-      :search="search"
       class="bg-surface-2"
     >
       <template v-slot:top>
@@ -357,7 +367,9 @@ const languages = (item: DocumentEntity) => {
       </template>
       <template v-slot:item.languages="{ item }">
         <v-list-item class="pl-0" density="compact" v-for="(lang, i) in languages(item)" :key="i">
-          <v-list-item-title class="text-body-2"> {{ lang.title }}</v-list-item-title>
+          <v-list-item-title class="text-body-2">
+            {{ `${i + 1}) ${lang.title}` }}</v-list-item-title
+          >
         </v-list-item>
       </template>
       <template v-slot:item.actions="{ item }">

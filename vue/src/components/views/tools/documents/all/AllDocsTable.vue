@@ -97,6 +97,16 @@ const headers: any = [
 
 const search = ref<string>("");
 
+const filteredDocuments = computed(() => {
+  return documents.value.filter((document) => {
+    const name = document.name.toLowerCase();
+    const description = document.description.toLowerCase();
+    const searchTerm = search.value.toLowerCase();
+
+    return name.includes(searchTerm) || description.includes(searchTerm);
+  });
+});
+
 const navigateToRoute = (file: Array<string>) => {
   const url = `/tool/documents/${file.at(0)}/${file.at(1)}/${file.at(2)}`;
   window.open(url, "_blank");
@@ -112,7 +122,7 @@ const addToFavorites = (item: any) => {
   <v-card class="rounded-xl elevation-2 pa-4">
     <v-data-table
       :headers="headers"
-      :items="documents"
+      :items="filteredDocuments"
       :sort-by="[{ key: 'name', order: 'asc' }]"
       :search="search"
       class="bg-surface-2"

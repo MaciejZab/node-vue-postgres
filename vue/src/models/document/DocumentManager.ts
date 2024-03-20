@@ -38,6 +38,7 @@ class DocumentManager {
     const response = await axios.get(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.Document}${params}`
     );
+    console.log(response);
     return response.data.documents;
   };
 

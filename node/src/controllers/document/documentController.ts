@@ -227,16 +227,24 @@ const getDocumentsByDep = async (req: Request, res: Response) => {
           },
         },
       },
+      relations: ["languages"],
     };
 
-    const documents = await dataSource.getRepository(Document).find(docOptions);
+    const docs = await dataSource.getRepository(Document).find(docOptions);
 
-    if (!documents) {
+    if (!docs) {
       return res.status(404).json({
         message: "Documents not found",
         statusMessage: HttpResponseMessage.GET_ERROR,
       });
     }
+
+    const documents = docs.map((document) => {
+      return {
+        ...document,
+        languages: document.languages.map((language) => language.name),
+      };
+    });
 
     res.status(200).json({
       documents: documents,
@@ -299,15 +307,23 @@ const getDocumentsByDepCat = async (req: Request, res: Response) => {
       where: {
         subcategory: In(subcategoryIds),
       },
+      relations: ["languages"],
     };
-    const documents = await dataSource.getRepository(Document).find(docOptions);
+    const docs = await dataSource.getRepository(Document).find(docOptions);
 
-    if (!documents) {
+    if (!docs) {
       return res.status(404).json({
         message: "Documents not found",
         statusMessage: HttpResponseMessage.GET_ERROR,
       });
     }
+
+    const documents = docs.map((document) => {
+      return {
+        ...document,
+        languages: document.languages.map((language) => language.name),
+      };
+    });
 
     res.status(200).json({
       documents: documents,
@@ -326,14 +342,12 @@ const getDocumentsByDepCat = async (req: Request, res: Response) => {
 const getDocumentsByDepCatSub = async (req: Request, res: Response) => {
   try {
     const { departmentName, categoryName, subcategoryName } = req.params;
-    console.log(departmentName, categoryName, subcategoryName);
     const depOptions = {
       where: {
         name: departmentName,
       },
     };
     const departmentEntity = await dataSource.getRepository(Department).find(depOptions);
-    console.log(departmentEntity);
     if (!departmentEntity) {
       return res.status(404).json({
         message: "Department not found",
@@ -351,7 +365,6 @@ const getDocumentsByDepCatSub = async (req: Request, res: Response) => {
       },
     };
     const categoryEntity = await dataSource.getRepository(Category).find(catOptions);
-    console.log(categoryEntity);
     if (!categoryEntity) {
       return res.status(404).json({
         message: "Category not found",
@@ -371,21 +384,27 @@ const getDocumentsByDepCatSub = async (req: Request, res: Response) => {
       },
     };
     const subcategoryEntity = await dataSource.getRepository(Subcategory).find(subOptions);
-    console.log(subcategoryEntity);
     const docOptions = {
       where: {
         subcategory: subcategoryEntity,
       },
+      relations: ["languages"],
     };
-    const documents = await dataSource.getRepository(Document).find(docOptions);
-    // console.log(documents);
+    const docs = await dataSource.getRepository(Document).find(docOptions);
 
-    if (!documents) {
+    if (!docs) {
       return res.status(404).json({
         message: "Documents not found",
         statusMessage: HttpResponseMessage.GET_ERROR,
       });
     }
+
+    const documents = docs.map((document) => {
+      return {
+        ...document,
+        languages: document.languages.map((language) => language.name),
+      };
+    });
 
     res.status(200).json({
       documents: documents,
