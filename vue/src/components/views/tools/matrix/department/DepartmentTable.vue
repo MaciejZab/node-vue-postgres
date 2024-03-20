@@ -110,10 +110,9 @@ const search = ref<string>("");
 const filteredDocuments = computed(() => {
   return documents.value.filter((document) => {
     const name = document.name.toLowerCase();
-    const description = document.description.toLowerCase();
     const searchTerm = search.value.toLowerCase();
 
-    return name.includes(searchTerm) || description.includes(searchTerm);
+    return name.includes(searchTerm);
   });
 });
 
