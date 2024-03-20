@@ -3,14 +3,14 @@ import { computed, ref, watchEffect } from "vue";
 import VerifyTables from "./VerifyTables.vue";
 import FilesForm from "./FilesForm.vue";
 import { FileItem } from "../../../../../interfaces/document/FileItem";
-import { DocumentEntity } from "../../../../../interfaces/document/DocumentEntity";
+import { IDocumentEntity } from "../../../../../interfaces/document/IDocumentEntity";
 import { nodeConfig } from "../../../../../config/env";
 import axios from "axios";
 
 const emit = defineEmits(["newDocData", "verified"]);
 
 const props = defineProps<{
-  editedItem: DocumentEntity;
+  editedItem: IDocumentEntity;
 }>();
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 
@@ -28,7 +28,7 @@ const nextStep = () => {
 const prevable = computed(() => activeStep.value > 1);
 const nextable = computed(() => activeStep.value < 3);
 
-const document = ref<DocumentEntity>(props.editedItem);
+const document = ref<IDocumentEntity>(props.editedItem);
 
 const files = ref<Array<FileItem>>([]);
 

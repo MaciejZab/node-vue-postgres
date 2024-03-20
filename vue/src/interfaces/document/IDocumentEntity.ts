@@ -1,4 +1,4 @@
-interface DocumentEntity {
+interface IDocumentEntity {
   id: number;
   ref: string;
   name: string;
@@ -12,4 +12,4 @@ interface DocumentEntity {
   languages: Array<string>;
 }
 
-export type { DocumentEntity };
+export type { IDocumentEntity };

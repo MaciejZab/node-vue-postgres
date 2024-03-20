@@ -175,6 +175,7 @@ const removeDocument = async (req: Request, res: Response) => {
       const documentToRemove = await transactionalEntityManager
         .getRepository(Document)
         .findOne({ where: { id } });
+      console.log("documentToRemove: ", documentToRemove);
 
       if (!documentToRemove) {
         return res.status(404).json({
@@ -184,10 +185,11 @@ const removeDocument = async (req: Request, res: Response) => {
       }
 
       const documentRef = documentToRemove.ref;
-
+      console.log("documentRef: ", documentRef);
       const directory = path.join(__dirname, "..", "..", "..", "uploads", "documents");
+      console.log("directory: ", directory);
       const files = fs.readdirSync(directory);
-
+      console.log("files: ", files);
       // Filter files that contain the document's reference in their names
       const filesToDelete = files.filter((file) => file.includes(documentRef));
 

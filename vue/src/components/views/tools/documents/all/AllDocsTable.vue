@@ -3,7 +3,7 @@ import { ref, computed, watch } from "vue";
 // import { ResponseStatus } from "../../../../models/common/ResponseStatus";
 import { Chips } from "../../../../../interfaces/document/Chips";
 import { DocumentManager } from "../../../../../models/document/DocumentManager";
-import { DocumentEntity } from "../../../../../interfaces/document/DocumentEntity";
+import { IDocumentEntity } from "../../../../../interfaces/document/IDocumentEntity";
 
 const emit = defineEmits(["table"]);
 
@@ -13,7 +13,7 @@ const props = defineProps<{
 
 const manager = new DocumentManager();
 
-const documents = ref<Array<DocumentEntity>>([]);
+const documents = ref<Array<IDocumentEntity>>([]);
 
 enum LangDictionary {
   en = "English",
@@ -26,7 +26,7 @@ type LangDictionaryStringMap = {
   [key: string]: LangDictionary[keyof LangDictionary];
 };
 
-const languages = (item: DocumentEntity) => {
+const languages = (item: IDocumentEntity) => {
   return item.languages.map((lang: string) => ({
     title: lang
       .split("_")

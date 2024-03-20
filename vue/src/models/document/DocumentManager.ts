@@ -1,12 +1,12 @@
 import axios from "axios";
 import { nodeConfig } from "../../config/env";
 import { Endpoints } from "../../config/Endpoints";
-import { DocumentEntity } from "../../interfaces/document/DocumentEntity";
+import { IDocumentEntity } from "../../interfaces/document/IDocumentEntity";
 
 class DocumentManager {
   constructor() {}
 
-  public post = async (formData: FormData): Promise<Array<DocumentEntity>> => {
+  public post = async (formData: FormData): Promise<Array<IDocumentEntity>> => {
     const response = await axios.post(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.Document}`,
       formData
@@ -14,7 +14,7 @@ class DocumentManager {
     return response.data.added;
   };
 
-  public get = async (reqData: any): Promise<Array<DocumentEntity>> => {
+  public get = async (reqData: any): Promise<Array<IDocumentEntity>> => {
     let lvl: number = 0;
     if (reqData.department) lvl = 1;
     if (reqData.category) lvl = 2;
@@ -42,7 +42,7 @@ class DocumentManager {
     return response.data.documents;
   };
 
-  public put = async (formData: FormData): Promise<Array<DocumentEntity>> => {
+  public put = async (formData: FormData): Promise<Array<IDocumentEntity>> => {
     const response = await axios.put(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.Document}`,
       formData
@@ -50,7 +50,7 @@ class DocumentManager {
     return response.data.edited;
   };
 
-  public delete = async (id: number): Promise<Array<DocumentEntity>> => {
+  public delete = async (id: number): Promise<Array<IDocumentEntity>> => {
     const response = await axios.delete(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.Document}/${id}`
     );

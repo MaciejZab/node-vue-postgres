@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { DocumentEntity } from "../../../../../interfaces/document/DocumentEntity";
+import { IDocumentEntity } from "../../../../../interfaces/document/IDocumentEntity";
 import { FileItem } from "../../../../../interfaces/document/FileItem";
 
 const props = defineProps<{
-  eDoc: Partial<DocumentEntity>;
+  eDoc: Partial<IDocumentEntity>;
   pFiles: Array<FileItem>;
 }>();
 
-const doc = ref<Partial<DocumentEntity>>(props.eDoc);
+const doc = ref<Partial<IDocumentEntity>>(props.eDoc);
 const files = ref<Array<FileItem>>(props.pFiles);
 </script>
 

@@ -26,7 +26,7 @@ export class Document {
   @ManyToOne(() => Competence, (competence) => competence.documents, { nullable: true })
   competence: Competence;
 
-  @OneToMany(() => Language, (language) => language.document)
+  @OneToMany(() => Language, (language) => language.document, { onDelete: "CASCADE" })
   languages: Array<Language>;
 
   constructor(

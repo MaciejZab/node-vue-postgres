@@ -7,8 +7,8 @@ import Stepper from "./Stepper.vue";
 import { useI18n } from "vue-i18n";
 import { FileItem } from "../../../../../interfaces/document/FileItem";
 import { DocumentManager } from "../../../../../models/document/DocumentManager";
-import { DocumentEntity } from "../../../../../interfaces/document/DocumentEntity";
-import { DocumentForm } from "../../../../../interfaces/document/DocumentForm";
+import { IDocumentEntity } from "../../../../../interfaces/document/IDocumentEntity";
+import { DocumentEntity } from "../../../../../models/document/DocumentEntity";
 
 const emit = defineEmits(["table"]);
 
@@ -18,7 +18,7 @@ const level = ref<Level>(Level.Dep);
 // };
 
 const manager = new DocumentManager();
-const documents = ref<Array<DocumentEntity>>([]);
+const documents = ref<Array<IDocumentEntity>>([]);
 
 const chips = ref<Chips>({
   department: "",
@@ -94,39 +94,15 @@ const dialog = ref<boolean>(false);
 const dialogDelete = ref<boolean>(false);
 const editedIndex = ref<number>(-1);
 
-const editedItem = ref<DocumentEntity>({
-  id: 0,
-  ref: "",
-  name: "",
-  description: "",
-  revision: 1,
-  subcategory: {
-    name: "",
-    id: 0,
-  },
-  competence: null,
-  languages: [],
-});
+const editedItem = ref<IDocumentEntity>(new DocumentEntity());
 
-const defaultItem: DocumentEntity = {
-  id: 0,
-  ref: "",
-  name: "",
-  description: "",
-  revision: 1,
-  subcategory: {
-    name: "",
-    id: 0,
-  },
-  competence: null,
-  languages: [],
-};
+const defaultItem: IDocumentEntity = new DocumentEntity();
 
 const formTitle = computed(() => (editedIndex.value === -1 ? `New Document` : `Edit Document`));
 
-const docFormFiles = ref<Array<FileItem> | null>(null);
-const docFormData = ref<DocumentForm | null>(null);
-const newDocData = ref<any>(null);
+const docFormData = ref<IDocumentEntity | undefined>(undefined);
+const docFormFiles = ref<Array<FileItem> | undefined>(undefined);
+const newDocData = ref<any>(undefined);
 
 const handleNewDocData = (data: any) => (newDocData.value = data);
 
@@ -139,20 +115,13 @@ watch(
   newDocData,
   (nV: any) => {
     const v = nV.value;
-    const docData: DocumentForm = {
-      name: v.name,
-      description: v.description,
-      revision: v.revision,
+    const data = new DocumentEntity();
+    data.name = v.name;
+    data.description = v.description;
+    data.revision = v.revision;
 
-      departmentName: chips.value.department,
-      categoryName: chips.value.category,
-      subcategoryName: chips.value.subcategory,
-    };
-
-    const docFiles: Array<FileItem> = v.files;
-
-    docFormData.value = docData;
-    docFormFiles.value = docFiles;
+    docFormData.value = data;
+    docFormFiles.value = v.files;
   },
   { deep: true }
 );
@@ -200,7 +169,7 @@ const closeDelete = async () => {
   });
 };
 
-const deleteItem = async (item: DocumentEntity) => {
+const deleteItem = async (item: IDocumentEntity) => {
   editedIndex.value = documents.value.indexOf(item);
   editedItem.value = { ...item };
   dialogDelete.value = true;
@@ -210,17 +179,14 @@ const save = async () => {
   const formData: any = new FormData();
   const formDataValue = docFormData.value;
 
-  const base = {
-    ref: editedItem.value.ref,
-    name: formDataValue?.name,
-    description: formDataValue?.description,
-    revision: formDataValue?.revision,
-    departmentName: formDataValue?.departmentName,
-    categoryName: formDataValue?.categoryName,
-    subcategoryName: formDataValue?.subcategoryName,
-  };
+  const base = new DocumentEntity();
+  base.ref = editedItem.value.ref;
+  base.name = formDataValue?.name as string;
+  base.description = formDataValue?.description as string;
+  base.revision = formDataValue?.revision as number;
 
   formData.append("base", JSON.stringify(base));
+  formData.append("chips", JSON.stringify(chips.value));
 
   interface Langs {
     langs: Array<string>;
@@ -276,7 +242,7 @@ type LangDictionaryStringMap = {
   [key: string]: LangDictionary[keyof LangDictionary];
 };
 
-const languages = (item: DocumentEntity) => {
+const languages = (item: IDocumentEntity) => {
   return item.languages.map((lang: string) => ({
     title: lang
       .split("_")
@@ -404,3 +370,4 @@ const languages = (item: DocumentEntity) => {
     </v-data-table>
   </v-card>
 </template>
+../../../../../interfaces/document/IDocumentEntity

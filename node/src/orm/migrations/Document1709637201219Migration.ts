@@ -205,7 +205,7 @@ export class Document1709637201219 implements MigrationInterface {
         columnNames: ["documentId"],
         referencedColumnNames: ["id"],
         referencedTableName: "document",
-        onDelete: "SET NULL",
+        onDelete: "CASCADE",
       })
     );
   }
