@@ -5,6 +5,10 @@ import { FileItem } from "../../../../../interfaces/document/FileItem";
 
 const emit = defineEmits(["files"]);
 
+const props = defineProps<{
+  retrieved: Array<FileItem>;
+}>();
+
 const files = ref<Array<FileItem>>([]);
 const hasFiles = computed(() => files.value.length > 0);
 
@@ -47,6 +51,8 @@ watch(
   },
   { deep: true }
 );
+
+files.value = props.retrieved ?? [];
 </script>
 
 <template>
@@ -62,7 +68,7 @@ watch(
       <v-icon icon="mdi-plus" :size="24" /> File
     </v-btn>
     <div v-for="file in files" :key="file.id" class="d-flex align-center w-100">
-      <FileLanguage @file-change="handleFileChange" :fileId="file.id" class="flex-grow-1" />
+      <FileLanguage @file-change="handleFileChange" :file="file" class="flex-grow-1" />
       <v-btn
         @click="() => removeFile(file.id)"
         class="ml-4"

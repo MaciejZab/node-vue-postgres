@@ -14,16 +14,8 @@ const getBreadcrumbs = (): Array<Breadcrumb> => {
   const breadcrumbs: Array<Breadcrumb> = [];
 
   for (const routeRecord of matchedRoutes) {
-    // const { path, meta, children, components } = routeRecord;
     const { path, meta } = routeRecord;
 
-    // if (!components) continue;
-
-    // let typedMeta: MetaBreadcrumbs;
-
-    // if (children && children.length > 0)
-    //   typedMeta = children.at(0)?.meta?.breadcrumbs as MetaBreadcrumbs;
-    // else
     const typedMeta: MetaBreadcrumbs = meta.breadcrumbs as MetaBreadcrumbs;
 
     if (!typedMeta.include) continue;

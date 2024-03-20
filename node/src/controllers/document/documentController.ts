@@ -42,17 +42,12 @@ const addDocument = async (req: Request, res: Response) => {
 
       const savedDocument = await transactionalEntityManager.getRepository(Document).save(document);
 
-      // const languageEntities: Array<Language> = [];
-
       for (const [index, file] of uploadedFiles.entries()) {
-        const originalName = path.parse(file.originalname).name;
         const languageName = files_langs[index].langs.join("_");
 
         const savedLanguage = await transactionalEntityManager
           .getRepository(Language)
           .save(new Language(languageName, savedDocument));
-
-        // languageEntities.push(savedLanguage);
 
         const params = {
           langs: savedLanguage.name,
@@ -62,17 +57,14 @@ const addDocument = async (req: Request, res: Response) => {
         const queryString = new URLSearchParams(params).toString();
 
         // Construct new file name
-        const newName = `${savedDocument.name}_qs_${queryString}${path.extname(file.originalname)}`;
+        const newFileName = `${savedDocument.name}_qs_${queryString}.pdf`;
 
         // Rename and move file to destination folder
         fs.renameSync(
           file.path,
-          path.join(__dirname, "..", "..", "..", "uploads", "documents", newName)
+          path.join(__dirname, "..", "..", "..", "uploads", "documents", newFileName)
         );
       }
-
-      // savedDocument.languages = languageEntities;
-      // await transactionalEntityManager.getRepository(Document).save(savedDocument);
 
       res.status(201).json({
         added: JSON.stringify(savedDocument),
@@ -89,84 +81,133 @@ const addDocument = async (req: Request, res: Response) => {
   }
 };
 
-// const editDocument = async (req: Request, res: Response) => {
-//   try {
-//     const { id } = req.params;
-//     const { name, description, revision, subcategory, competence, languages } = req.body;
+const editDocument = async (req: Request, res: Response) => {
+  try {
+    const body = req.body;
 
-//     const document = await getRepository(Document).findOne(id);
+    const base = JSON.parse(body.base);
+    const files_langs = JSON.parse(body.files_langs);
+    const uploadedFiles = req.files;
 
-//     if (!document) {
-//       return res.status(404).json({
-//         message: "Document not found",
-//         statusMessage: HttpResponseMessage.PUT_ERROR,
-//       });
-//     }
+    await dataSource.transaction(async (transactionalEntityManager) => {
+      const documentToUpdate = await transactionalEntityManager.getRepository(Document).findOne({
+        where: {
+          ref: base.documentRef,
+        },
+      });
 
-//     document.name = name;
-//     document.description = description;
-//     document.revision = revision;
-//     document.subcategory = subcategory;
-//     document.competence = competence;
+      if (!documentToUpdate) {
+        return res.status(404).json({
+          message: "Document not found.",
+          statusMessage: HttpResponseMessage.PUT_ERROR,
+        });
+      }
 
-//     const updatedDocument = await getRepository(Document).save(document);
+      const oldDocName = documentToUpdate.name;
 
-//     // Handle associated files here if needed
+      documentToUpdate.name = base.name;
+      documentToUpdate.description = base.description;
+      documentToUpdate.revision = base.revision;
 
-//     res.status(200).json({
-//       edited: updatedDocument,
-//       message: "Document updated successfully",
-//       statusMessage: HttpResponseMessage.PUT_SUCCESS,
-//     });
-//   } catch (error) {
-//     console.error("Error updating document: ", error);
-//     res.status(500).json({
-//       message: "Failed to update document.",
-//       statusMessage: HttpResponseMessage.UNKNOWN,
-//     });
-//   }
-// };
+      const updatedDocument = await transactionalEntityManager
+        .getRepository(Document)
+        .save(documentToUpdate);
 
-// const removeDocument = async (req: Request, res: Response) => {
-//   try {
-//     const { id } = req.params;
+      const languagesToDelete = await transactionalEntityManager
+        .getRepository(Language)
+        .find({ where: { document: updatedDocument } });
 
-//     const documentRepository = getRepository(Document);
-//     const document = await documentRepository.findOne(id);
+      for (const language of languagesToDelete) {
+        await transactionalEntityManager.getRepository(Language).delete(language.id);
 
-//     if (!document) {
-//       return res.status(404).json({
-//         message: "Document not found",
-//         statusMessage: HttpResponseMessage.DELETE_ERROR,
-//       });
-//     }
+        const oldParams = {
+          langs: language.name,
+          uuid: updatedDocument.ref,
+        };
+        const queryString = new URLSearchParams(oldParams).toString();
 
-//     // Delete associated files here if needed
-//     // Example: Delete files stored on disk
-//     // Assuming each document has a unique filename stored in a 'filePath' property
-//     await Promise.all(
-//       document.languages.map((language) => {
-//         if (language.location) {
-//           return unlink(language.location); // Delete the file associated with the document
-//         }
-//       })
-//     );
+        const oldFileName = `${oldDocName}_qs_${queryString}.pdf`;
+        fs.unlinkSync(path.join(__dirname, "..", "..", "..", "uploads", "documents", oldFileName));
+      }
 
-//     await documentRepository.remove(document);
+      for (const [index, file] of uploadedFiles.entries()) {
+        const languageName = files_langs[index].langs.join("_");
 
-//     res.status(200).json({
-//       removed: document,
-//       message: "Document removed successfully",
-//       statusMessage: HttpResponseMessage.DELETE_SUCCESS,
-//     });
-//   } catch (error) {
-//     console.error("Error removing document: ", error);
-//     res.status(500).json({
-//       message: "Failed to remove document.",
-//       statusMessage: HttpResponseMessage.UNKNOWN,
-//     });
-//   }
-// };
+        const savedLanguage = await transactionalEntityManager
+          .getRepository(Language)
+          .save(new Language(languageName, updatedDocument));
+
+        const params = {
+          langs: savedLanguage.name,
+          uuid: updatedDocument.ref,
+        };
+
+        const queryString = new URLSearchParams(params).toString();
+
+        const newFileName = `${updatedDocument.name}_qs_${queryString}.pdf`;
+
+        fs.renameSync(
+          file.path,
+          path.join(__dirname, "..", "..", "..", "uploads", "documents", newFileName)
+        );
+      }
+
+      res.status(200).json({
+        edited: JSON.stringify(updatedDocument),
+        message: "Document updated successfully",
+        statusMessage: HttpResponseMessage.PUT_SUCCESS,
+      });
+    });
+  } catch (error) {
+    console.error("Error editing document: ", error);
+    res.status(404).json({
+      message: "Failed to edit document.",
+      statusMessage: HttpResponseMessage.UNKNOWN,
+    });
+  }
+};
+
+const removeDocument = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    await dataSource.transaction(async (transactionalEntityManager) => {
+      const documentToRemove = await transactionalEntityManager
+        .getRepository(Document)
+        .findOne({ where: { id } });
+
+      if (!documentToRemove) {
+        return res.status(404).json({
+          message: "Document not found.",
+          statusMessage: HttpResponseMessage.DELETE_ERROR,
+        });
+      }
+
+      const documentRef = documentToRemove.ref;
+
+      const directory = path.join(__dirname, "..", "..", "..", "uploads", "documents");
+      const files = fs.readdirSync(directory);
+
+      // Filter files that contain the document's reference in their names
+      const filesToDelete = files.filter((file) => file.includes(documentRef));
+
+      // Delete each file
+      filesToDelete.forEach((file) => {
+        const filePath = path.join(directory, file);
+        fs.unlinkSync(filePath);
+        console.log(`Deleted file: ${filePath}`);
+      });
+
+      await transactionalEntityManager.getRepository(Document).remove(documentToRemove);
+    });
+  } catch (error) {
+    console.error("Error removing document: ", error);
+    res.status(404).json({
+      message: "Failed to remove document.",
+      statusMessage: HttpResponseMessage.UNKNOWN,
+    });
+  }
+};
 
 const getDocuments = async (_req: Request, res: Response) => {
   try {
@@ -423,6 +464,8 @@ const getDocumentsByDepCatSub = async (req: Request, res: Response) => {
 // export { addDocument, editDocument, removeDocument };
 export {
   addDocument,
+  editDocument,
+  removeDocument,
   getDocuments,
   getDocumentsByDep,
   getDocumentsByDepCat,

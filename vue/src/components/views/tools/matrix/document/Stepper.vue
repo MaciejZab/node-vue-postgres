@@ -4,11 +4,13 @@ import VerifyTables from "./VerifyTables.vue";
 import FilesForm from "./FilesForm.vue";
 import { FileItem } from "../../../../../interfaces/document/FileItem";
 import { DocumentEntity } from "../../../../../interfaces/document/DocumentEntity";
+import { nodeConfig } from "../../../../../config/env";
+import axios from "axios";
 
 const emit = defineEmits(["newDocData", "verified"]);
 
 const props = defineProps<{
-  editedItem: Partial<DocumentEntity>;
+  editedItem: DocumentEntity;
 }>();
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 
@@ -26,9 +28,44 @@ const nextStep = () => {
 const prevable = computed(() => activeStep.value > 1);
 const nextable = computed(() => activeStep.value < 3);
 
-const document = ref<Partial<DocumentEntity>>(props.editedItem);
+const document = ref<DocumentEntity>(props.editedItem);
 
 const files = ref<Array<FileItem>>([]);
+
+const retrievedFiles = ref<Array<FileItem>>([]);
+
+(async () => {
+  const docName = document.value.name;
+  const docRef = document.value.ref;
+  const docLangs = document.value.languages;
+
+  if (docName && docRef && docLangs) {
+    for (const [index, lang] of Object.entries(docLangs)) {
+      const fileName = `${docName}_qs_langs=${lang}&uuid=${docRef}`;
+      const fileUrl = `${nodeConfig.origin}:${nodeConfig.port}/uploads/documents/${fileName}.pdf`;
+
+      try {
+        const response = await axios.get(fileUrl, { responseType: "arraybuffer" });
+        const fileContent = response.data;
+
+        const blob = new Blob([fileContent]);
+
+        const file = new File([blob], fileName, { type: response.headers["content-type"] });
+
+        const fileItem: FileItem = {
+          id: parseInt(index, 10),
+          file: [file],
+          langs: [lang],
+        };
+
+        retrievedFiles.value.push(fileItem);
+      } catch (error) {
+        console.error(`Error fetching file for language ${lang}:`, error);
+      }
+    }
+  }
+})();
+
 const hasFiles = computed<boolean>(() => files.value.length > 0);
 const handleFiles = (filesData: Array<FileItem>) => {
   files.value = filesData;
@@ -36,11 +73,10 @@ const handleFiles = (filesData: Array<FileItem>) => {
 
 const newDocData = computed(() => {
   return {
+    ref: document.value.ref,
     name: document.value.name,
     description: document.value.description,
     revision: document.value.revision,
-    subcategory: null,
-    competence: null,
 
     files: files.value,
   };
@@ -111,7 +147,7 @@ watchEffect(() => {
 
       <v-stepper-window-item :value="2">
         <v-card flat>
-          <files-form @files="handleFiles"></files-form>
+          <files-form @files="handleFiles" :retrieved="retrievedFiles"></files-form>
         </v-card>
       </v-stepper-window-item>
 

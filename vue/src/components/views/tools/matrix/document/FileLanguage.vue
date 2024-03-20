@@ -5,14 +5,15 @@ import { FileItem } from "../../../../../interfaces/document/FileItem";
 const emit = defineEmits(["file-change"]);
 
 const props = defineProps<{
-  fileId: number;
+  file: FileItem;
 }>();
 
-const fileData = ref<FileItem>({
-  id: props.fileId,
-  file: undefined,
-  langs: null,
-});
+const transFile = {
+  ...props.file,
+  langs: props.file?.langs?.flatMap((lang) => lang.split("_")) as Array<string>,
+};
+
+const fileData = ref<FileItem>(transFile);
 
 const languages = [
   { name: "en", value: "en" },

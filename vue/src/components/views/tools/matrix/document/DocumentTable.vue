@@ -13,9 +13,9 @@ import { DocumentForm } from "../../../../../interfaces/document/DocumentForm";
 const emit = defineEmits(["table"]);
 
 const level = ref<Level>(Level.Dep);
-const emitTableChange = () => {
-  emit("table", level.value);
-};
+// const emitTableChange = () => {
+//   emit("table", level.value);
+// };
 
 const manager = new DocumentManager();
 const documents = ref<Array<DocumentEntity>>([]);
@@ -94,17 +94,32 @@ const dialog = ref<boolean>(false);
 const dialogDelete = ref<boolean>(false);
 const editedIndex = ref<number>(-1);
 
-const editedItem = ref<Partial<DocumentEntity>>({
+const editedItem = ref<DocumentEntity>({
+  id: 0,
+  ref: "",
   name: "",
   description: "",
-  competence: null,
   revision: 1,
+  subcategory: {
+    name: "",
+    id: 0,
+  },
+  competence: null,
+  languages: [],
 });
-const defaultItem: Partial<DocumentEntity> = {
+
+const defaultItem: DocumentEntity = {
+  id: 0,
+  ref: "",
   name: "",
   description: "",
-  competence: null,
   revision: 1,
+  subcategory: {
+    name: "",
+    id: 0,
+  },
+  competence: null,
+  languages: [],
 };
 
 const formTitle = computed(() => (editedIndex.value === -1 ? `New Document` : `Edit Document`));
@@ -128,7 +143,6 @@ watch(
       name: v.name,
       description: v.description,
       revision: v.revision,
-      competence: v.competence,
 
       departmentName: chips.value.department,
       categoryName: chips.value.category,
@@ -152,18 +166,12 @@ const editItem = (item: any) => {
 };
 
 const deleteItemConfirm = async () => {
-  // const reqData: any = {
-  //   name: editedItem.value.name,
-  //   categoryName: category.value,
-  //   departmentName: department.value,
-  // };
-
-  // const itemId: number = editedItem.value.id;
+  const itemId: number = editedItem.value.id;
 
   try {
-    // await manager.delete(itemId);
-    // documents.value = await manager.value.get(reqData);
-    emitTableChange();
+    await manager.delete(itemId);
+    documents.value = await manager.get(chips.value);
+    // emitTableChange();
   } catch (error: any) {
     console.log(error);
     responseStatus.value = new ResponseStatus({
@@ -203,6 +211,7 @@ const save = async () => {
   const formDataValue = docFormData.value;
 
   const base = {
+    ref: editedItem.value.ref,
     name: formDataValue?.name,
     description: formDataValue?.description,
     revision: formDataValue?.revision,
@@ -231,6 +240,8 @@ const save = async () => {
 
   if (editedIndex.value > -1) {
     try {
+      await manager.put(formData);
+      documents.value = await manager.get(chips.value);
     } catch (error: any) {
       console.log(error);
       responseStatus.value = new ResponseStatus({
@@ -240,7 +251,6 @@ const save = async () => {
     }
   } else {
     await manager.post(formData);
-
     documents.value = await manager.get(chips.value);
     try {
     } catch (error: any) {

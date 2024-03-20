@@ -1,11 +1,12 @@
 import axios from "axios";
 import { nodeConfig } from "../../config/env";
 import { Endpoints } from "../../config/Endpoints";
+import { DocumentEntity } from "../../interfaces/document/DocumentEntity";
 
 class DocumentManager {
   constructor() {}
 
-  public post = async (formData: FormData): Promise<Array<any>> => {
+  public post = async (formData: FormData): Promise<Array<DocumentEntity>> => {
     const response = await axios.post(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.Document}`,
       formData
@@ -13,7 +14,7 @@ class DocumentManager {
     return response.data.added;
   };
 
-  public get = async (reqData: any): Promise<Array<any>> => {
+  public get = async (reqData: any): Promise<Array<DocumentEntity>> => {
     let lvl: number = 0;
     if (reqData.department) lvl = 1;
     if (reqData.category) lvl = 2;
@@ -38,24 +39,23 @@ class DocumentManager {
     const response = await axios.get(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.Document}${params}`
     );
-    console.log(response);
     return response.data.documents;
   };
 
-  // public put = async (reqData: any): Promise<Array<any>> => {
-  //     const id: string = reqData.id;
-  //     const name: string = reqData.name;
-  //     const response = await axios.put(
-  //       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentDepartment}/${id}/${name}`
-  //     );
-  //     return response.data.edited;
-  //   };
-  //   public delete = async (id: number): Promise<Array<Chip>> => {
-  //     const response = await axios.delete(
-  //       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentDepartment}/${id}`
-  //     );
-  // return response.data.deleted;
-  // };
+  public put = async (formData: FormData): Promise<Array<DocumentEntity>> => {
+    const response = await axios.put(
+      `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.Document}`,
+      formData
+    );
+    return response.data.edited;
+  };
+
+  public delete = async (id: number): Promise<Array<DocumentEntity>> => {
+    const response = await axios.delete(
+      `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.Document}/${id}`
+    );
+    return response.data.deleted;
+  };
 }
 
 export { DocumentManager };

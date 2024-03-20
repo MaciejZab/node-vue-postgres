@@ -21,10 +21,12 @@ import {
 } from "../controllers/document/subcategoryController";
 import {
   addDocument,
+  editDocument,
   getDocuments,
   getDocumentsByDep,
   getDocumentsByDepCat,
   getDocumentsByDepCatSub,
+  removeDocument,
 } from "../controllers/document/documentController";
 
 const router = express.Router();
@@ -46,6 +48,8 @@ router.put("/subcategory/:id/:name", editSubcategory);
 router.delete("/subcategory/:id", removeSubcategory);
 
 router.post("/", upload.any(), addDocument);
+router.put("/", upload.any(), editDocument);
+router.delete("/:id", removeDocument);
 router.get("/", getDocuments);
 router.get("/:departmentName", getDocumentsByDep);
 router.get("/:departmentName/:categoryName", getDocumentsByDepCat);
