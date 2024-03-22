@@ -88,7 +88,7 @@ const removeDepartment = async (req: Request, res: Response) => {
     await dataSource.getRepository(Department).remove(department);
 
     res.status(200).json({
-      removed: department,
+      deleted: department,
       message: "Department removed successfully",
       statusMessage: HttpResponseMessage.DELETE_SUCCESS,
     });

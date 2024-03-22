@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
-import { FileItem } from "../../../../../interfaces/document/FileItem";
+import { computed, ref, watchEffect } from "vue";
+import { IFileItem } from "../../../../../interfaces/document/IFileItem";
 
 const emit = defineEmits(["file-change"]);
 
 const props = defineProps<{
-  file: FileItem;
+  file: IFileItem;
 }>();
 
 const transFile = {
@@ -13,7 +13,7 @@ const transFile = {
   langs: props.file?.langs?.flatMap((lang) => lang.split("_")) as Array<string>,
 };
 
-const fileData = ref<FileItem>(transFile);
+const fileData = ref<IFileItem>(transFile);
 
 const languages = [
   { name: "en", value: "en" },
@@ -27,18 +27,13 @@ const selectedLanguagesCount = computed(() =>
 
 const languageOrder = ["en", "pl", "ua"];
 
-watch(
-  fileData,
-  (newValue) => {
-    if (newValue.file !== undefined && newValue.langs !== null) {
-      newValue.langs = newValue.langs.sort((a, b) => {
-        return languageOrder.indexOf(a) - languageOrder.indexOf(b);
-      });
-      emit("file-change", newValue);
-    }
-  },
-  { deep: true }
-);
+watchEffect(() => {
+  fileData.value.langs = fileData.value.langs?.sort((a, b) => {
+    return languageOrder.indexOf(a) - languageOrder.indexOf(b);
+  });
+
+  if (fileData.value) emit("file-change", fileData.value);
+});
 </script>
 
 <template>
@@ -83,3 +78,4 @@ watch(
   text-overflow: ellipsis;
 }
 </style>
+../../../../../interfaces/document/IFileItem

@@ -200,7 +200,15 @@ const removeDocument = async (req: Request, res: Response) => {
         console.log(`Deleted file: ${filePath}`);
       });
 
-      await transactionalEntityManager.getRepository(Document).remove(documentToRemove);
+      const removedDocument = await transactionalEntityManager
+        .getRepository(Document)
+        .remove(documentToRemove);
+
+      res.status(200).json({
+        deleted: removedDocument,
+        message: "Document removed successfully",
+        statusMessage: HttpResponseMessage.DELETE_SUCCESS,
+      });
     });
   } catch (error) {
     console.error("Error removing document: ", error);

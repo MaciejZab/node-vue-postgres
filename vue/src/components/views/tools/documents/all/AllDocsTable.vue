@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
 // import { ResponseStatus } from "../../../../models/common/ResponseStatus";
-import { Chips } from "../../../../../interfaces/document/Chips";
+import { IChips } from "../../../../../interfaces/document/IChips";
 import { DocumentManager } from "../../../../../models/document/DocumentManager";
 import { IDocumentEntity } from "../../../../../interfaces/document/IDocumentEntity";
 
 const emit = defineEmits(["table"]);
 
 const props = defineProps<{
-  chips: Chips | undefined;
+  chips: IChips | undefined;
 }>();
 
 const manager = new DocumentManager();
@@ -36,18 +36,6 @@ const languages = (item: IDocumentEntity) => {
     value: [item.name, lang, item.ref],
   }));
 };
-
-// const documentsData = computed(() => {
-//   const transformed = documents.value.map((document) => ({
-//     id: document.id,
-//     name: document.name,
-//     description: document.description,
-//     languages: languages(document.languages),
-//   }));
-
-//   console.log(transformed);
-//   return transformed;
-// });
 
 (async () => {
   try {
@@ -119,7 +107,7 @@ const addToFavorites = (item: any) => {
 </script>
 
 <template>
-  <v-card class="rounded-xl elevation-2 pa-4">
+  <v-card class="rounded-xl elevation-2">
     <v-data-table
       :headers="headers"
       :items="filteredDocuments"
@@ -176,3 +164,4 @@ const addToFavorites = (item: any) => {
     </v-data-table>
   </v-card>
 </template>
+../../../../../interfaces/document/IChips

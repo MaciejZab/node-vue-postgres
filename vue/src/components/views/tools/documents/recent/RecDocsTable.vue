@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 // import { ResponseStatus } from "../../../../models/common/ResponseStatus";
-import { Chips } from "../../../../../interfaces/document/Chips";
-import { Chip } from "../../../../../interfaces/document/Chip";
-import { Level } from "../../../../../interfaces/document/Level";
+import { IChips } from "../../../../../interfaces/document/IChips";
+import { IChip } from "../../../../../interfaces/document/IChip";
+import { ILevel } from "../../../../../interfaces/document/ILevel";
 import { DepartmentsManager } from "../../../../../models/document/DepartmentsManager";
 import { SubcategoriesManager } from "../../../../../models/document/SubcategoriesManager";
 import { CategoriesManager } from "../../../../../models/document/CategoriesManager";
@@ -11,16 +11,16 @@ import { CategoriesManager } from "../../../../../models/document/CategoriesMana
 const emit = defineEmits(["table"]);
 
 const props = defineProps<{
-  chips: Chips | undefined;
+  chips: IChips | undefined;
 }>();
 
 const DepManager = new DepartmentsManager();
 const CatManager = new CategoriesManager();
 const SubManager = new SubcategoriesManager();
 
-const documents = ref<Array<Chip>>([]);
+const documents = ref<Array<IChip>>([]);
 
-const level = ref<Level>(Level.Dep);
+const level = ref<ILevel>(ILevel.Dep);
 const manager = ref<DepartmentsManager | CategoriesManager | SubcategoriesManager>(DepManager);
 
 const department = ref<string | undefined>(undefined);
@@ -49,7 +49,7 @@ watch(
       (async () => {
         try {
           documents.value = await SubManager.get(reqData);
-          level.value = Level.Sub;
+          level.value = ILevel.Sub;
           manager.value = SubManager;
           tableItem.value = "Workstation";
         } catch (error) {
@@ -60,7 +60,7 @@ watch(
       (async () => {
         try {
           documents.value = await CatManager.get(reqData);
-          level.value = Level.Cat;
+          level.value = ILevel.Cat;
           manager.value = CatManager;
           tableItem.value = "Program";
         } catch (error) {
@@ -71,7 +71,7 @@ watch(
       (async () => {
         try {
           documents.value = await DepManager.get();
-          level.value = Level.Dep;
+          level.value = ILevel.Dep;
           manager.value = DepManager;
           tableItem.value = "Department";
         } catch (error) {
@@ -108,7 +108,7 @@ const addToFavorites = (item: any) => {
 </script>
 
 <template>
-  <v-card class="rounded-xl elevation-0 pa-4">
+  <v-card class="rounded-xl elevation-0">
     <v-data-table
       :headers="headers"
       :items="documents"
@@ -145,3 +145,4 @@ const addToFavorites = (item: any) => {
     </v-data-table>
   </v-card>
 </template>
+../../../../../interfaces/document/IChips

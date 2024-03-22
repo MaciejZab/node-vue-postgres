@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { Chips } from "../../../../../interfaces/document/Chips";
-import { Chip } from "../../../../../interfaces/document/Chip";
-import { Level } from "../../../../../interfaces/document/Level";
+import { IChips } from "../../../../../interfaces/document/IChips";
+import { IChip } from "../../../../../interfaces/document/IChip";
+import { ILevel } from "../../../../../interfaces/document/ILevel";
 import { DepartmentsManager } from "../../../../../models/document/DepartmentsManager";
 import { CategoriesManager } from "../../../../../models/document/CategoriesManager";
 import { SubcategoriesManager } from "../../../../../models/document/SubcategoriesManager";
@@ -10,22 +10,22 @@ import { SubcategoriesManager } from "../../../../../models/document/Subcategori
 const emit = defineEmits(["chips"]);
 
 const props = defineProps<{
-  table: Level | undefined;
+  table: ILevel | undefined;
 }>();
 
 const DepManager = new DepartmentsManager();
 const CatManager = new CategoriesManager();
 const SubManager = new SubcategoriesManager();
 
-const chips = ref<Chips>({
+const chips = ref<IChips>({
   department: "",
   category: "",
   subcategory: "",
 });
 
-const departments = ref<Array<Chip> | null>(null);
-const categories = ref<Array<Chip> | null>(null);
-const subcategories = ref<Array<Chip> | null>(null);
+const departments = ref<Array<IChip> | null>(null);
+const categories = ref<Array<IChip> | null>(null);
+const subcategories = ref<Array<IChip> | null>(null);
 
 (async () => {
   try {
@@ -92,14 +92,14 @@ watch(
     if (dep) categories.value = await CatManager.get(reqData);
     if (cat) subcategories.value = await SubManager.get(reqData);
 
-    switch (table as Level) {
-      case Level.Dep:
+    switch (table as ILevel) {
+      case ILevel.Dep:
         departments.value = await DepManager.get();
         break;
-      case Level.Cat:
+      case ILevel.Cat:
         categories.value = await CatManager.get(reqData);
         break;
-      case Level.Sub:
+      case ILevel.Sub:
         subcategories.value = await SubManager.get(reqData);
         break;
     }

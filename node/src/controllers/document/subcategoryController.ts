@@ -85,7 +85,7 @@ const removeSubcategory = async (req: Request, res: Response) => {
     await dataSource.getRepository(Subcategory).remove(subcategory);
 
     res.status(200).json({
-      removed: subcategory,
+      deleted: subcategory,
       message: "Subcategory removed successfully",
       statusMessage: HttpResponseMessage.DELETE_SUCCESS,
     });

@@ -2,10 +2,11 @@
 import { computed, ref, watchEffect } from "vue";
 import VerifyTables from "./VerifyTables.vue";
 import FilesForm from "./FilesForm.vue";
-import { FileItem } from "../../../../../interfaces/document/FileItem";
+import { IFileItem } from "../../../../../interfaces/document/IFileItem";
 import { IDocumentEntity } from "../../../../../interfaces/document/IDocumentEntity";
 import { nodeConfig } from "../../../../../config/env";
 import axios from "axios";
+import { FileItem } from "../../../../../models/document/FileItem";
 
 const emit = defineEmits(["newDocData", "verified"]);
 
@@ -30,9 +31,9 @@ const nextable = computed(() => activeStep.value < 3);
 
 const document = ref<IDocumentEntity>(props.editedItem);
 
-const files = ref<Array<FileItem>>([]);
+const files = ref<Array<IFileItem>>([]);
 
-const retrievedFiles = ref<Array<FileItem>>([]);
+const retrievedFiles = ref<Array<IFileItem>>([]);
 
 (async () => {
   const docName = document.value.name;
@@ -52,11 +53,7 @@ const retrievedFiles = ref<Array<FileItem>>([]);
 
         const file = new File([blob], fileName, { type: response.headers["content-type"] });
 
-        const fileItem: FileItem = {
-          id: parseInt(index, 10),
-          file: [file],
-          langs: [lang],
-        };
+        const fileItem: FileItem = new FileItem(parseInt(index, 10), [file], [lang]);
 
         retrievedFiles.value.push(fileItem);
       } catch (error) {
@@ -67,7 +64,7 @@ const retrievedFiles = ref<Array<FileItem>>([]);
 })();
 
 const hasFiles = computed<boolean>(() => files.value.length > 0);
-const handleFiles = (filesData: Array<FileItem>) => {
+const handleFiles = (filesData: Array<IFileItem>) => {
   files.value = filesData;
 };
 
@@ -181,3 +178,4 @@ watchEffect(() => {
     </template>
   </v-stepper>
 </template>
+../../../../../interfaces/document/IFileItem

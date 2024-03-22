@@ -4,8 +4,8 @@ import DepartmentFilters from "../../components/views/tools/matrix/department/De
 import DepartmentTable from "../../components/views/tools/matrix/department/DepartmentTable.vue";
 import DocumentFilters from "../../components/views/tools/matrix/document/DocumentFilters.vue";
 import DocumentTable from "../../components/views/tools/matrix/document/DocumentTable.vue";
-import { Chips } from "../../interfaces/document/Chips";
-import { Level } from "../../interfaces/document/Level";
+import { IChips } from "../../interfaces/document/IChips";
+import { ILevel } from "../../interfaces/document/ILevel";
 
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 
@@ -24,13 +24,13 @@ const tabs = [
 
 const currentTab = ref<number>(1);
 
-const chips = ref<Chips | undefined>(undefined);
-const table = ref<Level | undefined>(undefined);
+const chips = ref<IChips | undefined>(undefined);
+const table = ref<ILevel | undefined>(undefined);
 
-const handleChips = (newValue: Chips): void => {
+const handleChips = (newValue: IChips): void => {
   chips.value = newValue;
 };
-const handleTable = (newValue: Level): void => {
+const handleTable = (newValue: ILevel): void => {
   table.value = newValue;
   setTimeout(() => {
     table.value = undefined;
@@ -49,7 +49,7 @@ const handleTable = (newValue: Level): void => {
         >
           <v-row :class="smallScreen ? '' : 'w-25'">
             <v-col>
-              <v-card class="rounded-xl bg-surface-2 elevation-2">
+              <v-card class="rounded-xl bg-surface-2 elevation-2 ma-1">
                 <v-tabs
                   v-model="currentTab"
                   color="secondary"
@@ -71,24 +71,24 @@ const handleTable = (newValue: Level): void => {
                   <department-filters
                     @chips="handleChips"
                     :table="table"
-                    class="bg-surface-2 mb-4"
+                    class="bg-surface-2 mb-5 ma-1"
                   ></department-filters>
                   <department-table
                     @table="handleTable"
                     :chips="chips"
-                    class="bg-surface-2"
+                    class="bg-surface-2 pa-4 ma-1"
                   ></department-table>
                 </v-window-item>
                 <v-window-item :value="2">
                   <document-filters
                     @chips="handleChips"
                     :table="table"
-                    class="bg-surface-2 mb-4"
+                    class="bg-surface-2 mb-5 ma-1"
                   ></document-filters>
                   <document-table
                     @table="handleTable"
                     :chips="chips"
-                    class="bg-surface-2"
+                    class="bg-surface-2 pa-4 ma-1"
                   ></document-table>
                 </v-window-item>
               </v-window>

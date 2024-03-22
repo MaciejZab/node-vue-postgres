@@ -1,26 +1,27 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from "vue";
 import { ResponseStatus } from "../../../../../models/common/ResponseStatus";
-import { Chips } from "../../../../../interfaces/document/Chips";
-import { Chip } from "../../../../../interfaces/document/Chip";
-import { Level } from "../../../../../interfaces/document/Level";
+import { IChips } from "../../../../../interfaces/document/IChips";
+import { IChip } from "../../../../../interfaces/document/IChip";
+import { ILevel } from "../../../../../interfaces/document/ILevel";
 import { DepartmentsManager } from "../../../../../models/document/DepartmentsManager";
 import { SubcategoriesManager } from "../../../../../models/document/SubcategoriesManager";
 import { CategoriesManager } from "../../../../../models/document/CategoriesManager";
+import tableDialog from "../../../../../components/tools/tableDialog.vue";
 
 const emit = defineEmits(["table"]);
 
 const props = defineProps<{
-  chips: Chips | undefined;
+  chips: IChips | undefined;
 }>();
 
 const DepManager = new DepartmentsManager();
 const CatManager = new CategoriesManager();
 const SubManager = new SubcategoriesManager();
 
-const documents = ref<Array<Chip>>([]);
+const documents = ref<Array<IChip>>([]);
 
-const level = ref<Level>(Level.Dep);
+const level = ref<ILevel>(ILevel.Dep);
 const manager = ref<DepartmentsManager | CategoriesManager | SubcategoriesManager>(DepManager);
 
 const emitTableChange = () => {
@@ -61,7 +62,7 @@ watch(
       (async () => {
         try {
           documents.value = await SubManager.get(reqData);
-          level.value = Level.Sub;
+          level.value = ILevel.Sub;
           manager.value = SubManager;
           tableItem.value = "Workstation";
         } catch (error) {
@@ -72,7 +73,7 @@ watch(
       (async () => {
         try {
           documents.value = await CatManager.get(reqData);
-          level.value = Level.Cat;
+          level.value = ILevel.Cat;
           manager.value = CatManager;
           tableItem.value = "Program";
         } catch (error) {
@@ -83,7 +84,7 @@ watch(
       (async () => {
         try {
           documents.value = await DepManager.get();
-          level.value = Level.Dep;
+          level.value = ILevel.Dep;
           manager.value = DepManager;
           tableItem.value = "Department";
         } catch (error) {
@@ -117,15 +118,13 @@ const filteredDocuments = computed(() => {
 });
 
 const dialog = ref<boolean>(false);
+const dialogLoading = ref<boolean>(false);
 const dialogDelete = ref<boolean>(false);
+const dialogDeleteLoading = ref<boolean>(false);
 const editedIndex = ref<number>(-1);
 
-const editedItem = ref<Chip>({ id: 0, name: "" });
-const defaultItem: Chip = { id: 0, name: "" };
-
-const formTitle = computed(() =>
-  editedIndex.value === -1 ? `New ${tableItem.value}` : `Edit ${tableItem.value}`
-);
+const editedItem = ref<IChip>({ id: 0, name: "" });
+const defaultItem: IChip = { id: 0, name: "" };
 
 const editItem = (item: any) => {
   editedIndex.value = documents.value.indexOf(item);
@@ -142,6 +141,7 @@ const deleteItemConfirm = async () => {
 
   const itemId: number = editedItem.value.id;
 
+  dialogDeleteLoading.value = true;
   try {
     await manager.value.delete(itemId);
     documents.value = await manager.value.get(reqData);
@@ -154,6 +154,7 @@ const deleteItemConfirm = async () => {
     });
   }
 
+  dialogDeleteLoading.value = false;
   closeDelete();
 };
 
@@ -174,7 +175,7 @@ const closeDelete = async () => {
   });
 };
 
-const deleteItem = async (item: Chip) => {
+const deleteItem = async (item: IChip) => {
   editedIndex.value = documents.value.indexOf(item);
   editedItem.value = { ...item };
   dialogDelete.value = true;
@@ -188,6 +189,7 @@ const save = async () => {
     departmentName: department.value,
   };
 
+  dialogLoading.value = true;
   if (editedIndex.value > -1) {
     try {
       await manager.value.put(reqData);
@@ -216,12 +218,13 @@ const save = async () => {
     // if (!responseStatus) documents.value.push(editedItem.value);
   }
 
+  dialogLoading.value = false;
   close();
 };
 </script>
 
 <template>
-  <v-card class="rounded-xl elevation-2 pa-4">
+  <v-card class="rounded-xl elevation-2">
     <v-data-table
       :headers="headers"
       :items="filteredDocuments"
@@ -243,68 +246,35 @@ const save = async () => {
             :rounded="true"
           ></v-text-field>
           <v-divider class="mx-4" inset vertical></v-divider>
-          <v-dialog v-model="dialog" max-width="500px">
-            <template v-slot:activator="{ props }">
-              <v-btn
-                class="bg-primary text-on-primary mr-4 rounded-xl"
-                height="40px"
-                prepend-icon="mdi-plus"
-                v-bind="props"
-              >
-                {{ tableItem }}
-              </v-btn>
+
+          <table-dialog
+            v-model="dialog"
+            variant="Save"
+            :item="tableItem"
+            :index="editedIndex"
+            :loading="dialogLoading"
+            @close="close"
+            @confirm="save"
+          >
+            <template v-slot>
+              <v-text-field
+                v-model="editedItem.name"
+                variant="underlined"
+                label="Name"
+              ></v-text-field>
             </template>
-            <v-card class="rounded-xl">
-              <v-card-title>
-                <span class="text-h5">{{ formTitle }}</span>
-              </v-card-title>
+          </table-dialog>
 
-              <v-card-text>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-text-field v-model="editedItem.name" label="Name"></v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
-
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn class="rounded-xl" color="primary" variant="text" @click="close">
-                  Cancel
-                </v-btn>
-                <v-btn class="bg-primary text-on-primary mr-4 rounded-xl" @click="save">
-                  Save
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <v-dialog v-model="dialogDelete" max-width="500px">
-            <v-card class="bg-surface rounded-xl">
-              <v-card-title class="text-h6">Are you sure you want to proceed?</v-card-title>
-              <v-alert
-                class="mx-4 mb-8"
-                :text="`Deleting this ${tableItem.toLowerCase()} will also affect all of its associated descendants.`"
-                border="start"
-                type="info"
-              >
-              </v-alert>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn class="rounded-xl" color="primary" variant="text" @click="closeDelete">
-                  Cancel
-                </v-btn>
-                <v-btn
-                  class="bg-primary text-on-primary mr-4 rounded-xl"
-                  @click="deleteItemConfirm"
-                >
-                  Ok
-                </v-btn>
-                <v-spacer></v-spacer>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+          <table-dialog
+            v-model="dialogDelete"
+            variant="Delete"
+            :item="tableItem"
+            :index="editedIndex"
+            :loading="dialogDeleteLoading"
+            @close="closeDelete"
+            @confirm="deleteItemConfirm"
+          >
+          </table-dialog>
         </v-toolbar>
       </template>
       <template v-slot:item.actions="{ item }">
@@ -329,4 +299,3 @@ const save = async () => {
     </v-data-table>
   </v-card>
 </template>
-../../../../../models/common/ResponseStatus../../../../../interfaces/document/Chips../../../../../interfaces/document/Chip../../../../../interfaces/document/Level../../../../../models/document/DepartmentsManager../../../../../models/document/SubcategoriesManager../../../../../models/document/CategoriesManager

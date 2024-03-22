@@ -1,30 +1,22 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from "vue";
 import { ResponseStatus } from "../../../../../models/common/ResponseStatus";
-import { Chips } from "../../../../../interfaces/document/Chips";
-import { Level } from "../../../../../interfaces/document/Level";
+import { IChips } from "../../../../../interfaces/document/IChips";
 import Stepper from "./Stepper.vue";
-import { useI18n } from "vue-i18n";
-import { FileItem } from "../../../../../interfaces/document/FileItem";
+import tableDialog from "../../../../../components/tools/tableDialog.vue";
+// import { useI18n } from "vue-i18n";
+import { IFileItem } from "../../../../../interfaces/document/IFileItem";
 import { DocumentManager } from "../../../../../models/document/DocumentManager";
 import { IDocumentEntity } from "../../../../../interfaces/document/IDocumentEntity";
 import { DocumentEntity } from "../../../../../models/document/DocumentEntity";
+import { Chips } from "../../../../../models/document/Chips";
 
 const emit = defineEmits(["table"]);
-
-const level = ref<Level>(Level.Dep);
-// const emitTableChange = () => {
-//   emit("table", level.value);
-// };
 
 const manager = new DocumentManager();
 const documents = ref<Array<IDocumentEntity>>([]);
 
-const chips = ref<Chips>({
-  department: "",
-  category: "",
-  subcategory: "",
-});
+const chips = ref<IChips>(new Chips());
 
 (async () => {
   try {
@@ -34,31 +26,23 @@ const chips = ref<Chips>({
   }
 })();
 
-// const tableItem = ref<string>("Department");
+// dictionary
+// const { t } = useI18n();
 
-const { t } = useI18n();
-
-const tableAddDisabled = ref<boolean>(true);
-const tableAdd = computed(() => t("tools.matrix.documents.add_button"));
+// const tableAdd = computed(() => t("tools.matrix.documents.add_button"));
+// const tableItem = computed<string>(() => t("tools.documents.name"));
 
 const props = defineProps<{
-  chips: Chips | undefined;
+  chips: IChips | undefined;
 }>();
+
+const tableAddDisabled = ref<boolean>(true);
 
 watch(
   () => [props.chips?.department, props.chips?.category, props.chips?.subcategory],
   async ([dep, cat, sub]) => {
     if (sub) tableAddDisabled.value = false;
-    else if (cat) {
-      level.value = Level.Sub;
-      tableAddDisabled.value = true;
-    } else if (dep) {
-      level.value = Level.Cat;
-      tableAddDisabled.value = true;
-    } else {
-      level.value = Level.Dep;
-      tableAddDisabled.value = true;
-    }
+    else tableAddDisabled.value = true;
 
     chips.value.department = dep !== undefined ? dep : "";
     chips.value.category = cat !== undefined ? cat : "";
@@ -73,7 +57,7 @@ const responseStatus = ref<ResponseStatus | null>(null);
 const headers: any = [
   { title: "Name", align: "start", key: "name" },
   { title: "Description", key: "description" },
-  { title: "Languages (files)", key: "languages" },
+  { title: "Languages (files)", key: "languages", sortable: false },
   { title: "Revision", key: "revision", sortable: false },
   { title: "Actions", key: "actions", sortable: false },
 ];
@@ -91,17 +75,16 @@ const filteredDocuments = computed(() => {
 });
 
 const dialog = ref<boolean>(false);
+const dialogLoading = ref<boolean>(false);
 const dialogDelete = ref<boolean>(false);
+const dialogDeleteLoading = ref<boolean>(false);
 const editedIndex = ref<number>(-1);
 
 const editedItem = ref<IDocumentEntity>(new DocumentEntity());
-
 const defaultItem: IDocumentEntity = new DocumentEntity();
 
-const formTitle = computed(() => (editedIndex.value === -1 ? `New Document` : `Edit Document`));
-
 const docFormData = ref<IDocumentEntity | undefined>(undefined);
-const docFormFiles = ref<Array<FileItem> | undefined>(undefined);
+const docFormFiles = ref<Array<IFileItem> | undefined>(undefined);
 const newDocData = ref<any>(undefined);
 
 const handleNewDocData = (data: any) => (newDocData.value = data);
@@ -128,36 +111,10 @@ watch(
 
 // FORM FUNCTIONS
 
-const editItem = (item: any) => {
+const deleteItem = async (item: IDocumentEntity) => {
   editedIndex.value = documents.value.indexOf(item);
   editedItem.value = { ...item };
-  dialog.value = true;
-};
-
-const deleteItemConfirm = async () => {
-  const itemId: number = editedItem.value.id;
-
-  try {
-    await manager.delete(itemId);
-    documents.value = await manager.get(chips.value);
-    // emitTableChange();
-  } catch (error: any) {
-    console.log(error);
-    responseStatus.value = new ResponseStatus({
-      code: error.response.status,
-      message: error.response.data.statusMessage,
-    });
-  }
-
-  closeDelete();
-};
-
-const close = () => {
-  dialog.value = false;
-  nextTick(() => {
-    editedItem.value = { ...defaultItem };
-    editedIndex.value = -1;
-  });
+  dialogDelete.value = true;
 };
 
 const closeDelete = async () => {
@@ -169,10 +126,38 @@ const closeDelete = async () => {
   });
 };
 
-const deleteItem = async (item: IDocumentEntity) => {
+const deleteItemConfirm = async () => {
+  const itemId: number = editedItem.value.id;
+
+  dialogDeleteLoading.value = true;
+  try {
+    await manager.delete(itemId);
+    documents.value = await manager.get(chips.value);
+  } catch (error: any) {
+    console.log(error);
+    responseStatus.value = new ResponseStatus({
+      code: error.response.status,
+      message: error.response.data.statusMessage,
+    });
+  }
+
+  dialogDeleteLoading.value = false;
+  closeDelete();
+};
+
+const editItem = (item: IDocumentEntity) => {
   editedIndex.value = documents.value.indexOf(item);
   editedItem.value = { ...item };
-  dialogDelete.value = true;
+  dialog.value = true;
+};
+
+const close = () => {
+  dialog.value = false;
+
+  nextTick(() => {
+    editedItem.value = { ...defaultItem };
+    editedIndex.value = -1;
+  });
 };
 
 const save = async () => {
@@ -194,7 +179,7 @@ const save = async () => {
 
   const filesLangs: Array<Langs> = [];
 
-  docFormFiles.value?.forEach((file: FileItem) => {
+  docFormFiles.value?.forEach((file: IFileItem) => {
     formData.append(`file_${file.id}`, file.file?.at(0));
 
     filesLangs.push({
@@ -204,6 +189,7 @@ const save = async () => {
 
   formData.append(`files_langs`, JSON.stringify(filesLangs));
 
+  dialogLoading.value = true;
   if (editedIndex.value > -1) {
     try {
       await manager.put(formData);
@@ -228,6 +214,7 @@ const save = async () => {
     }
   }
 
+  dialogLoading.value = false;
   close();
 };
 
@@ -253,7 +240,7 @@ const languages = (item: IDocumentEntity) => {
 </script>
 
 <template>
-  <v-card class="rounded-xl elevation-2 pa-4">
+  <v-card class="rounded-xl elevation-2">
     <v-data-table
       :headers="headers"
       :items="filteredDocuments"
@@ -275,70 +262,36 @@ const languages = (item: IDocumentEntity) => {
             :rounded="true"
           ></v-text-field>
           <v-divider class="mx-4" inset vertical></v-divider>
-          <v-dialog v-model="dialog" max-width="500px">
-            <template v-slot:activator="{ props }">
-              <v-btn
-                class="bg-primary text-on-primary mr-4 rounded-xl"
-                height="40px"
-                prepend-icon="mdi-plus"
-                v-bind="props"
-                :disabled="tableAddDisabled"
-              >
-                {{ tableAdd }}
-              </v-btn>
+
+          <table-dialog
+            v-model="dialog"
+            variant="Save"
+            :index="editedIndex"
+            :loading="dialogLoading"
+            :disable="tableAddDisabled"
+            :confirm-disable="verified"
+            @close="close"
+            @confirm="save"
+          >
+            <template v-slot>
+              <stepper
+                @verified="handleVerified"
+                @new-doc-data="handleNewDocData"
+                :edited-item="editedItem"
+              ></stepper>
             </template>
-            <v-card class="rounded-xl">
-              <v-card-title>
-                <span class="text-h5">{{ formTitle }}</span>
-              </v-card-title>
+          </table-dialog>
 
-              <v-card-text>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12" class="pa-0">
-                      <stepper
-                        @verified="handleVerified"
-                        @newDocData="handleNewDocData"
-                        :editedItem="editedItem"
-                      ></stepper>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
-
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn class="rounded-xl" color="primary" variant="outlined" @click="close">
-                  Cancel
-                </v-btn>
-                <v-btn
-                  class="bg-primary text-on-primary mr-4 rounded-xl"
-                  @click="save"
-                  :disabled="verified"
-                >
-                  Save
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <v-dialog v-model="dialogDelete" max-width="500px">
-            <v-card class="bg-surface">
-              <v-card-title class="text-h6">Are you sure you want to proceed?</v-card-title>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn class="rounded-xl" color="primary" variant="text" @click="closeDelete">
-                  Cancel
-                </v-btn>
-                <v-btn
-                  class="bg-primary text-on-primary mr-4 rounded-xl"
-                  @click="deleteItemConfirm"
-                >
-                  Ok
-                </v-btn>
-                <v-spacer></v-spacer>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+          <table-dialog
+            v-model="dialogDelete"
+            variant="Delete"
+            delete-t-msg="deleteDocumentConfirmation"
+            :index="editedIndex"
+            :loading="dialogDeleteLoading"
+            @close="closeDelete"
+            @confirm="deleteItemConfirm"
+          >
+          </table-dialog>
         </v-toolbar>
       </template>
       <template v-slot:item.languages="{ item }">
@@ -351,7 +304,7 @@ const languages = (item: IDocumentEntity) => {
       <template v-slot:item.actions="{ item }">
         <v-btn
           variant="tonal"
-          color="tertiary"
+          color="primary"
           size="small"
           @click="editItem(item)"
           icon="mdi-pencil"
@@ -360,7 +313,7 @@ const languages = (item: IDocumentEntity) => {
 
         <v-btn
           variant="tonal"
-          color="tertiary"
+          color="primary"
           size="small"
           @click="deleteItem(item)"
           icon="mdi-delete"
@@ -370,4 +323,3 @@ const languages = (item: IDocumentEntity) => {
     </v-data-table>
   </v-card>
 </template>
-../../../../../interfaces/document/IDocumentEntity

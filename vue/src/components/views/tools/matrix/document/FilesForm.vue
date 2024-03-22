@@ -1,27 +1,24 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import FileLanguage from "./FileLanguage.vue";
-import { FileItem } from "../../../../../interfaces/document/FileItem";
+import { IFileItem } from "../../../../../interfaces/document/IFileItem";
+import { FileItem } from "../../../../../models/document/FileItem";
 
 const emit = defineEmits(["files"]);
 
 const props = defineProps<{
-  retrieved: Array<FileItem>;
+  retrieved: Array<IFileItem>;
 }>();
 
-const files = ref<Array<FileItem>>([]);
+const files = ref<Array<IFileItem>>([]);
 const hasFiles = computed(() => files.value.length > 0);
 
 let nextId = 0;
 const addFile = () => {
-  files.value.push({
-    id: ++nextId,
-    file: undefined,
-    langs: null,
-  });
+  files.value.push(new FileItem(++nextId));
 };
 
-const handleFileChange = (fileData: FileItem) => {
+const handleFileChange = (fileData: IFileItem) => {
   const existingIndex = files.value.findIndex((item) => item.id === fileData.id);
 
   if (existingIndex !== -1) {
@@ -39,7 +36,7 @@ const filterFiles = () => {
     (fileItem) =>
       fileItem.file !== undefined &&
       fileItem.file.length > 0 &&
-      fileItem.langs !== null &&
+      fileItem.langs !== undefined &&
       fileItem.langs.length > 0
   );
 };
@@ -90,3 +87,4 @@ files.value = props.retrieved ?? [];
     >
   </div>
 </template>
+../../../../../interfaces/document/IFileItem
