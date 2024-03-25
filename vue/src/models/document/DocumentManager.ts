@@ -2,9 +2,12 @@ import axios from "axios";
 import { nodeConfig } from "../../config/env";
 import { Endpoints } from "../../config/Endpoints";
 import { IDocumentEntity } from "../../interfaces/document/IDocumentEntity";
+import { DocumentEntity } from "./DocumentEntity";
 
 class DocumentManager {
   constructor() {}
+
+  public new = () => new DocumentEntity();
 
   public post = async (formData: FormData): Promise<Array<IDocumentEntity>> => {
     const response = await axios.post(
@@ -16,20 +19,20 @@ class DocumentManager {
 
   public get = async (reqData: any): Promise<Array<IDocumentEntity>> => {
     let lvl: number = 0;
-    if (reqData.department) lvl = 1;
-    if (reqData.category) lvl = 2;
-    if (reqData.subcategory) lvl = 3;
+    if (reqData.departmentName) lvl = 1;
+    if (reqData.categoryName) lvl = 2;
+    if (reqData.subcategoryName) lvl = 3;
 
     let params: string = "";
     switch (lvl) {
       case 1:
-        params = `/${reqData.department}`;
+        params = `/${reqData.departmentName}`;
         break;
       case 2:
-        params = `/${reqData.department}/${reqData.category}`;
+        params = `/${reqData.departmentName}/${reqData.categoryName}`;
         break;
       case 3:
-        params = `/${reqData.department}/${reqData.category}/${reqData.subcategory}`;
+        params = `/${reqData.departmentName}/${reqData.categoryName}/${reqData.subcategoryName}`;
         break;
 
       default:

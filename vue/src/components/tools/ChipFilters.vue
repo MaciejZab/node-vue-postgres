@@ -1,27 +1,25 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { IChips } from "../../../../../interfaces/document/IChips";
-import { IChip } from "../../../../../interfaces/document/IChip";
-import { ILevel } from "../../../../../interfaces/document/ILevel";
-import { DepartmentsManager } from "../../../../../models/document/DepartmentsManager";
-import { CategoriesManager } from "../../../../../models/document/CategoriesManager";
-import { SubcategoriesManager } from "../../../../../models/document/SubcategoriesManager";
+import { IChip } from "../../interfaces/document/IChip";
+import { IChips } from "../../interfaces/document/IChips";
+import { Chips } from "../../models/document/Chips";
+import { ILevel } from "../../interfaces/document/ILevel";
+import { DepartmentsManager } from "../../models/document/DepartmentsManager";
+import { CategoriesManager } from "../../models/document/CategoriesManager";
+import { SubcategoriesManager } from "../../models/document/SubcategoriesManager";
 
 const emit = defineEmits(["chips"]);
 
 const props = defineProps<{
   table: ILevel | undefined;
+  maxLevel: number;
 }>();
+
+const chips = ref<IChips>(new Chips());
 
 const DepManager = new DepartmentsManager();
 const CatManager = new CategoriesManager();
 const SubManager = new SubcategoriesManager();
-
-const chips = ref<IChips>({
-  departmentName: "",
-  categoryName: "",
-  subcategoryName: "",
-});
 
 const departments = ref<Array<IChip> | null>(null);
 const categories = ref<Array<IChip> | null>(null);
@@ -37,11 +35,10 @@ const subcategories = ref<Array<IChip> | null>(null);
 
 const chipGroups = computed(() => [
   {
-    id: 1,
+    id: 0,
     subtitle: "Department",
     chipsIf: departments.value,
     chips: departments.value,
-    filter: true,
     get chipsModel() {
       return chips.value.departmentName;
     },
@@ -53,11 +50,10 @@ const chipGroups = computed(() => [
     },
   },
   {
-    id: 2,
+    id: 1,
     subtitle: "Program",
     chipsIf: chips.value.departmentName,
     chips: categories.value,
-    filter: true,
     get chipsModel() {
       return chips.value.categoryName;
     },
@@ -67,40 +63,44 @@ const chipGroups = computed(() => [
       emitChipsChange();
     },
   },
-  // {
-  //   id: 3,
-  //   subtitle: "Workstation",
-  //   chipsIf: chips.value.category,
-  //   chips: subcategories.value,
-  //   filter: false,
-  //   chipsModel: undefined,
-  // get chipsModel() {
-  //   return chips.value.subcategory;
-  // },
-  // set chipsModel(value) {
-  //   chips.value.subcategory = value;
-  //   emitChipsChange();
-  // },
-  // },
+  {
+    id: 2,
+    subtitle: "Workstation",
+    chipsIf: chips.value.categoryName,
+    chips: subcategories.value,
+    get chipsModel() {
+      return chips.value.subcategoryName;
+    },
+    set chipsModel(value) {
+      chips.value.subcategoryName = value;
+      emitChipsChange();
+    },
+  },
 ]);
 
 watch(
-  () => [chips.value.departmentName, chips.value.categoryName, props.table],
-  async ([dep, cat, table]) => {
-    const reqData: any = { categoryName: cat, departmentName: dep };
+  chips.value,
+  async (chips) => {
+    if (chips.departmentName) categories.value = await CatManager.get(chips);
+    if (chips.categoryName) subcategories.value = await SubManager.get(chips);
+  },
+  { deep: true }
+);
 
-    if (dep) categories.value = await CatManager.get(reqData);
-    if (cat) subcategories.value = await SubManager.get(reqData);
+watch(
+  () => props.table,
+  async (tableLvl) => {
+    if (!tableLvl) return;
 
-    switch (table as ILevel) {
+    switch (tableLvl as ILevel) {
       case ILevel.Dep:
         departments.value = await DepManager.get();
         break;
       case ILevel.Cat:
-        categories.value = await CatManager.get(reqData);
+        categories.value = await CatManager.get(chips.value);
         break;
       case ILevel.Sub:
-        subcategories.value = await SubManager.get(reqData);
+        subcategories.value = await SubManager.get(chips.value);
         break;
     }
   }
@@ -114,7 +114,10 @@ const emitChipsChange = () => {
 <template>
   <v-card class="rounded-xl elevation-2">
     <template v-for="(group, index) in chipGroups" :key="group.id">
-      <v-card-text v-if="!!group.chipsIf" :class="index !== 0 ? 'pt-0' : ''">
+      <v-card-text
+        v-if="props.maxLevel >= group.id && !!group.chipsIf"
+        :class="index !== 0 ? 'pt-0' : ''"
+      >
         <v-card-subtitle class="text-subtitle-1">
           <v-icon size="20">mdi-tag</v-icon> {{ group.subtitle }}
         </v-card-subtitle>

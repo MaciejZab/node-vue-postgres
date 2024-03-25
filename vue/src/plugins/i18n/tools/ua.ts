@@ -35,6 +35,12 @@ const uaT = {
         add_button: "ДОКУМЕНТ",
       },
     },
+    admin: {
+      name: "Адміністратор",
+      tabs: {
+        privileges: "Привілеї",
+      },
+    },
   },
 };
 

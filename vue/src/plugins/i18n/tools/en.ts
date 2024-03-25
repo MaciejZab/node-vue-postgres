@@ -35,6 +35,12 @@ const enT = {
         add_button: "DOCUMENT",
       },
     },
+    admin: {
+      name: "Admin",
+      tabs: {
+        privileges: "Privileges",
+      },
+    },
   },
 };
 

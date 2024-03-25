@@ -36,6 +36,12 @@ const plT = {
         add_button: "DOKUMENT",
       },
     },
+    admin: {
+      name: "Administrator",
+      tabs: {
+        privileges: "Uprawnienia",
+      },
+    },
   },
 };
 

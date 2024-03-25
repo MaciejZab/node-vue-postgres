@@ -21,6 +21,7 @@ const plC = {
             view: "Widok",
           },
           matrix: "Macierz",
+          admin: "Administrator",
         },
       },
       pages: {

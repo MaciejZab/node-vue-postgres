@@ -1,14 +1,14 @@
 import { IChips } from "../../interfaces/document/IChips";
 
 class Chips implements IChips {
-  department: string;
-  category: string;
-  subcategory: string;
+  departmentName: string;
+  categoryName: string;
+  subcategoryName: string;
 
   constructor(department: string = "", category: string = "", subcategory: string = "") {
-    this.department = department;
-    this.category = category;
-    this.subcategory = subcategory;
+    this.departmentName = department;
+    this.categoryName = category;
+    this.subcategoryName = subcategory;
   }
 }
 

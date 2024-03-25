@@ -123,11 +123,79 @@ const submitLogin = (): void => {
   <v-container class="layout-view-container mb-0 bg-background">
     <v-row>
       <v-col class="h-screen ma-n2 d-flex flex-column justify-center">
-        <v-sheet :width="300" class="h-auto d-flex flex-column align-center mx-auto">
+        <v-card
+          :loading="loader"
+          color="primary"
+          variant="outlined"
+          :width="300"
+          class="h-auto d-flex flex-column align-center mx-auto rounded-xl"
+        >
+          <template v-slot:loader="{ isActive }">
+            <v-progress-linear
+              :active="isActive"
+              color="primary"
+              height="4"
+              indeterminate
+            ></v-progress-linear>
+          </template>
+          <v-card-title class="text-secondary text-h3 text-center mt-4 mb-2">Intranet</v-card-title>
+          <v-card-text class="w-100">
+            <v-form
+              ref="login"
+              class="d-flex flex-column"
+              v-model="validation"
+              @submit.prevent="submitLogin"
+            >
+              <v-container fluid>
+                <v-row>
+                  <v-text-field
+                    color="primary"
+                    class="mb-2"
+                    v-model="data.username"
+                    :rules="nameRules"
+                    label="Username"
+                    required
+                  ></v-text-field
+                ></v-row>
+                <v-row>
+                  <v-select
+                    color="primary"
+                    label="Domain"
+                    v-model="data.domain"
+                    :items="['reconext.com', 'tgn.teleplan.com']"
+                    :rules="domainRules"
+                    required
+                  ></v-select>
+                </v-row>
+                <v-row>
+                  <v-text-field
+                    color="primary"
+                    class="mb-2"
+                    v-model="data.password"
+                    :rules="passwordRules"
+                    :append-inner-icon="passwordIcon"
+                    @click:append-inner="passwordVisibility = !passwordVisibility"
+                    label="Password"
+                    :type="passwordType"
+                    required
+                  />
+                </v-row>
+              </v-container>
+              <v-btn type="submit" color="primary" class="rounded-xl">Login</v-btn>
+            </v-form>
+            <!-- <v-spacer v-if="responseStatus"></v-spacer> -->
+            <alert-response-status
+              class="rounded-xl mt-2"
+              :status="responseStatus"
+              :persist="true"
+            />
+          </v-card-text>
+        </v-card>
+
+        <!-- <v-sheet :width="300" class="h-auto d-flex flex-column align-center mx-auto">
           <v-container fluid class="bg-surface-1 text-on-surface rounded-xl elevation-6">
             <v-row>
               <v-col>
-                <!-- <v-img :width="268" src="../intranet-logo.svg" class="d-flex flex-column"></v-img> -->
                 <h1 class="text-primary text-h2 text-center">Intranet</h1>
               </v-col>
             </v-row>
@@ -183,15 +251,7 @@ const submitLogin = (): void => {
                 <alert-response-status :status="responseStatus" :persist="true" />
               </v-col>
             </v-row>
-            <!-- <v-row>
-              <v-col>
-                <v-form ref="continue" class="d-flex flex-column" @submit.prevent="proceed">
-                  <v-btn type="submit" class="bg-primaryVariant text-onPrimary" variant="tonal"
-                    >Continue without Login</v-btn
-                  >
-                </v-form>
-              </v-col>
-            </v-row> -->
+            
             <v-spacer v-if="!responseStatus"></v-spacer>
           </v-container>
 
@@ -201,7 +261,7 @@ const submitLogin = (): void => {
             bottom
             color="primary"
           ></v-progress-linear>
-        </v-sheet>
+        </v-sheet> -->
       </v-col>
     </v-row>
   </v-container>

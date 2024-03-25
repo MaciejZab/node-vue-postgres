@@ -54,12 +54,12 @@ const category = ref<string | undefined>(undefined);
 const subcategory = ref<string | undefined>(undefined);
 
 watch(
-  () => [props.chips?.department, props.chips?.category, props.chips?.subcategory],
+  () => [props.chips?.departmentName, props.chips?.categoryName, props.chips?.subcategoryName],
   async ([dep, cat, sub]) => {
     const reqData: any = {
-      department: dep,
-      category: cat,
-      subcategory: sub,
+      departmentName: dep,
+      categoryName: cat,
+      subcategoryName: sub,
     };
 
     try {

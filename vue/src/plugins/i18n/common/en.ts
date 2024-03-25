@@ -21,6 +21,7 @@ const enC = {
             view: "View",
           },
           matrix: "Matrix",
+          admin: "Admin",
         },
       },
       pages: {

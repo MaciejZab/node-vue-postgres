@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import DepartmentFilters from "../../components/views/tools/matrix/department/DepartmentFilters.vue";
+// import DepartmentFilters from "../../components/views/tools/matrix/department/DepartmentFilters.vue";
 import DepartmentTable from "../../components/views/tools/matrix/department/DepartmentTable.vue";
-import DocumentFilters from "../../components/views/tools/matrix/document/DocumentFilters.vue";
+// import DocumentFilters from "../../components/views/tools/matrix/document/DocumentFilters.vue";
 import DocumentTable from "../../components/views/tools/matrix/document/DocumentTable.vue";
+import ChipFilters from "../../components/tools/ChipFilters.vue";
 import { IChips } from "../../interfaces/document/IChips";
 import { ILevel } from "../../interfaces/document/ILevel";
+import { Chips } from "../../models/document/Chips";
 
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 
@@ -24,7 +26,7 @@ const tabs = [
 
 const currentTab = ref<number>(1);
 
-const chips = ref<IChips | undefined>(undefined);
+const chips = ref<IChips>(new Chips());
 const table = ref<ILevel | undefined>(undefined);
 
 const handleChips = (newValue: IChips): void => {
@@ -68,11 +70,12 @@ const handleTable = (newValue: ILevel): void => {
             <v-col class="h-100">
               <v-window v-model="currentTab" class="w-100">
                 <v-window-item :value="1">
-                  <department-filters
+                  <chip-filters
                     @chips="handleChips"
                     :table="table"
+                    :max-level="1"
                     class="bg-surface-2 mb-5 ma-1"
-                  ></department-filters>
+                  ></chip-filters>
                   <department-table
                     @table="handleTable"
                     :chips="chips"
@@ -80,11 +83,12 @@ const handleTable = (newValue: ILevel): void => {
                   ></department-table>
                 </v-window-item>
                 <v-window-item :value="2">
-                  <document-filters
+                  <chip-filters
                     @chips="handleChips"
                     :table="table"
+                    :max-level="2"
                     class="bg-surface-2 mb-5 ma-1"
-                  ></document-filters>
+                  ></chip-filters>
                   <document-table
                     @table="handleTable"
                     :chips="chips"

@@ -8,6 +8,7 @@ import ToolsView from "../../views/ToolsView.vue";
 import DocumentsView from "../../views/tools/DocumentsView.vue";
 import MatrixView from "../../views/tools/MatrixView.vue";
 import DocumentView from "../../views/DocumentView.vue";
+import AdminView from "../../views/tools/AdminView.vue";
 import { RouteLocationNormalized } from "vue-router";
 
 // 2. Define routes
@@ -177,22 +178,22 @@ const routes = [
           },
         ],
       },
-      // {
-      //   path: "documents/view/:file",
-      //   name: "view",
-      //   component: DocumentView,
-      //   meta: {
-      //     read: true,
-      //     write: false,
-      //     control: false,
-      //     breadcrumbs: {
-      //       include: true,
-      //       parent: "tool",
-      //       name: "documents",
-      //       path: "/tool/documents",
-      //     },
-      //   },
-      // },
+      {
+        path: "admin",
+        name: "admin",
+        component: AdminView,
+        meta: {
+          read: true,
+          write: false,
+          control: false,
+          breadcrumbs: {
+            include: true,
+            parent: "tool",
+            name: "admin",
+            path: "",
+          },
+        },
+      },
       {
         path: "matrix",
         name: "matrix",

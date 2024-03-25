@@ -2,9 +2,13 @@ import axios from "axios";
 import { IChip } from "../../interfaces/document/IChip";
 import { nodeConfig } from "../../config/env";
 import { Endpoints } from "../../config/Endpoints";
+import { Chip } from "./Chip";
+import { IChips } from "../../interfaces/document/IChips";
 
 class CategoriesManager {
   constructor() {}
+
+  public new = () => new Chip();
 
   public post = async (reqData: any): Promise<Array<IChip>> => {
     const requestData = {
@@ -19,7 +23,7 @@ class CategoriesManager {
     return response.data.added;
   };
 
-  public get = async (reqData: any): Promise<Array<IChip>> => {
+  public get = async (reqData: IChips): Promise<Array<IChip>> => {
     const departmentName: string = reqData.departmentName;
     const response = await axios.get(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentCategory}/${departmentName}`

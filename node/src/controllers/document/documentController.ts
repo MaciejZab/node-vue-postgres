@@ -17,16 +17,17 @@ const addDocument = async (req: Request, res: Response) => {
 
     const base = JSON.parse(body.base);
     const files_langs = JSON.parse(body.files_langs);
+    const target = JSON.parse(body.target);
     const uploadedFiles = req.files;
 
     await dataSource.transaction(async (transactionalEntityManager) => {
       const subcategory = await transactionalEntityManager.getRepository(Subcategory).findOne({
         where: {
-          name: base.subcategoryName,
+          name: target.subcategoryName,
           category: {
-            name: base.categoryName,
+            name: target.categoryName,
             department: {
-              name: base.departmentName,
+              name: target.departmentName,
             },
           },
         },
@@ -92,7 +93,7 @@ const editDocument = async (req: Request, res: Response) => {
     await dataSource.transaction(async (transactionalEntityManager) => {
       const documentToUpdate = await transactionalEntityManager.getRepository(Document).findOne({
         where: {
-          ref: base.documentRef,
+          ref: base.ref,
         },
       });
 

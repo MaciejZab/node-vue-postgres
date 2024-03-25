@@ -39,6 +39,30 @@ const getUser = async (req: Request, res: Response) => {
   }
 };
 
+const getUsers = async (req: Request, res: Response) => {
+  try {
+    const users: Array<UserEntity> = await dataSource
+      .getRepository(UserEntity)
+      .find({ relations: ["languages"] });
+
+    // if (!user)
+    //   res
+    //     .status(404)
+    //     .json({ user, message: "User not found.", statusMessage: HttpResponseMessage.GET_ERROR });
+
+    // res
+    //   .status(200)
+    //   .json({ user, message: "User found.", statusMessage: HttpResponseMessage.GET_SUCCESS });
+  } catch (err) {
+    console.error("Error retrieving user:", err);
+    res.status(404).json({
+      err,
+      message: "Unknown error occurred. Failed to retrieve user.",
+      statusMessage: HttpResponseMessage.UNKNOWN,
+    });
+  }
+};
+
 const userAuth = async (req: Request, res: Response) => {
   try {
     const user = new User(req.body);

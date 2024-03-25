@@ -2,11 +2,16 @@ import axios from "axios";
 import { IChip } from "../../interfaces/document/IChip";
 import { nodeConfig } from "../../config/env";
 import { Endpoints } from "../../config/Endpoints";
+import { Chip } from "./Chip";
+import { IChips } from "../../interfaces/document/IChips";
 
 class DepartmentsManager {
   constructor() {}
 
+  public new = () => new Chip();
+
   public post = async (reqData: any): Promise<Array<IChip>> => {
+    console.log("reqData", reqData);
     const requestData = {
       name: reqData.name,
     };
@@ -18,7 +23,7 @@ class DepartmentsManager {
     return response.data.added;
   };
 
-  public get = async (_reqData?: any): Promise<Array<IChip>> => {
+  public get = async (_reqData?: IChips): Promise<Array<IChip>> => {
     const response = await axios.get(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentDepartment}`
     );

@@ -30,7 +30,7 @@ const subcategory = ref<string | undefined>(undefined);
 const tableItem = ref<string>("Department");
 
 watch(
-  () => [props.chips?.department, props.chips?.category, props.chips?.subcategory],
+  () => [props.chips?.departmentName, props.chips?.categoryName, props.chips?.subcategoryName],
   ([dep, cat, sub]) => {
     const reqData: any = {
       categoryName: cat,

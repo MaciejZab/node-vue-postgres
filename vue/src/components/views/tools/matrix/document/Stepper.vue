@@ -8,7 +8,7 @@ import { nodeConfig } from "../../../../../config/env";
 import axios from "axios";
 import { FileItem } from "../../../../../models/document/FileItem";
 
-const emit = defineEmits(["newDocData", "verified"]);
+const emit = defineEmits(["save-data", "verified"]);
 
 const props = defineProps<{
   editedItem: IDocumentEntity;
@@ -30,6 +30,10 @@ const prevable = computed(() => activeStep.value > 1);
 const nextable = computed(() => activeStep.value < 3);
 
 const document = ref<IDocumentEntity>(props.editedItem);
+
+watchEffect(() => {
+  document.value = props.editedItem;
+});
 
 const files = ref<Array<IFileItem>>([]);
 
@@ -87,13 +91,10 @@ watchEffect(() => {
     hasFiles.value
   ) {
     emit("verified", false);
+    emit("save-data", newDocData.value);
   } else {
     emit("verified", true);
   }
-});
-
-watchEffect(() => {
-  emit("newDocData", newDocData);
 });
 </script>
 
@@ -178,4 +179,3 @@ watchEffect(() => {
     </template>
   </v-stepper>
 </template>
-../../../../../interfaces/document/IFileItem

@@ -1,7 +1,7 @@
 interface IChips {
-  department: string;
-  category: string;
-  subcategory: string;
+  departmentName: string;
+  categoryName: string;
+  subcategoryName: string;
 }
 
 export type { IChips };

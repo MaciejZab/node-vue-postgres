@@ -90,7 +90,7 @@ const tools = [
   {
     id: 6,
     name: "boss",
-    href: "",
+    href: "/tool/admin",
     icon: "account-tie",
     image: "../tools/boss.png",
     permissions: {
