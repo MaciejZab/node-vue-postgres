@@ -103,6 +103,7 @@ const tools = [
 
 const filteredTools = tools.filter((tool) => {
   const toolPermissions: IPermission = tool.permissions;
+  // console.log(toolPermissions);
   return permissionStore.check(toolPermissions);
 });
 

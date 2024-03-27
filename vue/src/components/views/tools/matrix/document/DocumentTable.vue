@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { IChips } from "../../../../../interfaces/document/IChips";
 // import { useI18n } from "vue-i18n";
 import { IFileItem } from "../../../../../interfaces/document/IFileItem";
@@ -7,7 +7,9 @@ import { DocumentManager } from "../../../../../models/document/DocumentManager"
 import { IDocumentEntity } from "../../../../../interfaces/document/IDocumentEntity";
 import { DocumentEntity } from "../../../../../models/document/DocumentEntity";
 
-import CrudChipTable from "../../../../../components/tools/CrudChipTable.vue";
+// import CrudChipTable from "../../../../../components/tools/CrudChipTable.vue";
+import CrudTable from "../../../../../components/tools/CrudTable.vue";
+import Stepper from "./Stepper.vue";
 
 const emit = defineEmits(["table"]);
 
@@ -34,7 +36,7 @@ watch(
 const headers: any = [
   { title: "Name", align: "start", key: "name" },
   { title: "Description", key: "description" },
-  { title: "Languages (files)", key: "languages", sortable: false },
+  { title: "Languages (files)", key: "custom", sortable: false },
   { title: "Revision", key: "revision", sortable: false },
   { title: "Actions", key: "actions", sortable: false },
 ];
@@ -78,10 +80,34 @@ const handleReqData = (base: IDocumentEntity, files: Array<IFileItem>, chips: IC
 
   reqData.value = formData;
 };
+
+enum LangDictionary {
+  en = "English",
+  pl = "Polish",
+  ua = "Ukrainian",
+}
+
+// Type alias mimicking the enum with string-based access
+type LangDictionaryStringMap = {
+  [key: string]: LangDictionary[keyof LangDictionary];
+};
+
+const languages = (item: any) => {
+  return item?.languages.map((lang: string) => ({
+    title: lang
+      .split("_")
+      .map((code: string) => (LangDictionary as LangDictionaryStringMap)[code])
+      .join(", "),
+  }));
+};
+
+const disableAdd = computed(() => {
+  return !!chips.value.subcategoryName;
+});
 </script>
 
 <template>
-  <crud-chip-table
+  <!-- <crud-chip-table
     variant="documents"
     :headers="headers"
     :searchByKeys="['name', 'description']"
@@ -93,5 +119,27 @@ const handleReqData = (base: IDocumentEntity, files: Array<IFileItem>, chips: IC
     @save-data="handleSaveData"
     :req-data="reqData"
   >
-  </crud-chip-table>
+  </crud-chip-table> -->
+  <crud-table
+    :headers="headers"
+    :sortBy="[{ key: 'name', order: 'asc' }]"
+    :searchBy="['name', 'description']"
+    toolbarTitle="Documents"
+    :manager="manager"
+    @save-data="handleSaveData"
+    :req-data="reqData"
+    :disableAdd="disableAdd"
+    :chips="props.chips"
+    :tableAdd="true"
+    :tableDelete="true"
+    :tableEdit="true"
+    :tableDialogComponent="Stepper"
+    :tableDialogComponentProps="{}"
+  >
+    <template v-slot:table-key-slot="{ item }">
+      <v-list-item class="pl-0" density="compact" v-for="(lang, i) in languages(item)" :key="i">
+        <v-list-item-title class="text-body-2"> {{ `${i + 1}) ${lang.title}` }}</v-list-item-title>
+      </v-list-item>
+    </template>
+  </crud-table>
 </template>

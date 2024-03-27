@@ -11,7 +11,6 @@ const props = defineProps<{
 const item = ref<IChip>(props.editedItem);
 
 watchEffect(() => {
-  // console.log("props.editedItem: ", props.editedItem);
   item.value = props.editedItem;
 });
 

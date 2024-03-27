@@ -9,7 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ckeditor/ckeditor5-build-decoupled-document": "^41.2.0",
+    "@ckeditor/ckeditor5-build-classic": "^41.2.1",
+    "@ckeditor/ckeditor5-vue": "^5.1.0",
     "@mdi/font": "^7.4.47",
     "axios": "^1.6.7",
     "pinia": "^2.1.7",

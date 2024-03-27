@@ -5,7 +5,9 @@ import { ILevel } from "../../../../../interfaces/document/ILevel";
 import { DepartmentsManager } from "../../../../../models/document/DepartmentsManager";
 import { SubcategoriesManager } from "../../../../../models/document/SubcategoriesManager";
 import { CategoriesManager } from "../../../../../models/document/CategoriesManager";
-import CrudChipTable from "../../../../../components/tools/CrudChipTable.vue";
+// import CrudChipTable from "../../../../../components/tools/CrudChipTable.vue";
+import CrudTable from "../../../../../components/tools/CrudTable.vue";
+import DialogInput from "../../../../tools/DialogInput.vue";
 
 const emit = defineEmits(["table"]);
 
@@ -43,8 +45,10 @@ watch(
       tableItem.value = "Departments";
     }
 
-    chips.value.departmentName = dep;
-    chips.value.categoryName = cat;
+    console.log(manager.value);
+
+    chips.value.departmentName = dep === undefined ? "" : dep;
+    chips.value.categoryName = cat === undefined ? "" : cat;
     chips.value.subcategoryName = "";
   }
 );
@@ -58,10 +62,9 @@ const reqData = ref<any>(null);
 
 const handleSaveData = (data: any) => {
   if (!data) return;
-
   const rd: any = {
-    id: data.id,
-    name: data.name,
+    id: data.item.id,
+    name: data.model,
     categoryName: chips.value.categoryName,
     departmentName: chips.value.departmentName,
   };
@@ -71,7 +74,7 @@ const handleSaveData = (data: any) => {
 </script>
 
 <template>
-  <crud-chip-table
+  <!-- <crud-chip-table
     variant="departments"
     :headers="headers"
     :searchByKeys="['name']"
@@ -83,5 +86,23 @@ const handleSaveData = (data: any) => {
     :req-data="reqData"
     @emit-table-change="emitTableChange"
   >
-  </crud-chip-table>
+  </crud-chip-table> -->
+  <crud-table
+    :headers="headers"
+    :sortBy="[{ key: 'name', order: 'asc' }]"
+    :searchBy="['name']"
+    :toolbarTitle="tableItem"
+    :manager="manager"
+    @save-data="handleSaveData"
+    :req-data="reqData"
+    :chips="chips"
+    :emitTableChange="true"
+    @emit-table-change="emitTableChange"
+    :tableAdd="true"
+    :tableDelete="true"
+    :tableEdit="true"
+    :tableDialogComponent="DialogInput"
+    :tableDialogComponentProps="{ label: 'Name', property: 'name' }"
+  >
+  </crud-table>
 </template>

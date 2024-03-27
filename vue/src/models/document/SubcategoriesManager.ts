@@ -25,6 +25,8 @@ class SubcategoriesManager {
   };
 
   public get = async (reqData: IChips): Promise<Array<IChip>> => {
+    console.log(`getSub:`);
+    console.log(reqData);
     const departmentName: string = reqData.departmentName;
     const categoryName: string = reqData.categoryName;
     const response = await axios.get(

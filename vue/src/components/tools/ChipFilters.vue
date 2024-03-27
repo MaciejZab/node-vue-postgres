@@ -43,10 +43,10 @@ const chipGroups = computed(() => [
       return chips.value.departmentName;
     },
     set chipsModel(value) {
-      chips.value.departmentName = value;
+      chips.value.departmentName = value === undefined ? "" : value;
       chips.value.categoryName = "";
       chips.value.subcategoryName = "";
-      emitChipsChange();
+      emit("chips", chips.value);
     },
   },
   {
@@ -58,9 +58,9 @@ const chipGroups = computed(() => [
       return chips.value.categoryName;
     },
     set chipsModel(value) {
-      chips.value.categoryName = value;
+      chips.value.categoryName = value === undefined ? "" : value;
       chips.value.subcategoryName = "";
-      emitChipsChange();
+      emit("chips", chips.value);
     },
   },
   {
@@ -72,8 +72,8 @@ const chipGroups = computed(() => [
       return chips.value.subcategoryName;
     },
     set chipsModel(value) {
-      chips.value.subcategoryName = value;
-      emitChipsChange();
+      chips.value.subcategoryName = value === undefined ? "" : value;
+      emit("chips", chips.value);
     },
   },
 ]);
@@ -81,8 +81,8 @@ const chipGroups = computed(() => [
 watch(
   chips.value,
   async (chips) => {
-    if (chips.departmentName) categories.value = await CatManager.get(chips);
     if (chips.categoryName) subcategories.value = await SubManager.get(chips);
+    if (chips.departmentName) categories.value = await CatManager.get(chips);
   },
   { deep: true }
 );
@@ -90,7 +90,7 @@ watch(
 watch(
   () => props.table,
   async (tableLvl) => {
-    if (!tableLvl) return;
+    if (tableLvl === undefined) return;
 
     switch (tableLvl as ILevel) {
       case ILevel.Dep:
@@ -105,10 +105,6 @@ watch(
     }
   }
 );
-
-const emitChipsChange = () => {
-  emit("chips", chips.value);
-};
 </script>
 
 <template>
@@ -122,7 +118,7 @@ const emitChipsChange = () => {
           <v-icon size="20">mdi-tag</v-icon> {{ group.subtitle }}
         </v-card-subtitle>
         <v-chip-group v-model="group.chipsModel" column color="secondary">
-          <v-chip v-for="c in group.chips" :key="c.id" :value="c.name" variant="outlined">
+          <v-chip v-for="c in group.chips" :key="c.id" :value="c.name" variant="outlined" filter>
             {{ c.name }}
           </v-chip>
         </v-chip-group>

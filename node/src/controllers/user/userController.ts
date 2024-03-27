@@ -1,20 +1,17 @@
 import { Request, Response } from "express";
 import { dataSource } from "../../config/orm/dataSource";
-import { UserEntity } from "../../orm/entity/user/UserEntity";
+import { User as UserEntity } from "../../orm/entity/user/UserEntity";
 import { User } from "../../models/user/User";
-import { UserPermissionEntity } from "../../orm/entity/user/UserPermissionEntity";
-import { UserSettingsEntity } from "../../orm/entity/user/UserSettingsEntity";
+import { UserPermission } from "../../orm/entity/user/UserPermissionEntity";
+import { UserSettings } from "../../orm/entity/user/UserSettingsEntity";
 import { adminsConfig } from "../../config/admins";
 import { HttpResponseMessage } from "../../enums/response";
 
 const findUser = async (username: string): Promise<UserEntity> => {
-  return dataSource
-    .getRepository(UserEntity)
-    .createQueryBuilder("user_entity")
-    .leftJoinAndSelect("user_entity.permission", "user_entity_permission")
-    .leftJoinAndSelect("user_entity.settings", "user_entity_settings")
-    .where("user_entity.username = :username", { username: username })
-    .getOne();
+  return dataSource.getRepository(UserEntity).findOne({
+    where: { username },
+    relations: ["permission", "settings"],
+  });
 };
 
 const getUser = async (req: Request, res: Response) => {
@@ -39,20 +36,20 @@ const getUser = async (req: Request, res: Response) => {
   }
 };
 
-const getUsers = async (req: Request, res: Response) => {
+const getUsers = async (_req: Request, res: Response) => {
   try {
     const users: Array<UserEntity> = await dataSource
       .getRepository(UserEntity)
-      .find({ relations: ["languages"] });
+      .find({ relations: ["permission", "settings"] });
 
-    // if (!user)
-    //   res
-    //     .status(404)
-    //     .json({ user, message: "User not found.", statusMessage: HttpResponseMessage.GET_ERROR });
+    if (!users)
+      res
+        .status(404)
+        .json({ users, message: "Users not found.", statusMessage: HttpResponseMessage.GET_ERROR });
 
-    // res
-    //   .status(200)
-    //   .json({ user, message: "User found.", statusMessage: HttpResponseMessage.GET_SUCCESS });
+    res
+      .status(200)
+      .json({ users, message: "Users found.", statusMessage: HttpResponseMessage.GET_SUCCESS });
   } catch (err) {
     console.error("Error retrieving user:", err);
     res.status(404).json({
@@ -90,17 +87,13 @@ const userAuth = async (req: Request, res: Response) => {
         control: true,
       };
 
-      const permissionEntity: UserPermissionEntity = admins.includes(user.username)
-        ? new UserPermissionEntity(adminPermission)
-        : new UserPermissionEntity();
+      const permissionEntity: UserPermission = admins.includes(user.username)
+        ? new UserPermission(adminPermission)
+        : new UserPermission();
 
-      const permission = await dataSource
-        .getRepository(UserPermissionEntity)
-        .save(permissionEntity);
+      const permission = await dataSource.getRepository(UserPermission).save(permissionEntity);
 
-      const settings = await dataSource
-        .getRepository(UserSettingsEntity)
-        .save(new UserSettingsEntity());
+      const settings = await dataSource.getRepository(UserSettings).save(new UserSettings());
 
       await dataSource
         .getRepository(UserEntity)
@@ -129,4 +122,4 @@ const userAuth = async (req: Request, res: Response) => {
   }
 };
 
-export { getUser, userAuth };
+export { getUser, getUsers, userAuth };

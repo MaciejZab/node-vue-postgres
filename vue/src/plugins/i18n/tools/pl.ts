@@ -39,7 +39,8 @@ const plT = {
     admin: {
       name: "Administrator",
       tabs: {
-        privileges: "Uprawnienia",
+        permissions: "Uprawnienia",
+        news: "Wiadomości",
       },
     },
   },

@@ -38,7 +38,8 @@ const enT = {
     admin: {
       name: "Admin",
       tabs: {
-        privileges: "Privileges",
+        permissions: "Permissions",
+        news: "News",
       },
     },
   },

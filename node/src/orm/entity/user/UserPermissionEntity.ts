@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { IPermission } from "../../../interfaces/user/IPermission";
 
 @Entity()
-export class UserPermissionEntity {
+export class UserPermission {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()

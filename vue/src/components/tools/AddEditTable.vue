@@ -1,25 +1,16 @@
 <script setup lang="ts">
 import { ref, computed, watchEffect, nextTick, watch } from "vue";
-import { IChips } from "../../interfaces/document/IChips";
 import { ResponseStatus } from "../../models/common/ResponseStatus";
-import { Chips } from "../../models/document/Chips";
 import tableDialog from "./tableDialog.vue";
-// import Stepper from "../views/tools/matrix/document/Stepper.vue";
-// import DialogInput from "./DialogInput.vue";
 
 const props = defineProps<{
-  variant: "departments" | "documents";
   headers: any;
   searchByKeys: Array<string>;
   sortBy: Array<{ key: string; order?: boolean | "asc" | "desc" }>;
   toolbarTitle: string;
   manager: any;
-  chips: IChips;
-  langsVariant?: "list" | "select";
   reqData: any;
 }>();
-
-const variant = props.variant;
 
 const headers = ref<any>(props.headers);
 const items = ref<Array<any>>([]);
@@ -52,17 +43,12 @@ const editedItem = ref<any>({ ...item.value });
 
 const dialog = ref<boolean>(false);
 const dialogLoading = ref<boolean>(false);
-const dialogDelete = ref<boolean>(false);
-const dialogDeleteLoading = ref<boolean>(false);
 
-const tableAdd = ref<boolean>(variant === "departments" ? false : true);
 const verified = ref<boolean>(false);
-
-const chips = ref<IChips>(new Chips());
 
 (async () => {
   try {
-    items.value = await manager.value.get(chips.value);
+    items.value = await manager.value.get();
   } catch (error) {
     console.log(error);
   }
@@ -77,27 +63,15 @@ watchEffect(() => {
 });
 
 watch(
-  () => props.chips,
-  async (newChips) => {
-    chips.value = newChips;
-
-    if (chips.value.subcategoryName || variant === "departments") tableAdd.value = false;
-    else tableAdd.value = true;
-
-    manager.value = props.manager;
-    items.value = await manager.value.get(chips.value);
+  () => props.manager,
+  async (newManager) => {
+    manager.value = newManager;
+    items.value = await manager.value.get();
   },
   { deep: true }
 );
 
-const deleteItem = async (item: any) => {
-  // console.log("delete", { ...item });
-  editedIndex.value = items.value.indexOf(item);
-  editedItem.value = { ...item };
-  dialogDelete.value = true;
-};
 const editItem = (item: any) => {
-  // console.log("edit", { ...item });
   editedIndex.value = items.value.indexOf(item);
   editedItem.value = { ...item };
   dialog.value = true;
@@ -114,36 +88,7 @@ const close = () => {
   });
 };
 
-const closeDelete = async () => {
-  dialogDelete.value = false;
-
-  nextTick(() => {
-    editedItem.value = { ...item.value };
-    editedIndex.value = -1;
-  });
-};
-
 const responseStatus = ref<ResponseStatus | null>(null);
-
-const deleteItemConfirm = async () => {
-  const itemId: number = editedItem.value.id;
-
-  dialogDeleteLoading.value = true;
-  try {
-    await manager.value.delete(itemId);
-    if (variant === "departments") emit("emit-table-change");
-    items.value = await manager.value.get(chips.value);
-  } catch (error: any) {
-    console.log(error);
-    responseStatus.value = new ResponseStatus({
-      code: error.response.status,
-      message: error.response.data.statusMessage,
-    });
-  }
-
-  dialogDeleteLoading.value = false;
-  closeDelete();
-};
 
 const emit = defineEmits(["save-data", "emit-table-change"]);
 
@@ -161,36 +106,10 @@ const save = async () => {
       message: error.response.data.statusMessage,
     });
   } finally {
-    items.value = await manager.value.get(chips.value);
-    if (variant === "departments") emit("emit-table-change");
+    items.value = await manager.value.get();
+    // if (variant === "departments") emit("emit-table-change");
     close();
   }
-};
-
-// const handleVerified = (v: boolean) => {
-//   verified.value = v;
-// };
-
-// const handleSaveData = (data: any) => emit("save-data", data);
-
-enum LangDictionary {
-  en = "English",
-  pl = "Polish",
-  ua = "Ukrainian",
-}
-
-// Type alias mimicking the enum with string-based access
-type LangDictionaryStringMap = {
-  [key: string]: LangDictionary[keyof LangDictionary];
-};
-
-const languages = (item: any) => {
-  return item?.languages.map((lang: string) => ({
-    title: lang
-      .split("_")
-      .map((code: string) => (LangDictionary as LangDictionaryStringMap)[code])
-      .join(", "),
-  }));
 };
 </script>
 
@@ -230,49 +149,16 @@ const languages = (item: any) => {
             variant="Save"
             :index="editedIndex"
             :loading="dialogLoading"
-            :disable="tableAdd"
             :confirm-disable="verified"
             @close="close"
             @confirm="save"
             :showBtn="true"
           >
             <template v-slot>
-              <!-- <stepper
-                v-if="variant === 'documents'"
-                @verified="handleVerified"
-                @save-data="handleSaveData"
-                :edited-item="editedItem"
-              ></stepper> -->
-              <!-- <dialog-input
-                v-if="variant === 'departments'"
-                @save-data="handleSaveData"
-                :edited-item="editedItem"
-                label="Name"
-                property="name"
-              ></dialog-input> -->
+              <slot name="table-dialog-slot"></slot>
             </template>
           </table-dialog>
-
-          <table-dialog
-            v-model="dialogDelete"
-            variant="Delete"
-            delete-t-msg="deleteDocumentConfirmation"
-            :index="editedIndex"
-            :loading="dialogDeleteLoading"
-            @close="closeDelete"
-            @confirm="deleteItemConfirm"
-            :showBtn="true"
-          >
-          </table-dialog>
         </v-toolbar>
-      </template>
-
-      <template v-if="props.langsVariant === 'list'" v-slot:item.languages="{ item }">
-        <v-list-item class="pl-0" density="compact" v-for="(lang, i) in languages(item)" :key="i">
-          <v-list-item-title class="text-body-2">
-            {{ `${i + 1}) ${lang.title}` }}</v-list-item-title
-          >
-        </v-list-item>
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -282,15 +168,6 @@ const languages = (item: any) => {
           size="small"
           @click="editItem(item)"
           icon="mdi-pencil"
-          class="ma-2"
-        />
-
-        <v-btn
-          variant="tonal"
-          color="primary"
-          size="small"
-          @click="deleteItem(item)"
-          icon="mdi-delete"
           class="ma-2"
         />
       </template>

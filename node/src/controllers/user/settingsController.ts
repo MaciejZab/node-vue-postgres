@@ -1,21 +1,19 @@
 import { Request, Response } from "express";
 import { dataSource } from "../../config/orm/dataSource";
 import { Settings } from "../../models/user/Settings";
-import { UserEntity } from "../../orm/entity/user/UserEntity";
-import { UserSettingsEntity } from "../../orm/entity/user/UserSettingsEntity";
+import { User } from "../../orm/entity/user/UserEntity";
+import { UserSettings } from "../../orm/entity/user/UserSettingsEntity";
 import { Permission } from "../../models/user/Permission";
 import { IPermission } from "../../interfaces/user/IPermission";
-import { UserPermissionEntity } from "../../orm/entity/user/UserPermissionEntity";
+import { UserPermission } from "../../orm/entity/user/UserPermissionEntity";
 import { IUser } from "../../interfaces/user/IUser";
 import { HttpResponseMessage } from "../../enums/response";
 
-const findUser = async (id: number): Promise<UserEntity> => {
-  return dataSource
-    .getRepository(UserEntity)
-    .createQueryBuilder("user_entity")
-    .leftJoinAndSelect("user_entity.settings", "user_entity_settings")
-    .where("user_entity.id = :id", { id: id })
-    .getOne();
+const findUser = async (id: number): Promise<User> => {
+  return dataSource.getRepository(User).findOne({
+    where: { id },
+    relations: ["settings"],
+  });
 };
 
 const setSettingsTheme = async (req: Request, res: Response) => {
@@ -41,7 +39,7 @@ const setSettingsTheme = async (req: Request, res: Response) => {
 
     userSettings.theme = settings.theme;
 
-    await dataSource.getRepository(UserSettingsEntity).save(userSettings);
+    await dataSource.getRepository(UserSettings).save(userSettings);
 
     return res.status(200).json({
       message: "Theme updated successfully.",
@@ -78,7 +76,7 @@ const setSettingsLanguage = async (req: Request, res: Response) => {
 
     userSettings.language = settings.language;
 
-    await dataSource.getRepository(UserSettingsEntity).save(userSettings);
+    await dataSource.getRepository(UserSettings).save(userSettings);
 
     return res.status(200).json({
       message: "Language updated successfully.",

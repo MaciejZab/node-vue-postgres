@@ -84,7 +84,11 @@ const submitLogin = (): void => {
       .post(reqUrl, reqData)
       .then(function (response) {
         userStore.set(new User(response.data.userExist));
-        permissionStore.set(new Permission(response.data.userExist.permission));
+
+        const permission = { ...response.data.userExist.permission };
+        delete permission.id;
+
+        permissionStore.set(new Permission(permission));
         settingsStore.set(response.data.userExist.settings);
         router.push({ path: "/pages" });
       })

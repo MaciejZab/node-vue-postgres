@@ -11,7 +11,6 @@ class DepartmentsManager {
   public new = () => new Chip();
 
   public post = async (reqData: any): Promise<Array<IChip>> => {
-    console.log("reqData", reqData);
     const requestData = {
       name: reqData.name,
     };

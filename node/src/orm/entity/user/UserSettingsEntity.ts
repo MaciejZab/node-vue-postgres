@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { ISettings } from "../../../interfaces/user/ISettings";
 
 @Entity()
-export class UserSettingsEntity {
+export class UserSettings {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()

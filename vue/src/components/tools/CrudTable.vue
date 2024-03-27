@@ -1,29 +1,42 @@
 <script setup lang="ts">
-import { ref, computed, watchEffect, nextTick } from "vue";
+import { computed, nextTick, ref, watch, watchEffect } from "vue";
+import TableDialog from "./tableDialog.vue";
+import { IResponseStatus } from "../../interfaces/common/IResponseStatus";
 import { ResponseStatus } from "../../models/common/ResponseStatus";
-import tableDialog from "./tableDialog.vue";
-import ChipInput from "../views/tools/matrix/department/ChipInput.vue";
 
 const props = defineProps<{
   headers: any;
-  searchByKeys: Array<string>;
   sortBy: Array<{ key: string; order?: boolean | "asc" | "desc" }>;
+
+  searchBy: Array<string>; // header keys
   toolbarTitle: string;
+
   manager: any;
-  reqData: any;
+  reqData?: any;
+
+  chips?: any;
+  emitTableChange?: true;
+  disableAdd?: boolean;
+
+  tableAdd?: true;
+  tableDelete?: true;
+  tableEdit?: true;
+
+  tableDialogComponent?: any;
+  tableDialogComponentProps?: any;
 }>();
+
+const emit = defineEmits(["save-data", "emit-table-change"]);
 
 const headers = ref<any>(props.headers);
 const items = ref<Array<any>>([]);
 
-const filterKeys: Array<string> = props.searchByKeys;
-const sortBy = props.sortBy;
-
+const toolbarTitle = ref<string>(props.toolbarTitle);
 const search = ref<string>("");
 const filtered = computed(() => {
   if (search.value) {
-    return items.value.filter((item) => {
-      for (const key of filterKeys) {
+    return items.value.filter((item: any) => {
+      for (const key of props.searchBy) {
         const value = item[key]?.toLowerCase();
         const searchTerm = search.value.toLowerCase();
         if (value && value.includes(searchTerm)) {
@@ -34,33 +47,71 @@ const filtered = computed(() => {
     });
   } else return items.value;
 });
-
-const toolbarTitle = ref<string>(props.toolbarTitle);
+const dialog = ref<boolean>(false);
+const dialogLoading = ref<boolean>(false);
+const dialogDelete = ref<boolean>(false);
+const dialogDeleteLoading = ref<boolean>(false);
 
 const manager = ref<any>(props.manager);
 const item = ref<any>({ ...manager.value.new() });
-const editedIndex = ref<number>(-1);
 const editedItem = ref<any>({ ...item.value });
+const ComponentProps = computed(() => {
+  return {
+    ...props.tableDialogComponentProps,
+    editedItem: editedItem.value,
+  };
+});
+const editedIndex = ref<number>(-1);
 
-const dialog = ref<boolean>(false);
-const dialogLoading = ref<boolean>(false);
+const chips = ref<any>(props.chips);
 
-(async () => {
-  try {
-    items.value = await manager.value.get();
-  } catch (error) {
-    console.log(error);
-  }
-})();
+(async () => (items.value = await manager.value.get(chips.value)))();
 
 const reqData = ref<any>(props.reqData);
 
+const disableAdd = ref<boolean>(props.disableAdd === undefined ? false : props.disableAdd);
+
+const responseStatus = ref<IResponseStatus | null>(null);
+
+const verified = ref<boolean>(false);
+
 watchEffect(() => {
   headers.value = props.headers;
+});
+
+watchEffect(() => {
   toolbarTitle.value = props.toolbarTitle;
+});
+
+watchEffect(() => {
   reqData.value = props.reqData;
 });
 
+watchEffect(() => {
+  disableAdd.value = props.disableAdd;
+});
+
+// watchEffect(async () => {
+//   manager.value = props.manager;
+//   chips.value = props.chips;
+//   items.value = await manager.value.get(chips.value);
+// });
+
+watch(
+  [() => props.manager, () => props.chips],
+  async ([newManager, newChips]) => {
+    manager.value = newManager;
+    chips.value = newChips;
+    items.value = await manager.value.get(chips.value);
+  },
+  { deep: true }
+);
+
+const deleteItem = async (item: any) => {
+  editedIndex.value = items.value.indexOf(item);
+  editedItem.value = { ...item };
+  dialogDelete.value = true;
+};
 const editItem = (item: any) => {
   editedIndex.value = items.value.indexOf(item);
   editedItem.value = { ...item };
@@ -77,15 +128,37 @@ const close = () => {
   });
 };
 
-const responseStatus = ref<ResponseStatus | null>(null);
+const closeDelete = async () => {
+  dialogDelete.value = false;
 
-const emit = defineEmits(["save-data", "emit-table-change"]);
+  nextTick(() => {
+    editedItem.value = { ...item.value };
+    editedIndex.value = -1;
+  });
+};
+
+const deleteItemConfirm = async () => {
+  try {
+    dialogDeleteLoading.value = true;
+    await manager.value.delete(editedItem.value.id);
+    if (props.emitTableChange) emit("emit-table-change");
+    items.value = await manager.value.get(chips.value);
+  } catch (error: any) {
+    console.log(error);
+    responseStatus.value = new ResponseStatus({
+      code: error.response.status,
+      message: error.response.data.statusMessage,
+    });
+  } finally {
+    dialogDeleteLoading.value = false;
+    closeDelete();
+  }
+};
 
 const save = async () => {
   try {
     const data: any = reqData.value;
     dialogLoading.value = true;
-
     if (editedIndex.value > -1) await manager.value.put(data);
     else await manager.value.post(data);
   } catch (error: any) {
@@ -95,10 +168,13 @@ const save = async () => {
       message: error.response.data.statusMessage,
     });
   } finally {
-    items.value = await manager.value.get();
+    items.value = await manager.value.get(chips.value);
+    if (props.emitTableChange) emit("emit-table-change");
     close();
   }
 };
+
+const handleVerified = (v: boolean) => (verified.value = v);
 
 const handleSaveData = (data: any) => emit("save-data", data);
 </script>
@@ -108,7 +184,7 @@ const handleSaveData = (data: any) => emit("save-data", data);
     <v-data-table
       :headers="headers"
       :items="filtered"
-      :sort-by="sortBy"
+      :sort-by="props.sortBy"
       class="bg-surface-2"
       :items-per-page-options="[
         { value: 5, title: '5' },
@@ -132,30 +208,69 @@ const handleSaveData = (data: any) => emit("save-data", data);
             single-line
             :rounded="true"
           ></v-text-field>
-          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-divider v-if="props.tableAdd" class="mx-4" inset vertical></v-divider>
 
           <table-dialog
             v-model="dialog"
             variant="Save"
+            :disable="!disableAdd"
+            :confirm-disable="verified"
             :index="editedIndex"
             :loading="dialogLoading"
             @close="close"
             @confirm="save"
+            :showBtn="props.tableAdd"
           >
-            <template v-slot>
-              <chip-input @save-data="handleSaveData" :edited-item="editedItem"></chip-input>
-            </template>
+            <component
+              :is="props.tableDialogComponent"
+              @verified="handleVerified"
+              @save-data="handleSaveData"
+              :componentProps="ComponentProps"
+            ></component>
+          </table-dialog>
+
+          <slot name="table-dialog-add-edit"></slot>
+
+          <table-dialog
+            v-model="dialogDelete"
+            variant="Delete"
+            delete-t-msg="deleteDocumentConfirmation"
+            :index="editedIndex"
+            :loading="dialogDeleteLoading"
+            @close="closeDelete"
+            @confirm="deleteItemConfirm"
+            :showBtn="false"
+          >
           </table-dialog>
         </v-toolbar>
       </template>
 
+      <template v-slot:item.custom="{ item }">
+        <slot name="table-key-slot" :item="item"></slot>
+      </template>
+
+      <template v-slot:item.custom2="{ item }">
+        <slot name="table-key-slot-2" :item="item"></slot>
+      </template>
+
       <template v-slot:item.actions="{ item }">
         <v-btn
+          v-if="props.tableEdit"
           variant="tonal"
           color="primary"
           size="small"
           @click="editItem(item)"
           icon="mdi-pencil"
+          class="ma-2"
+        />
+
+        <v-btn
+          v-if="props.tableDelete"
+          variant="tonal"
+          color="primary"
+          size="small"
+          @click="deleteItem(item)"
+          icon="mdi-delete"
           class="ma-2"
         />
       </template>

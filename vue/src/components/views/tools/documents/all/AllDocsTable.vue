@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, watch } from "vue";
 // import { ResponseStatus } from "../../../../models/common/ResponseStatus";
 import { IChips } from "../../../../../interfaces/document/IChips";
 import { DocumentManager } from "../../../../../models/document/DocumentManager";
 import { IDocumentEntity } from "../../../../../interfaces/document/IDocumentEntity";
+import CrudTable from "../../../../tools/CrudTable.vue";
 
 const emit = defineEmits(["table"]);
 
 const props = defineProps<{
-  chips: IChips | undefined;
+  chips: IChips;
 }>();
 
 const manager = new DocumentManager();
@@ -79,21 +80,21 @@ watch(
 const headers: any = [
   { title: "Name", align: "start", key: "name" },
   { title: "Description", key: "description" },
-  { title: "View Document", key: "languages", sortable: false, filterable: false },
-  // { title: "Favorite", key: "favorite", sortable: false, filterable: false },
+  { title: "View Document", key: "custom", sortable: false, filterable: false },
+  // { title: "Favorite", key: "custom2", sortable: false, filterable: false },
 ];
 
-const search = ref<string>("");
+// const search = ref<string>("");
 
-const filteredDocuments = computed(() => {
-  return documents.value.filter((document) => {
-    const name = document.name.toLowerCase();
-    const description = document.description.toLowerCase();
-    const searchTerm = search.value.toLowerCase();
+// const filteredDocuments = computed(() => {
+//   return documents.value.filter((document) => {
+//     const name = document.name.toLowerCase();
+//     const description = document.description.toLowerCase();
+//     const searchTerm = search.value.toLowerCase();
 
-    return name.includes(searchTerm) || description.includes(searchTerm);
-  });
-});
+//     return name.includes(searchTerm) || description.includes(searchTerm);
+//   });
+// });
 
 const navigateToRoute = (file: Array<string>) => {
   const url = `/tool/documents/${file.at(0)}/${file.at(1)}/${file.at(2)}`;
@@ -107,7 +108,7 @@ const addToFavorites = (item: any) => {
 </script>
 
 <template>
-  <v-card class="rounded-xl elevation-2">
+  <!-- <v-card class="rounded-xl elevation-2">
     <v-data-table
       :headers="headers"
       :items="filteredDocuments"
@@ -162,6 +163,44 @@ const addToFavorites = (item: any) => {
         />
       </template>
     </v-data-table>
-  </v-card>
+  </v-card> -->
+  <crud-table
+    :headers="headers"
+    :sortBy="[{ key: 'name', order: 'asc' }]"
+    :searchBy="['name', 'description']"
+    toolbarTitle="Documents"
+    :manager="manager"
+    :chips="props.chips"
+  >
+    <template v-slot:table-key-slot="{ item }">
+      <v-select
+        :items="languages(item)"
+        item-title="title"
+        item-value="value"
+        density="compact"
+        variant="underlined"
+        label="Select language"
+        color="primary"
+        hide-details
+        class="my-5"
+      >
+        <template #item="{ item }">
+          <v-list-item @click="navigateToRoute(item.value)">
+            <v-list-item-content>
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
+      </v-select>
+    </template>
+    <template v-slot:table-key-slot-2="{ item }">
+      <v-btn
+        variant="text"
+        size="small"
+        @click="addToFavorites(item)"
+        icon="mdi-star-outline"
+        class="ma-2"
+      />
+    </template>
+  </crud-table>
 </template>
-../../../../../interfaces/document/IChips

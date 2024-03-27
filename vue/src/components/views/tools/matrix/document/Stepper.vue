@@ -11,8 +11,10 @@ import { FileItem } from "../../../../../models/document/FileItem";
 const emit = defineEmits(["save-data", "verified"]);
 
 const props = defineProps<{
-  editedItem: IDocumentEntity;
+  // editedItem: IDocumentEntity;
+  componentProps: any;
 }>();
+console.log(props.componentProps.editedItem);
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 
 const activeStep = ref<number>(1);
@@ -29,10 +31,10 @@ const nextStep = () => {
 const prevable = computed(() => activeStep.value > 1);
 const nextable = computed(() => activeStep.value < 3);
 
-const document = ref<IDocumentEntity>(props.editedItem);
+const document = ref<IDocumentEntity>(props.componentProps.editedItem);
 
 watchEffect(() => {
-  document.value = props.editedItem;
+  document.value = props.componentProps.editedItem;
 });
 
 const files = ref<Array<IFileItem>>([]);

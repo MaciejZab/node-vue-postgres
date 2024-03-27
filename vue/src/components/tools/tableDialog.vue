@@ -3,7 +3,7 @@ import { useI18n } from "vue-i18n";
 import { ref, computed, ComputedRef, watchEffect } from "vue";
 
 const { t } = useI18n();
-const emit = defineEmits(["close", "confirm"]);
+const emit = defineEmits(["close", "confirm", "save-data", "verified"]);
 const props = defineProps<{
   variant: string;
   disable?: boolean;
@@ -11,6 +11,7 @@ const props = defineProps<{
   index: number;
   loading: boolean;
   deleteTMsg?: string;
+  showBtn: boolean;
 }>();
 
 const variant: "Save" | "Delete" = props.variant as "Save" | "Delete";
@@ -19,6 +20,7 @@ const confirmDisable = ref<boolean>(props.confirmDisable ?? false);
 const index = ref<number>(props.index);
 const loading = ref<boolean>(props.loading);
 const deleteTMsg: string | undefined = props.deleteTMsg;
+const showBtn = props.showBtn;
 
 const title = computed<string>(() => {
   switch (variant) {
@@ -58,6 +60,7 @@ watchEffect(() => {
         icon="mdi-plus"
         v-bind="props"
         :disabled="disable"
+        v-show="showBtn"
       />
     </template>
     <v-card :loading="loading" color="primary" variant="outlined" class="bg-background rounded-xl">

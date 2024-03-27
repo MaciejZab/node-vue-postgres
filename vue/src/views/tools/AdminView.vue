@@ -1,13 +1,20 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import PermissionsTable from "../../components/views/tools/admin/PermissionsTable.vue";
+import NewsTable from "../../components/views/tools/admin/NewsTable.vue";
 
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 
 const tabs = [
   {
     id: 1,
-    name: "privileges",
-    icon: "mdi-account-group",
+    name: "permissions",
+    icon: "mdi-shield-account",
+  },
+  {
+    id: 2,
+    name: "news",
+    icon: "mdi-pencil-outline",
   },
 ];
 
@@ -43,7 +50,12 @@ const currentTab = ref<number>(1);
           <v-row :class="smallScreen ? 'mt-1' : 'w-75 ml-1 pl-0 mt-n3'">
             <v-col class="h-100">
               <v-window v-model="currentTab" class="w-100">
-                <v-window-item :value="1"> </v-window-item>
+                <v-window-item :value="1">
+                  <permissions-table class="bg-surface-2 pa-4 ma-1"></permissions-table>
+                </v-window-item>
+                <v-window-item :value="2">
+                  <news-table class="bg-surface-2 pa-4 ma-1"></news-table>
+                </v-window-item>
               </v-window>
             </v-col>
           </v-row>

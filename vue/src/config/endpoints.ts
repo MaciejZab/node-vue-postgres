@@ -1,8 +1,10 @@
 enum Endpoints {
-  UserAuth = "/api/user",
+  User = "/api/user/one",
+  Users = "/api/user/all",
+  UserAuth = "/api/user/auth",
   UserSettingsTheme = "/api/user/settings/theme",
   UserSettingsLanguage = "/api/user/settings/language",
-  UserSettingsPermission = "/api/user/settings/permission",
+  UserPermission = "/api/user/permission",
 
   // documents
   ViewDocument = "/uploads",
@@ -10,6 +12,9 @@ enum Endpoints {
   DocumentDepartment = "/api/document/department",
   DocumentCategory = "/api/document/category",
   DocumentSubcategory = "/api/document/subcategory",
+
+  // editor
+  News = "/api/editor/news",
 }
 
 export { Endpoints };

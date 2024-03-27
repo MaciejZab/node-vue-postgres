@@ -8,6 +8,7 @@ import MyDocsTable from "../../components/views/tools/documents/my/MyDocsTable.v
 import RecDocsTable from "../../components/views/tools/documents/recent/RecDocsTable.vue";
 import { IChips } from "../../interfaces/document/IChips";
 import { ILevel } from "../../interfaces/document/ILevel";
+import { Chips } from "../../models/document/Chips";
 
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 
@@ -36,7 +37,7 @@ const tabs = [
 
 const currentTab = ref<number>(3);
 
-const chips = ref<IChips | undefined>(undefined);
+const chips = ref<IChips>(new Chips());
 const table = ref<ILevel | undefined>(undefined);
 
 const handleChips = (newValue: IChips): void => {

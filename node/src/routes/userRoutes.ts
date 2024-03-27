@@ -1,15 +1,18 @@
 import express from "express";
-import { getUser, userAuth } from "../controllers/user/userController";
+import { getUser, getUsers, userAuth } from "../controllers/user/userController";
 import { setSettingsLanguage, setSettingsTheme } from "../controllers/user/settingsController";
+import { editPermission } from "../controllers/user/permissionController";
 
 const router = express.Router();
 
 // Define routes
-router.get("/", getUser);
-router.post("/", userAuth);
+router.get("/one", getUser);
+router.get("/all", getUsers);
+router.post("/auth", userAuth);
 
 router.put("/settings/theme", setSettingsTheme);
 router.put("/settings/language", setSettingsLanguage);
-// router.post("/settings/permission", setSettingsPermission);
+
+router.put("/permission", editPermission);
 
 export { router as userRoutes };

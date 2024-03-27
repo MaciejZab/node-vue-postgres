@@ -38,7 +38,8 @@ const uaT = {
     admin: {
       name: "Адміністратор",
       tabs: {
-        privileges: "Привілеї",
+        permissions: "Права доступу",
+        news: "Новини",
       },
     },
   },

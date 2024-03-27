@@ -1,10 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from "typeorm";
-import { UserPermissionEntity } from "./UserPermissionEntity";
-import { UserSettingsEntity } from "./UserSettingsEntity";
-import { User } from "../../../models/user/User";
+import { UserPermission } from "./UserPermissionEntity";
+import { UserSettings } from "./UserSettingsEntity";
 
 @Entity()
-export class UserEntity {
+export class User {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
@@ -12,19 +11,19 @@ export class UserEntity {
   @Column()
   domain: string;
 
-  @OneToOne(() => UserPermissionEntity)
+  @OneToOne(() => UserPermission)
   @JoinColumn()
-  permission: UserPermissionEntity;
+  permission: UserPermission;
 
-  @OneToOne(() => UserSettingsEntity)
+  @OneToOne(() => UserSettings)
   @JoinColumn()
-  settings: UserSettingsEntity;
+  settings: UserSettings;
 
   constructor(
     username: string,
     domain: string,
-    permission: UserPermissionEntity,
-    settings: UserSettingsEntity
+    permission: UserPermission,
+    settings: UserSettings
   ) {
     this.username = username;
     this.domain = domain;
