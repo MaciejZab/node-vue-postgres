@@ -39,18 +39,18 @@ const tools = [
       control: false,
     },
   },
-  {
-    id: 2,
-    name: "training",
-    href: "",
-    icon: "book-open-variant-outline",
-    image: "../tools/training.png",
-    permissions: {
-      read: true,
-      write: true,
-      control: false,
-    },
-  },
+  // {
+  //   id: 2,
+  //   name: "training",
+  //   href: "",
+  //   icon: "book-open-variant-outline",
+  //   image: "../tools/training.png",
+  //   permissions: {
+  //     read: true,
+  //     write: true,
+  //     control: false,
+  //   },
+  // },
   {
     id: 3,
     name: "cn",
@@ -75,18 +75,18 @@ const tools = [
       control: false,
     },
   },
-  {
-    id: 5,
-    name: "8d",
-    href: "",
-    icon: "alert-octagon",
-    image: "../tools/analytics.png",
-    permissions: {
-      read: true,
-      write: true,
-      control: false,
-    },
-  },
+  // {
+  //   id: 5,
+  //   name: "8d",
+  //   href: "",
+  //   icon: "alert-octagon",
+  //   image: "../tools/analytics.png",
+  //   permissions: {
+  //     read: true,
+  //     write: true,
+  //     control: false,
+  //   },
+  // },
   {
     id: 6,
     name: "boss",

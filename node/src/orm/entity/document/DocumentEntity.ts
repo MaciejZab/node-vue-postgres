@@ -12,6 +12,9 @@ export class Document {
   ref: string;
 
   @Column()
+  type: string;
+
+  @Column()
   name: string;
 
   @Column()
@@ -31,12 +34,14 @@ export class Document {
 
   constructor(
     ref: string,
+    type: string,
     name: string,
     description: string,
     revision: number,
     subcategory: Subcategory
   ) {
     this.ref = ref;
+    this.type = type;
     this.name = name;
     this.description = description;
     this.revision = revision;

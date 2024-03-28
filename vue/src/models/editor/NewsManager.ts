@@ -17,10 +17,11 @@ class NewsManager {
     return response.data.added;
   };
 
-  public get = async (): Promise<Array<INews>> => {
-    const response = await axios.get(`${nodeConfig.origin}:${nodeConfig.port}${Endpoints.News}`);
-    return response.data.news;
-  };
+  // public get = async (): Promise<Array<INews>> => {
+  //   const response = await axios.get(`${nodeConfig.origin}:${nodeConfig.port}${Endpoints.News}`);
+  //   return response.data.news;
+  // };
+  public get = async () => {};
 }
 
 export { NewsManager };

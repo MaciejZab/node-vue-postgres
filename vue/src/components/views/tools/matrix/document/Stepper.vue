@@ -42,11 +42,12 @@ const files = ref<Array<IFileItem>>([]);
 const retrievedFiles = ref<Array<IFileItem>>([]);
 
 (async () => {
+  const docType = document.value.type;
   const docName = document.value.name;
   const docRef = document.value.ref;
   const docLangs = document.value.languages;
 
-  if (docName && docRef && docLangs) {
+  if (docType && docName && docRef && docLangs) {
     for (const [index, lang] of Object.entries(docLangs)) {
       const fileName = `${docName}_qs_langs=${lang}&uuid=${docRef}`;
       const fileUrl = `${nodeConfig.origin}:${nodeConfig.port}/uploads/documents/${fileName}.pdf`;
@@ -77,6 +78,7 @@ const handleFiles = (filesData: Array<IFileItem>) => {
 const newDocData = computed(() => {
   return {
     ref: document.value.ref,
+    type: document.value.type,
     name: document.value.name,
     description: document.value.description,
     revision: document.value.revision,
@@ -87,6 +89,7 @@ const newDocData = computed(() => {
 
 watchEffect(() => {
   if (
+    !!document.value.type &&
     !!document.value.name &&
     !!document.value.description &&
     !!document.value.revision &&
@@ -131,6 +134,12 @@ watchEffect(() => {
     <v-stepper-window>
       <v-stepper-window-item :value="1">
         <v-card flat>
+          <v-select
+            v-model="document.type"
+            label="Type"
+            :items="['Instruction', 'Visual']"
+            variant="underlined"
+          ></v-select>
           <v-text-field v-model="document.name" variant="underlined" label="Name"></v-text-field>
           <v-text-field
             v-model="document.description"

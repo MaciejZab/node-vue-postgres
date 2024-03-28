@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch, watchEffect } from "vue";
-import TableDialog from "./tableDialog.vue";
+import TableDialog from "./TableDialog.vue";
 import { IResponseStatus } from "../../interfaces/common/IResponseStatus";
 import { ResponseStatus } from "../../models/common/ResponseStatus";
 
@@ -213,7 +213,7 @@ const handleSaveData = (data: any) => emit("save-data", data);
           <table-dialog
             v-model="dialog"
             variant="Save"
-            :disable="!disableAdd"
+            :disable="disableAdd"
             :confirm-disable="verified"
             :index="editedIndex"
             :loading="dialogLoading"

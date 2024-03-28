@@ -8,11 +8,44 @@ const initializeEditor = () => {
     console.error("Editor element not found.");
     return;
   }
-
-  ClassicEditor.create(editorElement)
+  ClassicEditor.create(editorElement, {
+    toolbar: {
+      items: [
+        "undo",
+        "redo",
+        "|",
+        "heading",
+        "|",
+        "fontfamily",
+        "fontsize",
+        "fontColor",
+        "fontBackgroundColor",
+        "|",
+        "bold",
+        "italic",
+        "strikethrough",
+        "subscript",
+        "superscript",
+        "code",
+        "|",
+        "link",
+        "uploadImage",
+        "blockQuote",
+        "codeBlock",
+        "|",
+        "alignment",
+        "|",
+        "bulletedList",
+        "numberedList",
+        "todoList",
+        "outdent",
+        "indent",
+      ],
+      shouldNotGroupWhenFull: true,
+    },
+  })
     .then((editor: any) => {
       console.log("Editor was initialized", editor);
-
       editor.model.document.on("change:data", () => {
         editorValue.value = editor.getData();
       });
@@ -36,3 +69,10 @@ onMounted(() => {
 <template>
   <div id="editor"></div>
 </template>
+
+<style>
+body {
+  --ck-z-default: 100; /* Default CKEditor z-index */
+  --ck-z-modal: calc(var(--ck-z-default) + 999); /* Higher z-index for CKEditor modal */
+}
+</style>

@@ -16,7 +16,8 @@ const uaT = {
       tabs: {
         my_documents: "МОЇ ДОКУМЕНТИ",
         my_favorites: "МОЇ УЛЮБЛЕНІ",
-        all_documents: "УСІ ДОКУМЕНТИ",
+        all_instructions: "УСІ ІНСТРУКЦІЇ",
+        all_visuals: "УСІ ВІЗУАЛІЗАЦІЇ",
         recently_browsed: "ОСТАННЄ ПЕРЕГЛЯНУТЕ",
       },
     },

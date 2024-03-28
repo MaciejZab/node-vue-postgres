@@ -24,8 +24,6 @@ class CategoriesManager {
   };
 
   public get = async (reqData: IChips): Promise<Array<IChip>> => {
-    console.log(`getCat:`);
-    console.log(reqData);
     const departmentName: string = reqData.departmentName;
     const response = await axios.get(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.DocumentCategory}/${departmentName}`

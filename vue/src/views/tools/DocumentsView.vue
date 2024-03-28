@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import AllDocsFilters from "../../components/views/tools/documents/all/AllDocsFilters.vue";
-import AllDocsTable from "../../components/views/tools/documents/all/AllDocsTable.vue";
+import ChipFilters from "../../components/tools/ChipFilters.vue";
+import AllInstructionsTable from "../../components/views/tools/documents/all/AllInstructionsTable.vue";
+import AllVisualsTable from "../../components/views/tools/documents/all/AllVisualsTable.vue";
 import FavDocsTable from "../../components/views/tools/documents/favorites/FavDocsTable.vue";
-import MyDocsFilters from "../../components/views/tools/documents/my/MyDocsFilters.vue";
 import MyDocsTable from "../../components/views/tools/documents/my/MyDocsTable.vue";
 import RecDocsTable from "../../components/views/tools/documents/recent/RecDocsTable.vue";
 import { IChips } from "../../interfaces/document/IChips";
@@ -13,26 +13,31 @@ import { Chips } from "../../models/document/Chips";
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 
 const tabs = [
-  {
-    id: 1,
-    name: "my_documents",
-    icon: "mdi-folder-account",
-  },
-  {
-    id: 2,
-    name: "my_favorites",
-    icon: "mdi-star",
-  },
+  // {
+  //   id: 1,
+  //   name: "my_documents",
+  //   icon: "mdi-folder-account",
+  // },
+  // {
+  //   id: 2,
+  //   name: "my_favorites",
+  //   icon: "mdi-star",
+  // },
   {
     id: 3,
-    name: "all_documents",
+    name: "all_instructions",
     icon: "mdi-file-multiple",
   },
   {
     id: 4,
-    name: "recently_browsed",
-    icon: "mdi-history",
+    name: "all_visuals",
+    icon: "mdi-file-multiple",
   },
+  // {
+  //   id: 5,
+  //   name: "recently_browsed",
+  //   icon: "mdi-history",
+  // },
 ];
 
 const currentTab = ref<number>(3);
@@ -69,13 +74,7 @@ const handleTable = (newValue: ILevel): void => {
                   class="ma-4"
                   :direction="smallScreen ? 'horizontal' : 'vertical'"
                 >
-                  <v-tab
-                    v-for="tab in tabs"
-                    :key="tab.id"
-                    :value="tab.id"
-                    class="rounded"
-                    :disabled="tab.id === 1 || tab.id === 2 || tab.id === 4 ? true : false"
-                  >
+                  <v-tab v-for="tab in tabs" :key="tab.id" :value="tab.id" class="rounded">
                     <v-icon size="28">{{ tab.icon }}</v-icon>
                     {{ smallScreen ? "" : $t(`tools.documents.tabs.${tab.name}`) }}
                   </v-tab>
@@ -87,11 +86,11 @@ const handleTable = (newValue: ILevel): void => {
             <v-col class="h-100">
               <v-window v-model="currentTab" class="w-100">
                 <v-window-item :value="1">
-                  <my-docs-filters
+                  <!-- <my-docs-filters
                     @chips="handleChips"
                     :table="table"
                     class="bg-surface-2 mb-5 ma-1"
-                  ></my-docs-filters>
+                  ></my-docs-filters> -->
                   <my-docs-table
                     @table="handleTable"
                     :chips="chips"
@@ -106,18 +105,37 @@ const handleTable = (newValue: ILevel): void => {
                   ></fav-docs-table>
                 </v-window-item>
                 <v-window-item :value="3">
-                  <all-docs-filters
+                  <!-- <all-docs-filters
                     @chips="handleChips"
                     :table="table"
                     class="bg-surface-2 mb-5 ma-1"
-                  ></all-docs-filters>
-                  <all-docs-table
+                  ></all-docs-filters> -->
+                  <chip-filters
+                    @chips="handleChips"
+                    :table="table"
+                    :max-level="2"
+                    class="bg-surface-2 mb-5 ma-1"
+                  ></chip-filters>
+                  <all-instructions-table
                     @table="handleTable"
                     :chips="chips"
                     class="bg-surface-2 pa-4 ma-1"
-                  ></all-docs-table>
+                  ></all-instructions-table>
                 </v-window-item>
                 <v-window-item :value="4">
+                  <chip-filters
+                    @chips="handleChips"
+                    :table="table"
+                    :max-level="2"
+                    class="bg-surface-2 mb-5 ma-1"
+                  ></chip-filters>
+                  <all-visuals-table
+                    @table="handleTable"
+                    :chips="chips"
+                    class="bg-surface-2 pa-4 ma-1"
+                  ></all-visuals-table>
+                </v-window-item>
+                <v-window-item :value="5">
                   <rec-docs-table
                     @table="handleTable"
                     :chips="chips"

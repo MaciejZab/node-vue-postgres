@@ -17,7 +17,8 @@ const plT = {
       tabs: {
         my_documents: "MOJE DOKUMENTY",
         my_favorites: "MOJE ULUBIONE",
-        all_documents: "WSZYSTKIE DOKUMENTY",
+        all_instructions: "WSZYSTKIE INSTRUKCJE",
+        all_visuals: "WSZYSTKIE WIZUALIZACJE",
         recently_browsed: "OSTATNIO PRZEGLĄDANE",
       },
     },

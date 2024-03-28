@@ -6,8 +6,6 @@ import { IFileItem } from "../../../../../interfaces/document/IFileItem";
 import { DocumentManager } from "../../../../../models/document/DocumentManager";
 import { IDocumentEntity } from "../../../../../interfaces/document/IDocumentEntity";
 import { DocumentEntity } from "../../../../../models/document/DocumentEntity";
-
-// import CrudChipTable from "../../../../../components/tools/CrudChipTable.vue";
 import CrudTable from "../../../../../components/tools/CrudTable.vue";
 import Stepper from "./Stepper.vue";
 
@@ -35,6 +33,7 @@ watch(
 
 const headers: any = [
   { title: "Name", align: "start", key: "name" },
+  { title: "Type", align: "start", key: "type" },
   { title: "Description", key: "description" },
   { title: "Languages (files)", key: "custom", sortable: false },
   { title: "Revision", key: "revision", sortable: false },
@@ -44,6 +43,7 @@ const headers: any = [
 const handleSaveData = (data: any) => {
   const base = new DocumentEntity();
   base.ref = data.ref;
+  base.type = data.type;
   base.name = data.name;
   base.description = data.description;
   base.revision = data.revision;
@@ -102,28 +102,15 @@ const languages = (item: any) => {
 };
 
 const disableAdd = computed(() => {
-  return !!chips.value.subcategoryName;
+  return !!!chips.value.subcategoryName;
 });
 </script>
 
 <template>
-  <!-- <crud-chip-table
-    variant="documents"
-    :headers="headers"
-    :searchByKeys="['name', 'description']"
-    :sortBy="[{ key: 'name', order: 'asc' }]"
-    toolbarTitle="Documents"
-    :manager="manager"
-    :chips="props.chips"
-    langs-variant="list"
-    @save-data="handleSaveData"
-    :req-data="reqData"
-  >
-  </crud-chip-table> -->
   <crud-table
     :headers="headers"
     :sortBy="[{ key: 'name', order: 'asc' }]"
-    :searchBy="['name', 'description']"
+    :searchBy="['name', 'type', 'description']"
     toolbarTitle="Documents"
     :manager="manager"
     @save-data="handleSaveData"

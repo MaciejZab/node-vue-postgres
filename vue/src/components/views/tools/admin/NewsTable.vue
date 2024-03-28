@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import AddEditTable from "../../../../components/tools/AddEditTable.vue";
-// import CrudTable from "../../../../components/tools/CrudTable.vue";
+import CrudTable from "../../../../components/tools/CrudTable.vue";
 import { NewsManager } from "../../../../models/editor/NewsManager";
 import CkEditor from "../../../common/CkEditor.vue";
-const emit = defineEmits(["table"]);
 
 const headers: any = [
   { title: "Title", align: "start", key: "title" },
@@ -18,47 +16,27 @@ const handleSaveData = (data: any) => {
   if (!data) return;
 
   console.log(data);
-  // const user: IUser = {
-  //   id: data.item.id,
-  //   username: data.item.username,
-  //   domain: data.item.domain,
-  // };
 
-  // const permission: IPermission = new Permission(data.model);
-
-  // reqData.value = { user, permission };
+  // reqData.value = { };
 };
 
 const manager = new NewsManager();
 </script>
 
 <template>
-  <add-edit-table
+  <crud-table
     :headers="headers"
-    :searchByKeys="['title', 'subtitle']"
     :sortBy="[{ key: 'title', order: 'asc' }]"
-    toolbarTitle="News"
-    :manager="manager"
-    @save-data="handleSaveData"
-    :req-data="reqData"
-  >
-    <template v-slot:table-dialog-slot>
-      <ck-editor @save-data="handleSaveData"></ck-editor>
-    </template>
-  </add-edit-table>
-
-  <!-- <crud-table
-    :headers="headers"
     :searchBy="['title', 'subtitle']"
-    :sortBy="[{ key: 'title', order: 'asc' }]"
     toolbarTitle="News"
     :manager="manager"
     @save-data="handleSaveData"
-    :req-data="reqData"
+    :reqData="reqData"
+    :tableAdd="true"
+    :tableDelete="true"
     :tableEdit="true"
+    :tableDialogComponent="CkEditor"
+    :tableDialogComponentProps="{}"
   >
-    <template v-slot:table-dialog-slot>
-      <ck-editor @save-data="handleSaveData"></ck-editor>
-    </template>
-  </crud-table> -->
+  </crud-table>
 </template>

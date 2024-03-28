@@ -10,6 +10,7 @@ import { Language } from "../../orm/entity/document/LanguageEntity";
 import { Department } from "../../orm/entity/document/DepartmentEntity";
 import { Category } from "../../orm/entity/document/CategoryEntity";
 import { In } from "typeorm";
+import { IDocOptions } from "../../interfaces/document/IDocOptions";
 
 const addDocument = async (req: Request, res: Response) => {
   try {
@@ -35,6 +36,7 @@ const addDocument = async (req: Request, res: Response) => {
 
       const document = new Document(
         uuidv4(),
+        base.type,
         base.name,
         base.description,
         base.revision,
@@ -220,9 +222,23 @@ const removeDocument = async (req: Request, res: Response) => {
   }
 };
 
-const getDocuments = async (_req: Request, res: Response) => {
+const getDocuments = async (req: Request, res: Response) => {
   try {
-    const docs = await dataSource.getRepository(Document).find({ relations: ["languages"] });
+    const { type } = req.params;
+
+    let docOptions: IDocOptions = {
+      relations: ["languages"],
+    };
+
+    if (type !== "all") {
+      docOptions.where = {
+        type,
+      };
+    }
+
+    console.log(type, docOptions);
+
+    const docs = await dataSource.getRepository(Document).find(docOptions);
 
     if (!docs) {
       return res.status(404).json({
@@ -255,7 +271,7 @@ const getDocuments = async (_req: Request, res: Response) => {
 
 const getDocumentsByDep = async (req: Request, res: Response) => {
   try {
-    const { departmentName } = req.params;
+    const { departmentName, type } = req.params;
 
     const depOptions = {
       where: {
@@ -271,7 +287,7 @@ const getDocumentsByDep = async (req: Request, res: Response) => {
       });
     }
 
-    const docOptions = {
+    let docOptions: IDocOptions = {
       where: {
         subcategory: {
           category: {
@@ -281,6 +297,17 @@ const getDocumentsByDep = async (req: Request, res: Response) => {
       },
       relations: ["languages"],
     };
+
+    if (type !== "all") {
+      docOptions.where = {
+        type,
+        subcategory: {
+          category: {
+            department: departmentEntity,
+          },
+        },
+      };
+    }
 
     const docs = await dataSource.getRepository(Document).find(docOptions);
 
@@ -314,7 +341,7 @@ const getDocumentsByDep = async (req: Request, res: Response) => {
 
 const getDocumentsByDepCat = async (req: Request, res: Response) => {
   try {
-    const { departmentName, categoryName } = req.params;
+    const { departmentName, categoryName, type } = req.params;
 
     const depOptions = {
       where: {
@@ -355,12 +382,20 @@ const getDocumentsByDepCat = async (req: Request, res: Response) => {
     // Extract subcategory IDs to use in the document query
     const subcategoryIds = subcategories.map((subcategory) => subcategory.id);
 
-    const docOptions = {
+    let docOptions: IDocOptions = {
       where: {
         subcategory: In(subcategoryIds),
       },
       relations: ["languages"],
     };
+
+    if (type !== "all") {
+      docOptions.where = {
+        type,
+        subcategory: In(subcategoryIds),
+      };
+    }
+
     const docs = await dataSource.getRepository(Document).find(docOptions);
 
     if (!docs) {
@@ -393,7 +428,7 @@ const getDocumentsByDepCat = async (req: Request, res: Response) => {
 
 const getDocumentsByDepCatSub = async (req: Request, res: Response) => {
   try {
-    const { departmentName, categoryName, subcategoryName } = req.params;
+    const { departmentName, categoryName, subcategoryName, type } = req.params;
     const depOptions = {
       where: {
         name: departmentName,
@@ -436,12 +471,21 @@ const getDocumentsByDepCatSub = async (req: Request, res: Response) => {
       },
     };
     const subcategoryEntity = await dataSource.getRepository(Subcategory).find(subOptions);
-    const docOptions = {
+
+    let docOptions: IDocOptions = {
       where: {
         subcategory: subcategoryEntity,
       },
       relations: ["languages"],
     };
+
+    if (type !== "all") {
+      docOptions.where = {
+        type,
+        subcategory: subcategoryEntity,
+      };
+    }
+
     const docs = await dataSource.getRepository(Document).find(docOptions);
 
     if (!docs) {

@@ -4,7 +4,7 @@ import { Endpoints } from "../../config/Endpoints";
 import { IDocumentEntity } from "../../interfaces/document/IDocumentEntity";
 import { DocumentEntity } from "./DocumentEntity";
 
-class DocumentManager {
+class VisualManager {
   constructor() {}
 
   public new = () => new DocumentEntity();
@@ -23,16 +23,16 @@ class DocumentManager {
     if (reqData.categoryName) lvl = 2;
     if (reqData.subcategoryName) lvl = 3;
 
-    let params: string = "/all";
+    let params: string = "/Visual";
     switch (lvl) {
       case 1:
-        params = `/${reqData.departmentName}/all`;
+        params = `/${reqData.departmentName}/Visual`;
         break;
       case 2:
-        params = `/${reqData.departmentName}/${reqData.categoryName}/all`;
+        params = `/${reqData.departmentName}/${reqData.categoryName}/Visual`;
         break;
       case 3:
-        params = `/${reqData.departmentName}/${reqData.categoryName}/${reqData.subcategoryName}/all`;
+        params = `/${reqData.departmentName}/${reqData.categoryName}/${reqData.subcategoryName}/Visual`;
         break;
 
       default:
@@ -61,4 +61,4 @@ class DocumentManager {
   };
 }
 
-export { DocumentManager };
+export { VisualManager };

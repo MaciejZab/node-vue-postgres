@@ -2,13 +2,11 @@
 
 ## High Priority
 
-- mozliwa zmiana categorii w matrix dep
-
-\*/
+-
 
 ## Medium Priority
 
--
+- Deleting this document will also affect all of its associated files.
 
 ## Low Priority
 
@@ -20,7 +18,7 @@
 
 ## Bug Fixes
 
-- kiedy nie odznacze dalszej kategorii w matrix dep i zmienie department wypierdala jakies 404
+-
 
 ## Miscellaneous
 

@@ -16,7 +16,8 @@ const enT = {
       tabs: {
         my_documents: "MY DOCUMENTS",
         my_favorites: "MY FAVORITES",
-        all_documents: "ALL DOCUMENTS",
+        all_instructions: "ALL INSTRUCTIONS",
+        all_visuals: "ALL VISUALS",
         recently_browsed: "RECENTLY BROWSED",
       },
     },

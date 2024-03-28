@@ -31,7 +31,6 @@ const handleSaveData = (data: any) => {
   const permission: IPermission = new Permission(data.model);
 
   reqData.value = { user, permission };
-  console.log(reqData.value);
 };
 
 const manager = new UserPermissionManager();

@@ -1,6 +1,7 @@
 interface IDocumentEntity {
   id: number;
   ref: string;
+  type: string;
   name: string;
   description: string;
   revision: number;

@@ -2,7 +2,7 @@
 import { ref, watch } from "vue";
 // import { ResponseStatus } from "../../../../models/common/ResponseStatus";
 import { IChips } from "../../../../../interfaces/document/IChips";
-import { DocumentManager } from "../../../../../models/document/DocumentManager";
+import { InstructionManager } from "../../../../../models/document/InstructionManager";
 import { IDocumentEntity } from "../../../../../interfaces/document/IDocumentEntity";
 import CrudTable from "../../../../tools/CrudTable.vue";
 
@@ -12,7 +12,7 @@ const props = defineProps<{
   chips: IChips;
 }>();
 
-const manager = new DocumentManager();
+const manager = new InstructionManager();
 
 const documents = ref<Array<IDocumentEntity>>([]);
 
@@ -84,18 +84,6 @@ const headers: any = [
   // { title: "Favorite", key: "custom2", sortable: false, filterable: false },
 ];
 
-// const search = ref<string>("");
-
-// const filteredDocuments = computed(() => {
-//   return documents.value.filter((document) => {
-//     const name = document.name.toLowerCase();
-//     const description = document.description.toLowerCase();
-//     const searchTerm = search.value.toLowerCase();
-
-//     return name.includes(searchTerm) || description.includes(searchTerm);
-//   });
-// });
-
 const navigateToRoute = (file: Array<string>) => {
   const url = `/tool/documents/${file.at(0)}/${file.at(1)}/${file.at(2)}`;
   window.open(url, "_blank");
@@ -108,67 +96,11 @@ const addToFavorites = (item: any) => {
 </script>
 
 <template>
-  <!-- <v-card class="rounded-xl elevation-2">
-    <v-data-table
-      :headers="headers"
-      :items="filteredDocuments"
-      :sort-by="[{ key: 'name', order: 'asc' }]"
-      :search="search"
-      class="bg-surface-2"
-    >
-      <template v-slot:top>
-        <v-toolbar flat density="compact" class="pa-n4" color="surface-2">
-          <v-toolbar-title class="ml-0">{{ $t(`tools.documents.name`) }}</v-toolbar-title>
-          <v-text-field
-            v-model="search"
-            label="Search"
-            prepend-inner-icon="mdi-magnify"
-            variant="outlined"
-            density="compact"
-            color="primary"
-            hide-details
-            single-line
-            :rounded="true"
-          ></v-text-field>
-        </v-toolbar>
-      </template>
-      <template v-slot:item.languages="{ item }">
-        <v-select
-          :items="languages(item)"
-          item-title="title"
-          item-value="value"
-          density="compact"
-          variant="underlined"
-          label="Select language"
-          color="primary"
-          hide-details
-          class="my-5"
-        >
-          <template #item="{ item }">
-            <v-list-item @click="navigateToRoute(item.value)">
-              <v-list-item-content>
-                <v-list-item-title>{{ item.title }}</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </template>
-        </v-select>
-      </template>
-      <template v-slot:item.favorite="{ item }">
-        <v-btn
-          variant="text"
-          size="small"
-          @click="addToFavorites(item)"
-          icon="mdi-star-outline"
-          class="ma-2"
-        />
-      </template>
-    </v-data-table>
-  </v-card> -->
   <crud-table
     :headers="headers"
     :sortBy="[{ key: 'name', order: 'asc' }]"
     :searchBy="['name', 'description']"
-    toolbarTitle="Documents"
+    toolbarTitle="Instructions"
     :manager="manager"
     :chips="props.chips"
   >
