@@ -211,6 +211,9 @@ const handleSaveData = (data: any) => emit("save-data", data);
           <v-divider v-if="props.tableAdd" class="mx-4" inset vertical></v-divider>
 
           <table-dialog
+            persistent
+            no-click-animation
+            :retain-focus="false"
             v-model="dialog"
             variant="Save"
             :disable="disableAdd"

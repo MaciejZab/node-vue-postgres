@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import CrudTable from "../../../../components/tools/CrudTable.vue";
 import { NewsManager } from "../../../../models/editor/NewsManager";
-import CkEditor from "../../../common/CkEditor.vue";
+import NewsStepper from "./NewsStepper.vue";
 
 const headers: any = [
   { title: "Title", align: "start", key: "title" },
@@ -35,7 +35,7 @@ const manager = new NewsManager();
     :tableAdd="true"
     :tableDelete="true"
     :tableEdit="true"
-    :tableDialogComponent="CkEditor"
+    :tableDialogComponent="NewsStepper"
     :tableDialogComponentProps="{}"
   >
   </crud-table>

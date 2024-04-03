@@ -1,4 +1,6 @@
-class NewsEntity {
+import { INewsEntity } from "../../interfaces/editor/INewsEntity";
+
+class NewsEntity implements INewsEntity {
   id: number;
   ref: string;
   title: string;
@@ -10,7 +12,7 @@ class NewsEntity {
     this.ref = "";
     this.title = "";
     this.subtitle = "";
-    this.content = "";
+    this.content = `<div class="ck-override-vuetify-styles"></div><div></div>`;
   }
 }
 

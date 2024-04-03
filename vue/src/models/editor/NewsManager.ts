@@ -2,14 +2,14 @@ import axios from "axios";
 import { nodeConfig } from "../../config/env";
 import { Endpoints } from "../../config/Endpoints";
 import { NewsEntity } from "./NewsEntity";
-import { INews } from "../../interfaces/editor/INews";
+import { INewsEntity } from "../../interfaces/editor/INewsEntity";
 
 class NewsManager {
   constructor() {}
 
   public new = () => new NewsEntity();
 
-  public post = async (formData: FormData): Promise<Array<INews>> => {
+  public post = async (formData: FormData): Promise<Array<INewsEntity>> => {
     const response = await axios.post(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.News}`,
       formData

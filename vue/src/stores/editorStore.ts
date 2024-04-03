@@ -1,16 +1,21 @@
 import { defineStore } from "pinia";
+import { v4 as uuidv4 } from "uuid";
 import { ref } from "vue";
 
 export const useEditorStore = defineStore("editor", () => {
-  const editor = ref<string>("");
+  const editor = ref<string>(`<div class="ck-override-vuetify-styles"></div><div></div>`);
+  const eRef = ref<string>("");
 
-  const save = (value: string) => {
+  const save = (value: string): void => {
     editor.value = value;
   };
 
-  const get = () => {
-    console.log(editor.value);
+  const get = (): string => editor.value;
+
+  const getRef = (): string => {
+    if (!eRef.value) return uuidv4();
+    return eRef.value;
   };
 
-  return { save, get };
+  return { save, get, getRef };
 });

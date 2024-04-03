@@ -52,7 +52,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <v-dialog max-width="500px">
+  <v-dialog max-width="700px">
     <template v-if="variant === 'Save'" v-slot:activator="{ props }">
       <v-btn
         class="bg-primary text-on-primary mr-4 rounded-xl"

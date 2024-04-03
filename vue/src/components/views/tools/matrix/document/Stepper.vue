@@ -11,10 +11,8 @@ import { FileItem } from "../../../../../models/document/FileItem";
 const emit = defineEmits(["save-data", "verified"]);
 
 const props = defineProps<{
-  // editedItem: IDocumentEntity;
   componentProps: any;
 }>();
-console.log(props.componentProps.editedItem);
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 
 const activeStep = ref<number>(1);
@@ -93,7 +91,8 @@ watchEffect(() => {
     !!document.value.name &&
     !!document.value.description &&
     !!document.value.revision &&
-    hasFiles.value
+    hasFiles.value &&
+    activeStep.value === 3
   ) {
     emit("verified", false);
     emit("save-data", newDocData.value);

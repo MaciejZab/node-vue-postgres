@@ -1,4 +1,4 @@
-interface INews {
+interface INewsEntity {
   id: number;
   ref: string;
   title: string;
@@ -6,4 +6,4 @@ interface INews {
   content: string;
 }
 
-export type { INews };
+export type { INewsEntity };
