@@ -1,73 +1,58 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import weather from "../components/common/weather.vue";
 import { useI18n } from "vue-i18n";
-import frequentlyUsed from "../components/views/home/frequentlyUsed.vue";
+// import frequentlyUsed from "../components/views/home/frequentlyUsed.vue";
+import { nodeConfig } from "../config/env";
+import { INewsEntity } from "../interfaces/editor/INewsEntity";
+import { INewsCard } from "../interfaces/editor/INewsCard";
+import { NewsManager } from "../models/editor/NewsManager";
+import { NewsCard } from "../models/editor/NewsCard";
 
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 const boardCols = computed((): number => (smallScreen.value ? 12 : 8));
 
-interface Item {
-  id: number;
-  title: string;
-  subtitle: string;
-  imgPath: string;
-  text: string;
-  show: boolean;
-}
-const imgPlaceholder = "../home/welcome.jpg";
-//href The card becomes an anchor with the href prop. with target="_blank" and append-icon="mdi-open-in-new"
+const constructImgSrc = (item: INewsEntity): string => {
+  const backend = `${nodeConfig.origin}:${nodeConfig.port}/uploads/news/`;
+  return `${backend}${item.bgImage}`;
+};
 
-const items = ref<Item[]>([]);
+const newsPage = ref<number>(0);
+const news = ref<Array<INewsCard>>([]);
 
-async function api(): Promise<Item[]> {
-  return new Promise<Item[]>((resolve) => {
-    setTimeout(() => {
-      const newItems: Item[] = [
-        {
-          id: 1,
-          title: "Lorem",
-          subtitle: "Lorem Ipsum",
-          imgPath: "../home/welcome.jpg",
-          text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed accumsan leo ut tellus feugiat, ac molestie nisi mattis. Nulla facilisi. Nullam efficitur, lorem non bibendum vestibulum, lectus justo ultricies nisi, a tempus velit sem sit amet elit.",
-          show: false,
-        },
-        {
-          id: 2,
-          title: "Lorem",
-          subtitle: "Lorem Ipsum",
-          imgPath: imgPlaceholder,
-          text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed accumsan leo ut tellus feugiat, ac molestie nisi mattis. Nulla facilisi. Nullam efficitur, lorem non bibendum vestibulum, lectus justo ultricies nisi, a tempus velit sem sit amet elit.",
-          show: false,
-        },
-        {
-          id: 3,
-          title: "Lorem",
-          subtitle: "Lorem Ipsum",
-          imgPath: imgPlaceholder,
-          text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed accumsan leo ut tellus feugiat, ac molestie nisi mattis. Nulla facilisi. Nullam efficitur, lorem non bibendum vestibulum, lectus justo ultricies nisi, a tempus velit sem sit amet elit.",
-          show: false,
-        },
-      ];
-      resolve(newItems);
-    }, 1000);
-  });
-}
+watch(news, () => newsPage.value++);
 
-async function load(): Promise<void> {
-  const newItems = await api();
-  items.value = [...items.value, ...newItems];
-}
+const api = async (skip: number, take: number): Promise<Array<INewsCard>> => {
+  const manager = new NewsManager();
+  const newItems: Array<INewsEntity> = await manager.get(true, skip, take);
+
+  return newItems.map((news: INewsEntity) => new NewsCard(news));
+};
+
+const load = async ({ done }: { done: any }): Promise<void> => {
+  // items per load
+  const take = 3;
+  // items to ommit from db (pagination)
+  const skip = newsPage.value * take;
+
+  const newItems = await api(skip, take);
+  news.value = [...news.value, ...newItems];
+
+  if (newItems.length > 0) done("ok");
+  else done("empty");
+};
+
+// toggling
 
 const toggleDetails = (cardId: number) => {
-  const card = items.value.find((detail) => detail.id === cardId);
+  const card = news.value.find((detail) => detail.id === cardId);
   if (card) {
     card.show = !card.show;
   }
 };
 
 const computedShowValue = (itemId: number) => {
-  const item = items.value.find((item) => item.id === itemId);
+  const item = news.value.find((item) => item.id === itemId);
   return item ? item.show : false;
 };
 
@@ -77,15 +62,15 @@ const exploreBtn = computed(() => t("common.default_layout.pages.home.card.explo
 
 <template>
   <v-container class="layout-view-container d-flex flex-column bg-background pt-0 mt-0">
-    <v-row>
+    <!-- <v-row>
       <frequently-used />
-    </v-row>
+    </v-row> -->
     <v-row>
       <v-col class="pt-0" :cols="boardCols">
-        <v-infinite-scroll :items="items" :onLoad="load" color="secondary">
-          <template v-for="item in items" :key="item.id">
+        <v-infinite-scroll :items="news" :onLoad="load" color="secondary">
+          <template v-for="item in news" :key="item.id">
             <v-card class="ma-4 bg-surface-1 text-on-surface rounded-xl">
-              <v-img height="300" :src="item.imgPath" cover></v-img>
+              <v-img height="300" :src="constructImgSrc(item)" cover></v-img>
 
               <v-card-item>
                 <v-card-title>{{ item.title }}</v-card-title>
@@ -106,9 +91,7 @@ const exploreBtn = computed(() => t("common.default_layout.pages.home.card.explo
                 <div class="details" v-show="computedShowValue(item.id)">
                   <v-divider></v-divider>
 
-                  <v-card-text>
-                    {{ item.text }}
-                  </v-card-text>
+                  <v-card-text v-html="item.content"> </v-card-text>
                 </div>
               </v-expand-transition>
             </v-card>

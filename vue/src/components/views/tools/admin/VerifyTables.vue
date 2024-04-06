@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { INewsEntity } from "./../../../../interfaces/editor/INewsEntity";
+import { watchEffect } from "vue";
 
 const props = defineProps<{
   eNews: Partial<INewsEntity>;
@@ -9,6 +10,10 @@ const props = defineProps<{
 
 const news = ref<Partial<INewsEntity>>(props.eNews);
 const image = ref<Array<File>>(props.bgImage);
+
+watchEffect(() => {
+  image.value = props.bgImage;
+});
 </script>
 
 <template>
@@ -39,7 +44,7 @@ const image = ref<Array<File>>(props.bgImage);
 
       <tbody>
         <tr>
-          <td>{{ image?.at(0)?.name }}</td>
+          <td>{{ image.at(0)?.name }}</td>
         </tr>
       </tbody>
     </v-table>

@@ -5,7 +5,11 @@ import CkEditor from "../../../common/CkEditor.vue";
 import VerifyTables from "./VerifyTables.vue";
 import { useEditorStore } from "../../../../stores/editorStore";
 import { watch } from "vue";
-// import { nodeConfig } from "../../../../config/env";
+import { Permission } from "../../../../models/user/Permission";
+import { IPermission } from "../../../../interfaces/user/IPermission";
+import { usePermissionStore } from "../../../../stores/permissionStore";
+import { nodeConfig } from "../../../../config/env";
+import axios from "axios";
 
 const emit = defineEmits(["save-data", "verified"]);
 
@@ -32,56 +36,60 @@ const nextable = computed(() => activeStep.value < 4);
 const bgImage = ref<Array<File>>([]);
 const news = ref<INewsEntity>(props.componentProps.editedItem);
 
-const handleRef = (ref: string) => {
-  news.value.ref = ref;
+const setPermission = (val: string | null) => {
+  if (val) news.value.permission = new Permission(val as "User" | "Moderator" | "Admin");
 };
+
+const getPermission = (per: IPermission) => {
+  const permissionStore = usePermissionStore();
+  const code = permissionStore.getPermissionCode(per, true) as "User" | "Moderator" | "Admin";
+  return code;
+};
+
+const newsPermissionSelect = ref<string>("User");
 
 watchEffect(() => {
   news.value = props.componentProps.editedItem;
 });
 
+const editorStore = useEditorStore();
+
 (async () => {
-  //   id: number;
-  // ref: string;
-  // title: string;
-  // subtitle: string;
-  // content: string;
-  // const newsRef = news.value.ref;
-  // const newsTitle = news.value.title;
-  // const newsSubtitle = news.value.subtitle;
-  // const newsContent = news.value.content;
-  // if (newsRef && newsTitle && newsSubtitle && newsContent) {
-  //   const directoryPath = `${nodeConfig.origin}:${nodeConfig.port}/uploads/news`;
-  //   const desiredId = newsRef;
-  //   fs.readdir(directoryPath, function (err, files) {
-  //     if (err) {
-  //       return console.log("Unable to scan directory: " + err);
-  //     }
-  //     const filteredFiles = files.filter((file) => {
-  //       const fileName = path.parse(file).name;
-  //       return fileName.lastIndexOf(desiredId) !== -1;
-  //     });
-  //     console.log("Files with specified ID:", filteredFiles);
-  //   });
-  //       const bgImage = `${docName}_qs_uuid=${newsRef}`;
-  //       const bgImage = `${docName}_qs_uuid=${newsRef}`;
-  //       const fileUrl = `${nodeConfig.origin}:${nodeConfig.port}/uploads/news/${fileName}.pdf`;
-  //       try {
-  //         const response = await axios.get(fileUrl, { responseType: "arraybuffer" });
-  //         const fileContent = response.data;
-  //         const blob = new Blob([fileContent]);
-  //         const file = new File([blob], fileName, { type: response.headers["content-type"] });
-  //         const fileItem: FileItem = new FileItem(parseInt(index, 10), [file], [lang]);
-  //         retrievedFiles.value.push(fileItem);
-  //       } catch (error) {
-  //         console.error(`Error fetching file for language ${lang}:`, error);
-  //       }
-  // }
+  const newsRef = news.value.ref;
+  newsPermissionSelect.value = getPermission(news.value.permission);
+  const newsTitle = news.value.title;
+  const newsSubtitle = news.value.subtitle;
+  const newsContent = news.value.content;
+  editorStore.save(newsContent);
+  const newsBgImage = news.value.bgImage;
+  if (newsRef && newsTitle && newsSubtitle && newsContent && newsBgImage) {
+    const constructBgImgSrc = (): string => {
+      const backend = `${nodeConfig.origin}:${nodeConfig.port}/uploads/news/`;
+      return `${backend}${newsBgImage}`;
+    };
+
+    const fileUrl = constructBgImgSrc();
+    try {
+      const response = await axios.get(fileUrl, { responseType: "arraybuffer" });
+      const fileContent = response.data;
+      const blob = new Blob([fileContent]);
+      //?.split(".")[0]
+      const name = fileUrl.split("/").pop();
+      if (!name) throw new Error("Failed to extract file name from URL");
+
+      const file = new File([blob], name, { type: response.headers["content-type"] });
+      bgImage.value = [file];
+    } catch (error) {
+      console.error(error);
+    }
+  }
 })();
 
-const hasBgImage = computed<boolean>(() => bgImage.value.length > 0);
+const handleRef = (ref: string) => {
+  if (!news.value.ref) news.value.ref = ref;
+};
 
-const editorStore = useEditorStore();
+const hasBgImage = computed<boolean>(() => bgImage.value.length > 0);
 
 watch(activeStep, (newStep, oldStep) => {
   if (oldStep === 3 && newStep === 4) news.value.content = editorStore.get();
@@ -94,6 +102,7 @@ const hasContent = computed<boolean>(() => {
 const newNewsData = computed(() => {
   return {
     ref: news.value.ref,
+    permission: news.value.permission,
     title: news.value.title,
     subtitle: news.value.subtitle,
     content: news.value.content,
@@ -153,6 +162,13 @@ watchEffect(() => {
     <v-stepper-window>
       <v-stepper-window-item :value="1">
         <v-card flat>
+          <v-select
+            v-model:model-value="newsPermissionSelect"
+            @update:modelValue="setPermission"
+            variant="underlined"
+            label="Permission"
+            :items="['User', 'Moderator', 'Admin']"
+          ></v-select>
           <v-text-field v-model="news.title" variant="underlined" label="Title"></v-text-field>
           <v-text-field
             v-model="news.subtitle"

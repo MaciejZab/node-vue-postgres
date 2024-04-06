@@ -15,9 +15,20 @@ const reqData = ref<any>(null);
 const handleSaveData = (data: any) => {
   if (!data) return;
 
-  console.log(data);
+  const base = {
+    ref: data.ref,
+    permission: data.permission,
+    title: data.title,
+    subtitle: data.subtitle,
+    content: data.content,
+  };
+  const bgImage: File = data.bgImage.at(0);
 
-  // reqData.value = { };
+  const formData: any = new FormData();
+  formData.append("base", JSON.stringify(base));
+  formData.append("bgImage", bgImage);
+
+  reqData.value = formData;
 };
 
 const manager = new NewsManager();

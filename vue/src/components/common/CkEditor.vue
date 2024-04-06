@@ -9,8 +9,10 @@ const emit = defineEmits(["ref"]);
 
 const editor = Editor;
 
-const editorData = ref<string>(`<div class="ck-override-vuetify-styles"></div><div></div>`);
 const editorStore = useEditorStore();
+
+const editorData = ref<string>(editorStore.get());
+
 const eRef = editorStore.getRef();
 
 const editorConfig = {
@@ -28,7 +30,9 @@ emit("ref", eRef);
 
 // div.ck-override-vuetify-styles is the preceding styling element for ck output - see ckeditor.scss
 watch(editorData, (newV) => {
-  editorStore.save(`<div class="ck-override-vuetify-styles"></div><div>${newV}</div>`);
+  editorStore.save(
+    `<div class="ck-override-vuetify-styles"></div><div class="ck ck-content">${newV}</div>`
+  );
 });
 </script>
 
@@ -42,7 +46,7 @@ watch(editorData, (newV) => {
 </template>
 
 <style>
-.ck-editor__editable {
+.ck.ck-content.ck-editor__editable {
   min-height: 360px !important;
 }
 .ck-body-wrapper {

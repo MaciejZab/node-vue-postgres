@@ -18,6 +18,10 @@ export class Editor1711454048711 implements MigrationInterface {
             type: "varchar",
           },
           {
+            name: "permission",
+            type: "jsonb",
+          },
+          {
             name: "title",
             type: "varchar",
           },
@@ -28,6 +32,10 @@ export class Editor1711454048711 implements MigrationInterface {
           {
             name: "content",
             type: "text",
+          },
+          {
+            name: "bgImage",
+            type: "varchar",
           },
         ],
       })
