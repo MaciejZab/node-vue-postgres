@@ -50,9 +50,12 @@ router.delete("/subcategory/:id", removeSubcategory);
 router.post("/", upload.any(), addDocument);
 router.put("/", upload.any(), editDocument);
 router.delete("/:id", removeDocument);
-router.get("/:type", getDocuments);
-router.get("/:departmentName/:type", getDocumentsByDep);
-router.get("/:departmentName/:categoryName/:type", getDocumentsByDepCat);
-router.get("/:departmentName/:categoryName/:subcategoryName/:type", getDocumentsByDepCatSub);
+router.get("/:type/:reduce", getDocuments);
+router.get("/:departmentName/:type/:reduce", getDocumentsByDep);
+router.get("/:departmentName/:categoryName/:type/:reduce", getDocumentsByDepCat);
+router.get(
+  "/:departmentName/:categoryName/:subcategoryName/:type/:reduce",
+  getDocumentsByDepCatSub
+);
 
 export { router as documentRoutes };

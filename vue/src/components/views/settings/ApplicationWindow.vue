@@ -120,6 +120,8 @@ watch(locale, () => {
     :items="themeOptions"
     item-title="title"
     item-value="value"
+    variant="underlined"
+    class="w-50 mx-auto"
   ></v-select>
   <v-select
     v-model="language"
@@ -127,5 +129,7 @@ watch(locale, () => {
     :items="languageOptions"
     item-title="title"
     item-value="value"
+    variant="underlined"
+    class="w-50 mx-auto"
   ></v-select>
 </template>

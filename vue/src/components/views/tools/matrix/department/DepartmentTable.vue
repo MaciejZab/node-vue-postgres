@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import { IChips } from "../../../../../interfaces/document/IChips";
 import { ILevel } from "../../../../../interfaces/document/ILevel";
 import { DepartmentsManager } from "../../../../../models/document/DepartmentsManager";
@@ -8,11 +8,14 @@ import { CategoriesManager } from "../../../../../models/document/CategoriesMana
 // import CrudChipTable from "../../../../../components/tools/CrudChipTable.vue";
 import CrudTable from "../../../../../components/tools/CrudTable.vue";
 import DialogInput from "../../../../tools/DialogInput.vue";
+import { useI18n } from "vue-i18n";
+import { IResponseStatus } from "../../../../../interfaces/common/IResponseStatus";
 
-const emit = defineEmits(["table"]);
+const emit = defineEmits(["table", "responseStatus"]);
 
 const props = defineProps<{
   chips: IChips;
+  tab: string;
 }>();
 
 const level = ref<ILevel>(ILevel.Dep);
@@ -26,7 +29,7 @@ const emitTableChange = () => {
 
 const chips = ref<IChips>(props.chips);
 
-const tableItem = ref<string>("Department");
+const tableItem = ref<string>("departments");
 
 watch(
   () => [props.chips?.departmentName, props.chips?.categoryName, props.chips?.subcategoryName],
@@ -34,18 +37,16 @@ watch(
     if (cat) {
       level.value = ILevel.Sub;
       manager.value = new SubcategoriesManager();
-      tableItem.value = "Workstations";
+      tableItem.value = "workstations";
     } else if (dep) {
       level.value = ILevel.Cat;
       manager.value = new CategoriesManager();
-      tableItem.value = "Programs";
+      tableItem.value = "programs";
     } else {
       level.value = ILevel.Dep;
       manager.value = new DepartmentsManager();
-      tableItem.value = "Departments";
+      tableItem.value = "departments";
     }
-
-    console.log(manager.value);
 
     chips.value.departmentName = dep === undefined ? "" : dep;
     chips.value.categoryName = cat === undefined ? "" : cat;
@@ -53,10 +54,20 @@ watch(
   }
 );
 
+const { t } = useI18n();
+const tab = ref<string>(props.tab);
+watchEffect(() => (tab.value = props.tab));
+const tPath = `tools.matrix.tabs.${tab.value}.table`;
+
 const headers = ref<any>([
-  { title: "Name", align: "start", key: "name" },
-  { title: "Actions", key: "actions", sortable: false },
+  { title: t(`${tPath}.header.name`), align: "start", key: "name" },
+  { title: t(`${tPath}.header.actions`), key: "actions", sortable: false },
 ]);
+
+const toolbarTitle = computed(() => {
+  return t(`${tPath}.toolbar.${tableItem.value}`);
+});
+const searchTitle = t(`${tPath}.search`);
 
 const reqData = ref<any>(null);
 
@@ -71,27 +82,17 @@ const handleSaveData = (data: any) => {
 
   reqData.value = rd;
 };
+
+const handleResponseStatus = (status: IResponseStatus) => emit("responseStatus", status);
 </script>
 
 <template>
-  <!-- <crud-chip-table
-    variant="departments"
-    :headers="headers"
-    :searchByKeys="['name']"
-    :sortBy="[{ key: 'name', order: 'asc' }]"
-    :toolbarTitle="tableItem"
-    :manager="manager"
-    :chips="chips"
-    @save-data="handleSaveData"
-    :req-data="reqData"
-    @emit-table-change="emitTableChange"
-  >
-  </crud-chip-table> -->
   <crud-table
     :headers="headers"
     :sortBy="[{ key: 'name', order: 'asc' }]"
     :searchBy="['name']"
-    :toolbarTitle="tableItem"
+    :toolbarTitle="toolbarTitle"
+    :searchTitle="searchTitle"
     :manager="manager"
     @save-data="handleSaveData"
     :req-data="reqData"
@@ -103,6 +104,7 @@ const handleSaveData = (data: any) => {
     :tableEdit="true"
     :tableDialogComponent="DialogInput"
     :tableDialogComponentProps="{ label: 'Name', property: 'name' }"
+    @responseStatus="handleResponseStatus"
   >
   </crud-table>
 </template>

@@ -8,8 +8,11 @@ import { IDocumentEntity } from "../../../../../interfaces/document/IDocumentEnt
 import { DocumentEntity } from "../../../../../models/document/DocumentEntity";
 import CrudTable from "../../../../../components/tools/CrudTable.vue";
 import Stepper from "./Stepper.vue";
+import { useI18n } from "vue-i18n";
+import { watchEffect } from "vue";
+import { IResponseStatus } from "../../../../../interfaces/common/IResponseStatus";
 
-const emit = defineEmits(["table"]);
+const emit = defineEmits(["table", "responseStatus"]);
 
 // dictionary
 // const { t } = useI18n();
@@ -19,6 +22,7 @@ const emit = defineEmits(["table"]);
 
 const props = defineProps<{
   chips: IChips;
+  tab: string;
 }>();
 
 const chips = ref<IChips>(props.chips);
@@ -31,14 +35,22 @@ watch(
   { deep: true }
 );
 
+const { t } = useI18n();
+const tab = ref<string>(props.tab);
+watchEffect(() => (tab.value = props.tab));
+const tPath = `tools.matrix.tabs.${tab.value}.table`;
+
 const headers: any = [
-  { title: "Name", align: "start", key: "name" },
-  { title: "Type", align: "start", key: "type" },
-  { title: "Description", key: "description" },
-  { title: "Languages (files)", key: "custom", sortable: false },
-  { title: "Revision", key: "revision", sortable: false },
-  { title: "Actions", key: "actions", sortable: false },
+  { title: t(`${tPath}.header.name`), align: "start", key: "name" },
+  { title: t(`${tPath}.header.type`), align: "start", key: "type" },
+  { title: t(`${tPath}.header.description`), key: "description" },
+  { title: t(`${tPath}.header.language`), key: "custom", sortable: false },
+  { title: t(`${tPath}.header.revision`), key: "revision", sortable: false },
+  { title: t(`${tPath}.header.actions`), key: "actions", sortable: false },
 ];
+
+const toolbarTitle = t(`${tPath}.toolbar`);
+const searchTitle = t(`${tPath}.search`);
 
 const handleSaveData = (data: any) => {
   const base = new DocumentEntity();
@@ -104,6 +116,8 @@ const languages = (item: any) => {
 const disableAdd = computed(() => {
   return !!!chips.value.subcategoryName;
 });
+
+const handleResponseStatus = (status: IResponseStatus) => emit("responseStatus", status);
 </script>
 
 <template>
@@ -111,7 +125,8 @@ const disableAdd = computed(() => {
     :headers="headers"
     :sortBy="[{ key: 'name', order: 'asc' }]"
     :searchBy="['name', 'type', 'description']"
-    toolbarTitle="Documents"
+    :toolbarTitle="toolbarTitle"
+    :searchTitle="searchTitle"
     :manager="manager"
     @save-data="handleSaveData"
     :req-data="reqData"
@@ -122,6 +137,7 @@ const disableAdd = computed(() => {
     :tableEdit="true"
     :tableDialogComponent="Stepper"
     :tableDialogComponentProps="{}"
+    @responseStatus="handleResponseStatus"
   >
     <template v-slot:table-key-slot="{ item }">
       <v-list-item class="pl-0" density="compact" v-for="(lang, i) in languages(item)" :key="i">

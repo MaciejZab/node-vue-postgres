@@ -10,6 +10,7 @@ const props = defineProps<{
 
   searchBy: Array<string>; // header keys
   toolbarTitle: string;
+  searchTitle?: string;
 
   manager: any;
   reqData?: any;
@@ -26,13 +27,14 @@ const props = defineProps<{
   tableDialogComponentProps?: any;
 }>();
 
-const emit = defineEmits(["save-data", "emit-table-change"]);
+const emit = defineEmits(["save-data", "emit-table-change", "responseStatus"]);
 
 const headers = ref<any>(props.headers);
 const items = ref<Array<any>>([]);
 
 const toolbarTitle = ref<string>(props.toolbarTitle);
 const search = ref<string>("");
+const searchTitle = ref<string>(props.searchTitle ? props.searchTitle : "Search");
 const filtered = computed(() => {
   if (search.value) {
     return items.value.filter((item: any) => {
@@ -72,6 +74,10 @@ const reqData = ref<any>(props.reqData);
 const disableAdd = ref<boolean>(props.disableAdd === undefined ? false : props.disableAdd);
 
 const responseStatus = ref<IResponseStatus | null>(null);
+
+watchEffect(() => {
+  emit("responseStatus", responseStatus.value);
+});
 
 const verified = ref<boolean>(false);
 
@@ -140,7 +146,7 @@ const closeDelete = async () => {
 const deleteItemConfirm = async () => {
   try {
     dialogDeleteLoading.value = true;
-    await manager.value.delete(editedItem.value.id);
+    responseStatus.value = await manager.value.delete(editedItem.value.id, true);
     if (props.emitTableChange) emit("emit-table-change");
     items.value = await manager.value.get(chips.value);
   } catch (error: any) {
@@ -159,8 +165,8 @@ const save = async () => {
   try {
     const data: any = reqData.value;
     dialogLoading.value = true;
-    if (editedIndex.value > -1) await manager.value.put(data);
-    else await manager.value.post(data);
+    if (editedIndex.value > -1) responseStatus.value = await manager.value.put(data, true);
+    else responseStatus.value = await manager.value.post(data, true);
   } catch (error: any) {
     console.log(error);
     responseStatus.value = new ResponseStatus({
@@ -199,7 +205,7 @@ const handleSaveData = (data: any) => emit("save-data", data);
           <v-toolbar-title class="bg-surface-2 ml-0">{{ toolbarTitle }}</v-toolbar-title>
           <v-text-field
             v-model="search"
-            label="Search"
+            :label="searchTitle"
             prepend-inner-icon="mdi-magnify"
             variant="outlined"
             density="compact"

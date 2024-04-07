@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 // import DepartmentFilters from "../../components/views/tools/matrix/department/DepartmentFilters.vue";
 import DepartmentTable from "../../components/views/tools/matrix/department/DepartmentTable.vue";
 // import DocumentFilters from "../../components/views/tools/matrix/document/DocumentFilters.vue";
@@ -8,6 +8,8 @@ import ChipFilters from "../../components/tools/ChipFilters.vue";
 import { IChips } from "../../interfaces/document/IChips";
 import { ILevel } from "../../interfaces/document/ILevel";
 import { Chips } from "../../models/document/Chips";
+import { IResponseStatus } from "../../interfaces/common/IResponseStatus";
+import alertResponseStatus from "../../components/common/alertResponseStatus.vue";
 
 const smallScreen = ref<boolean>(window.innerWidth < 960);
 
@@ -25,6 +27,9 @@ const tabs = [
 ];
 
 const currentTab = ref<number>(1);
+const currentTabName = computed<string>(() => {
+  return tabs.find((tab) => tab.id === currentTab.value)?.name || "";
+});
 
 const chips = ref<IChips>(new Chips());
 const table = ref<ILevel | undefined>(undefined);
@@ -38,10 +43,18 @@ const handleTable = (newValue: ILevel): void => {
     table.value = undefined;
   }, 0);
 };
+
+const responseStatus = ref<IResponseStatus | null>(null);
+const handleResponseStatus = (status: IResponseStatus) => (responseStatus.value = status);
 </script>
 
 <template>
   <v-container class="layout-view-container bg-background">
+    <v-row>
+      <v-col cols="12">
+        <alert-response-status :status="responseStatus" :persist="false" />
+      </v-col>
+    </v-row>
     <v-row>
       <v-col>
         <v-container
@@ -60,7 +73,7 @@ const handleTable = (newValue: ILevel): void => {
                 >
                   <v-tab v-for="tab in tabs" :key="tab.id" :value="tab.id" class="rounded">
                     <v-icon size="28">{{ tab.icon }}</v-icon>
-                    {{ smallScreen ? "" : $t(`tools.matrix.tabs.${tab.name}`) }}
+                    {{ smallScreen ? "" : $t(`tools.matrix.tabs.${tab.name}.name`) }}
                   </v-tab>
                 </v-tabs>
               </v-card>
@@ -79,6 +92,8 @@ const handleTable = (newValue: ILevel): void => {
                   <department-table
                     @table="handleTable"
                     :chips="chips"
+                    :tab="currentTabName"
+                    @responseStatus="handleResponseStatus"
                     class="bg-surface-2 pa-4 ma-1"
                   ></department-table>
                 </v-window-item>
@@ -92,6 +107,8 @@ const handleTable = (newValue: ILevel): void => {
                   <document-table
                     @table="handleTable"
                     :chips="chips"
+                    :tab="currentTabName"
+                    @responseStatus="handleResponseStatus"
                     class="bg-surface-2 pa-4 ma-1"
                   ></document-table>
                 </v-window-item>

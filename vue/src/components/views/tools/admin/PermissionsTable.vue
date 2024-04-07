@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 // import EditTable from "../../../../components/tools/EditTable.vue";
 import CrudTable from "../../../../components/tools/CrudTable.vue";
 import DialogInput from "../../../tools/DialogInput.vue";
@@ -7,15 +7,29 @@ import { UserPermissionManager } from "../../../../models/user/UserPermissionMan
 import { IUser } from "../../../../interfaces/user/IUser";
 import { IPermission } from "../../../../interfaces/user/IPermission";
 import { Permission } from "../../../../models/user/Permission";
+import { useI18n } from "vue-i18n";
+import { IResponseStatus } from "../../../../interfaces/common/IResponseStatus";
 
-const emit = defineEmits(["table"]);
+const emit = defineEmits(["table", "responseStatus"]);
+
+const props = defineProps<{
+  tab: string;
+}>();
+
+const { t } = useI18n();
+const tab = ref<string>(props.tab);
+watchEffect(() => (tab.value = props.tab));
+const tPath = `tools.admin.tabs.${tab.value}.table`;
 
 const headers: any = [
-  { title: "Username", align: "start", key: "username" },
-  { title: "Domain", key: "domain" },
-  { title: "Permission", key: "custom", sortable: false },
-  { title: "Actions", key: "actions", sortable: false },
+  { title: t(`${tPath}.header.username`), align: "start", key: "username" },
+  { title: t(`${tPath}.header.domain`), key: "domain" },
+  { title: t(`${tPath}.header.permission`), key: "custom", sortable: false },
+  { title: t(`${tPath}.header.actions`), key: "actions", sortable: false },
 ];
+
+const toolbarTitle = t(`${tPath}.toolbar`);
+const searchTitle = t(`${tPath}.search`);
 
 const reqData = ref<any>(null);
 
@@ -42,6 +56,8 @@ const permission = (item: any) => {
   if (p.write) return "Moderator";
   else return "User";
 };
+
+const handleResponseStatus = (status: IResponseStatus) => emit("responseStatus", status);
 </script>
 
 <template>
@@ -49,13 +65,15 @@ const permission = (item: any) => {
     :headers="headers"
     :sortBy="[{ key: 'username', order: 'asc' }]"
     :searchBy="['username', 'domain']"
-    toolbarTitle="Permissions"
+    :toolbarTitle="toolbarTitle"
+    :searchTitle="searchTitle"
     :manager="manager"
     @save-data="handleSaveData"
     :req-data="reqData"
     :tableEdit="true"
     :tableDialogComponent="DialogInput"
     :tableDialogComponentProps="{ label: 'Permission', items: ['User', 'Moderator', 'Admin'] }"
+    @responseStatus="handleResponseStatus"
   >
     <template v-slot:table-key-slot="{ item }">
       <span class="text-body-2">{{ permission(item) }}</span>

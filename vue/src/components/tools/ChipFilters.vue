@@ -7,6 +7,7 @@ import { ILevel } from "../../interfaces/document/ILevel";
 import { DepartmentsManager } from "../../models/document/DepartmentsManager";
 import { CategoriesManager } from "../../models/document/CategoriesManager";
 import { SubcategoriesManager } from "../../models/document/SubcategoriesManager";
+import { useI18n } from "vue-i18n";
 
 const emit = defineEmits(["chips"]);
 
@@ -33,10 +34,12 @@ const subcategories = ref<Array<IChip> | null>(null);
   }
 })();
 
+const { t } = useI18n();
+
 const chipGroups = computed(() => [
   {
     id: 0,
-    subtitle: "Department",
+    subtitle: t("tools.chips.departments"),
     chipsIf: departments.value,
     chips: departments.value,
     get chipsModel() {
@@ -51,7 +54,7 @@ const chipGroups = computed(() => [
   },
   {
     id: 1,
-    subtitle: "Program",
+    subtitle: t("tools.chips.programs"),
     chipsIf: chips.value.departmentName,
     chips: categories.value,
     get chipsModel() {
@@ -65,7 +68,7 @@ const chipGroups = computed(() => [
   },
   {
     id: 2,
-    subtitle: "Workstation",
+    subtitle: t("tools.chips.workstations"),
     chipsIf: chips.value.categoryName,
     chips: subcategories.value,
     get chipsModel() {

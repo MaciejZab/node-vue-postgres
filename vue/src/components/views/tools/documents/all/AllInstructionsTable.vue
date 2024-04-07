@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, watchEffect } from "vue";
 // import { ResponseStatus } from "../../../../models/common/ResponseStatus";
 import { IChips } from "../../../../../interfaces/document/IChips";
 import { InstructionManager } from "../../../../../models/document/InstructionManager";
 import { IDocumentEntity } from "../../../../../interfaces/document/IDocumentEntity";
 import CrudTable from "../../../../tools/CrudTable.vue";
+import { useI18n } from "vue-i18n";
 
 const emit = defineEmits(["table"]);
 
 const props = defineProps<{
   chips: IChips;
+  tab: string;
 }>();
 
 const manager = new InstructionManager();
@@ -77,12 +79,21 @@ watch(
 
 // const responseStatus = ref<ResponseStatus | null>(null);
 
+const { t } = useI18n();
+const tab = ref<string>(props.tab);
+watchEffect(() => (tab.value = props.tab));
+const tPath = `tools.documents.tabs.${tab.value}.table`;
+
 const headers: any = [
-  { title: "Name", align: "start", key: "name" },
-  { title: "Description", key: "description" },
-  { title: "View Document", key: "custom", sortable: false, filterable: false },
+  { title: t(`${tPath}.header.name`), align: "start", key: "name" },
+  { title: t(`${tPath}.header.description`), key: "description" },
+  { title: t(`${tPath}.header.view_document`), key: "custom", sortable: false, filterable: false },
   // { title: "Favorite", key: "custom2", sortable: false, filterable: false },
 ];
+
+const toolbarTitle = t(`${tPath}.toolbar`);
+const searchTitle = t(`${tPath}.search`);
+const selectLanguage = t(`${tPath}.select_lang`);
 
 const navigateToRoute = (file: Array<string>) => {
   const url = `/tool/documents/${file.at(0)}/${file.at(1)}/${file.at(2)}`;
@@ -100,7 +111,8 @@ const addToFavorites = (item: any) => {
     :headers="headers"
     :sortBy="[{ key: 'name', order: 'asc' }]"
     :searchBy="['name', 'description']"
-    toolbarTitle="Instructions"
+    :toolbarTitle="toolbarTitle"
+    :searchTitle="searchTitle"
     :manager="manager"
     :chips="props.chips"
   >
@@ -111,7 +123,7 @@ const addToFavorites = (item: any) => {
         item-value="value"
         density="compact"
         variant="underlined"
-        label="Select language"
+        :label="selectLanguage"
         color="primary"
         hide-details
         class="my-5"

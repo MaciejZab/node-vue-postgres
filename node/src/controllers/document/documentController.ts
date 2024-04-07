@@ -219,7 +219,7 @@ const removeDocument = async (req: Request, res: Response) => {
 
 const getDocuments = async (req: Request, res: Response) => {
   try {
-    const { type } = req.params;
+    const { type, reduce } = req.params;
 
     let docOptions: IDocOptions = {
       relations: ["languages"],
@@ -231,13 +231,26 @@ const getDocuments = async (req: Request, res: Response) => {
       };
     }
 
-    const docs = await dataSource.getRepository(Document).find(docOptions);
+    let docs: Array<Document> = await dataSource.getRepository(Document).find(docOptions);
 
     if (!docs) {
       return res.status(404).json({
         message: "Documents not found",
         statusMessage: HttpResponseMessage.GET_ERROR,
       });
+    }
+
+    if (reduce === "true") {
+      docs = docs.reduce((result, currentDoc) => {
+        const existingHighestRevision = result.find((doc) => doc.name === currentDoc.name);
+
+        if (!existingHighestRevision || currentDoc.revision > existingHighestRevision.revision) {
+          // Replace existing document or add a new one
+          result = [...result.filter((doc) => doc.name !== currentDoc.name), currentDoc];
+        }
+
+        return result;
+      }, []);
     }
 
     // Add languages array to each document record
@@ -264,7 +277,7 @@ const getDocuments = async (req: Request, res: Response) => {
 
 const getDocumentsByDep = async (req: Request, res: Response) => {
   try {
-    const { departmentName, type } = req.params;
+    const { departmentName, type, reduce } = req.params;
 
     const depOptions = {
       where: {
@@ -302,7 +315,20 @@ const getDocumentsByDep = async (req: Request, res: Response) => {
       };
     }
 
-    const docs = await dataSource.getRepository(Document).find(docOptions);
+    let docs = await dataSource.getRepository(Document).find(docOptions);
+
+    if (reduce === "true") {
+      docs = docs.reduce((result, currentDoc) => {
+        const existingHighestRevision = result.find((doc) => doc.name === currentDoc.name);
+
+        if (!existingHighestRevision || currentDoc.revision > existingHighestRevision.revision) {
+          // Replace existing document or add a new one
+          result = [...result.filter((doc) => doc.name !== currentDoc.name), currentDoc];
+        }
+
+        return result;
+      }, []);
+    }
 
     if (!docs) {
       return res.status(404).json({
@@ -334,7 +360,7 @@ const getDocumentsByDep = async (req: Request, res: Response) => {
 
 const getDocumentsByDepCat = async (req: Request, res: Response) => {
   try {
-    const { departmentName, categoryName, type } = req.params;
+    const { departmentName, categoryName, type, reduce } = req.params;
 
     const depOptions = {
       where: {
@@ -389,7 +415,20 @@ const getDocumentsByDepCat = async (req: Request, res: Response) => {
       };
     }
 
-    const docs = await dataSource.getRepository(Document).find(docOptions);
+    let docs = await dataSource.getRepository(Document).find(docOptions);
+
+    if (reduce === "true") {
+      docs = docs.reduce((result, currentDoc) => {
+        const existingHighestRevision = result.find((doc) => doc.name === currentDoc.name);
+
+        if (!existingHighestRevision || currentDoc.revision > existingHighestRevision.revision) {
+          // Replace existing document or add a new one
+          result = [...result.filter((doc) => doc.name !== currentDoc.name), currentDoc];
+        }
+
+        return result;
+      }, []);
+    }
 
     if (!docs) {
       return res.status(404).json({
@@ -421,7 +460,7 @@ const getDocumentsByDepCat = async (req: Request, res: Response) => {
 
 const getDocumentsByDepCatSub = async (req: Request, res: Response) => {
   try {
-    const { departmentName, categoryName, subcategoryName, type } = req.params;
+    const { departmentName, categoryName, subcategoryName, type, reduce } = req.params;
     const depOptions = {
       where: {
         name: departmentName,
@@ -479,7 +518,20 @@ const getDocumentsByDepCatSub = async (req: Request, res: Response) => {
       };
     }
 
-    const docs = await dataSource.getRepository(Document).find(docOptions);
+    let docs = await dataSource.getRepository(Document).find(docOptions);
+
+    if (reduce === "true") {
+      docs = docs.reduce((result, currentDoc) => {
+        const existingHighestRevision = result.find((doc) => doc.name === currentDoc.name);
+
+        if (!existingHighestRevision || currentDoc.revision > existingHighestRevision.revision) {
+          // Replace existing document or add a new one
+          result = [...result.filter((doc) => doc.name !== currentDoc.name), currentDoc];
+        }
+
+        return result;
+      }, []);
+    }
 
     if (!docs) {
       return res.status(404).json({
@@ -509,7 +561,6 @@ const getDocumentsByDepCatSub = async (req: Request, res: Response) => {
   }
 };
 
-// export { addDocument, editDocument, removeDocument };
 export {
   addDocument,
   editDocument,

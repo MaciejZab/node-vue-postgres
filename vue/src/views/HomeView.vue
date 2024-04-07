@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import weather from "../components/common/weather.vue";
+// import weather from "../components/common/weather.vue";
 import { useI18n } from "vue-i18n";
 // import frequentlyUsed from "../components/views/home/frequentlyUsed.vue";
 import { nodeConfig } from "../config/env";
@@ -99,7 +99,7 @@ const exploreBtn = computed(() => t("common.default_layout.pages.home.card.explo
         </v-infinite-scroll>
       </v-col>
       <v-col v-if="!smallScreen" cols="4">
-        <weather></weather>
+        <!-- <weather></weather> -->
       </v-col>
     </v-row>
   </v-container>

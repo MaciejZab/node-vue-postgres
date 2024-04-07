@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import ChipFilters from "../../components/tools/ChipFilters.vue";
 import AllInstructionsTable from "../../components/views/tools/documents/all/AllInstructionsTable.vue";
 import AllVisualsTable from "../../components/views/tools/documents/all/AllVisualsTable.vue";
@@ -41,6 +41,9 @@ const tabs = [
 ];
 
 const currentTab = ref<number>(3);
+const currentTabName = computed<string>(() => {
+  return tabs.find((tab) => tab.id === currentTab.value)?.name || "";
+});
 
 const chips = ref<IChips>(new Chips());
 const table = ref<ILevel | undefined>(undefined);
@@ -76,7 +79,7 @@ const handleTable = (newValue: ILevel): void => {
                 >
                   <v-tab v-for="tab in tabs" :key="tab.id" :value="tab.id" class="rounded">
                     <v-icon size="28">{{ tab.icon }}</v-icon>
-                    {{ smallScreen ? "" : $t(`tools.documents.tabs.${tab.name}`) }}
+                    {{ smallScreen ? "" : $t(`tools.documents.tabs.${tab.name}.name`) }}
                   </v-tab>
                 </v-tabs>
               </v-card>
@@ -119,6 +122,7 @@ const handleTable = (newValue: ILevel): void => {
                   <all-instructions-table
                     @table="handleTable"
                     :chips="chips"
+                    :tab="currentTabName"
                     class="bg-surface-2 pa-4 ma-1"
                   ></all-instructions-table>
                 </v-window-item>
@@ -132,6 +136,7 @@ const handleTable = (newValue: ILevel): void => {
                   <all-visuals-table
                     @table="handleTable"
                     :chips="chips"
+                    :tab="currentTabName"
                     class="bg-surface-2 pa-4 ma-1"
                   ></all-visuals-table>
                 </v-window-item>

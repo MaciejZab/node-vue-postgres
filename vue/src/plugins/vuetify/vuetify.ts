@@ -81,7 +81,7 @@ const dark: ThemeDefinition = {
     // "on-surface-2": "#ffffff",
     // "surface-3": "#2c4052",
     // "on-surface-3": "#ffffff",
-    background: "#000000", // Black background
+    background: "#111111", // Black background
 
     "on-background": "#ffffff", // White text for contrast with black bg
 

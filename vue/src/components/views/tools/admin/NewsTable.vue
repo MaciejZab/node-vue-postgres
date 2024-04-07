@@ -1,14 +1,30 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 import CrudTable from "../../../../components/tools/CrudTable.vue";
 import { NewsManager } from "../../../../models/editor/NewsManager";
 import NewsStepper from "./NewsStepper.vue";
+import { useI18n } from "vue-i18n";
+import { IResponseStatus } from "../../../../interfaces/common/IResponseStatus";
+
+const emit = defineEmits(["responseStatus"]);
+
+const props = defineProps<{
+  tab: string;
+}>();
+
+const { t } = useI18n();
+const tab = ref<string>(props.tab);
+watchEffect(() => (tab.value = props.tab));
+const tPath = `tools.admin.tabs.${tab.value}.table`;
 
 const headers: any = [
-  { title: "Title", align: "start", key: "title" },
-  { title: "Subtitle", key: "subtitle" },
-  { title: "Actions", key: "actions", sortable: false },
+  { title: t(`${tPath}.header.title`), align: "start", key: "title" },
+  { title: t(`${tPath}.header.subtitle`), key: "subtitle" },
+  { title: t(`${tPath}.header.actions`), key: "actions", sortable: false },
 ];
+
+const toolbarTitle = t(`${tPath}.toolbar`);
+const searchTitle = t(`${tPath}.search`);
 
 const reqData = ref<any>(null);
 
@@ -32,6 +48,8 @@ const handleSaveData = (data: any) => {
 };
 
 const manager = new NewsManager();
+
+const handleResponseStatus = (status: IResponseStatus) => emit("responseStatus", status);
 </script>
 
 <template>
@@ -39,7 +57,8 @@ const manager = new NewsManager();
     :headers="headers"
     :sortBy="[{ key: 'title', order: 'asc' }]"
     :searchBy="['title', 'subtitle']"
-    toolbarTitle="News"
+    :toolbarTitle="toolbarTitle"
+    :searchTitle="searchTitle"
     :manager="manager"
     @save-data="handleSaveData"
     :reqData="reqData"
@@ -48,6 +67,7 @@ const manager = new NewsManager();
     :tableEdit="true"
     :tableDialogComponent="NewsStepper"
     :tableDialogComponentProps="{}"
+    @responseStatus="handleResponseStatus"
   >
   </crud-table>
 </template>

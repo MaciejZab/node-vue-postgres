@@ -4,25 +4,45 @@ import { Endpoints } from "../../config/Endpoints";
 import { NewsEntity } from "./NewsEntity";
 import { INewsEntity } from "../../interfaces/editor/INewsEntity";
 import { usePermissionStore } from "../../stores/permissionStore";
+import { IResponseStatus } from "../../interfaces/common/IResponseStatus";
+import { ResponseStatus } from "../common/ResponseStatus";
 
 class NewsManager {
   constructor() {}
 
   public new = () => new NewsEntity();
 
-  public post = async (formData: FormData): Promise<Array<INewsEntity>> => {
+  public post = async (
+    formData: FormData,
+    status: boolean = false
+  ): Promise<Array<INewsEntity> | IResponseStatus> => {
     const response = await axios.post(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.News}`,
       formData
     );
+    if (status) {
+      return new ResponseStatus({
+        code: response.status,
+        message: response.data.statusMessage,
+      });
+    }
     return response.data.added;
   };
 
-  public put = async (formData: FormData): Promise<Array<INewsEntity>> => {
+  public put = async (
+    formData: FormData,
+    status: boolean = false
+  ): Promise<Array<INewsEntity> | IResponseStatus> => {
     const response = await axios.put(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.News}`,
       formData
     );
+    if (status) {
+      return new ResponseStatus({
+        code: response.status,
+        message: response.data.statusMessage,
+      });
+    }
     return response.data.edited;
   };
 
@@ -42,10 +62,19 @@ class NewsManager {
     return response.data.news;
   };
 
-  public delete = async (id: number): Promise<Array<INewsEntity>> => {
+  public delete = async (
+    id: number,
+    status: boolean = false
+  ): Promise<Array<INewsEntity> | IResponseStatus> => {
     const response = await axios.delete(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.News}/${id}`
     );
+    if (status) {
+      return new ResponseStatus({
+        code: response.status,
+        message: response.data.statusMessage,
+      });
+    }
     return response.data.deleted;
   };
 }

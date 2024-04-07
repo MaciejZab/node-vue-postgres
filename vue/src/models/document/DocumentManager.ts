@@ -3,17 +3,28 @@ import { nodeConfig } from "../../config/env";
 import { Endpoints } from "../../config/Endpoints";
 import { IDocumentEntity } from "../../interfaces/document/IDocumentEntity";
 import { DocumentEntity } from "./DocumentEntity";
+import { IResponseStatus } from "../../interfaces/common/IResponseStatus";
+import { ResponseStatus } from "../common/ResponseStatus";
 
 class DocumentManager {
   constructor() {}
 
   public new = () => new DocumentEntity();
 
-  public post = async (formData: FormData): Promise<Array<IDocumentEntity>> => {
+  public post = async (
+    formData: FormData,
+    status: boolean = false
+  ): Promise<Array<IDocumentEntity> | IResponseStatus> => {
     const response = await axios.post(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.Document}`,
       formData
     );
+    if (status) {
+      return new ResponseStatus({
+        code: response.status,
+        message: response.data.statusMessage,
+      });
+    }
     return response.data.added;
   };
 
@@ -23,16 +34,16 @@ class DocumentManager {
     if (reqData.categoryName) lvl = 2;
     if (reqData.subcategoryName) lvl = 3;
 
-    let params: string = "/all";
+    let params: string = "/all/false";
     switch (lvl) {
       case 1:
-        params = `/${reqData.departmentName}/all`;
+        params = `/${reqData.departmentName}/all/false`;
         break;
       case 2:
-        params = `/${reqData.departmentName}/${reqData.categoryName}/all`;
+        params = `/${reqData.departmentName}/${reqData.categoryName}/all/false`;
         break;
       case 3:
-        params = `/${reqData.departmentName}/${reqData.categoryName}/${reqData.subcategoryName}/all`;
+        params = `/${reqData.departmentName}/${reqData.categoryName}/${reqData.subcategoryName}/all/false`;
         break;
 
       default:
@@ -45,18 +56,36 @@ class DocumentManager {
     return response.data.documents;
   };
 
-  public put = async (formData: FormData): Promise<Array<IDocumentEntity>> => {
+  public put = async (
+    formData: FormData,
+    status: boolean = false
+  ): Promise<Array<IDocumentEntity> | IResponseStatus> => {
     const response = await axios.put(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.Document}`,
       formData
     );
+    if (status) {
+      return new ResponseStatus({
+        code: response.status,
+        message: response.data.statusMessage,
+      });
+    }
     return response.data.edited;
   };
 
-  public delete = async (id: number): Promise<Array<IDocumentEntity>> => {
+  public delete = async (
+    id: number,
+    status: boolean = false
+  ): Promise<Array<IDocumentEntity> | IResponseStatus> => {
     const response = await axios.delete(
       `${nodeConfig.origin}:${nodeConfig.port}${Endpoints.Document}/${id}`
     );
+    if (status) {
+      return new ResponseStatus({
+        code: response.status,
+        message: response.data.statusMessage,
+      });
+    }
     return response.data.deleted;
   };
 }
